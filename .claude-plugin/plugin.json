@@ -1,0 +1,8 @@
+{
+  "name": "agkan-skills",
+  "version": "0.1.0",
+  "description": "agkan タスク管理ワークフロースキル集",
+  "skills": [
+    "./skills/"
+  ]
+}
