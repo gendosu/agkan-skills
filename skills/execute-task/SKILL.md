@@ -42,6 +42,12 @@ bug > security > improvement > test > performance > refactor > docs
 **子タスクがある場合・ブロッカータスクがある場合**
 対象の子タスク・ブロッカータスクを優先して選ぶ（重要度・タグの基準は同じ）
 
+### 1. タスクをin_progressに更新
+
+```bash
+agkan task update <id> status in_progress
+```
+
 ### 4. 実装・PR作成・完了
 
 **Task ツール（general-purpose サブエージェント）** を使って実装する。
