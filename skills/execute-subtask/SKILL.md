@@ -16,12 +16,6 @@ metadata:
 
 ## ワークフロー
 
-### 1. タスクをin_progressに更新
-
-```bash
-agkan task update <id> status in_progress
-```
-
 ### 2. ブランチ作成
 
 ```bash
