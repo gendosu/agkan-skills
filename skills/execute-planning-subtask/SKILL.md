@@ -8,85 +8,85 @@ user-invokable: false
 
 ## Overview
 
-agkanの単一Backlogタスクを精査し、分解・Ready移動・先送りの判断を行うサブワークフロー。
+A sub-workflow that reviews a single Backlog task in agkan, makes decisions on decomposition, Ready status movement, and deferral.
 
 ---
 
-## ワークフロー
+## Workflow
 
-### 1. 内容の確認・補足・タスクリスト化
+### 1. Content Review, Supplementation, and Task List Creation
 
-- タスク内容が不明確な場合、コードを確認して詳細を調査する
-- 調査した内容はタスクの説明に追記する:
-
-```bash
-agkan task update <id> body "<追記内容>"
-```
-
-- タスクに複数の作業が含まれている場合、内容を整理してタスクリスト形式で説明に追記する:
-
-タスクリスト化する際に、調査をする場合はExploreスキルを使用してコードを確認し、タスク内容を理解した上で、Planモードでタスクリストを作成することが望ましい。
-
-```- タスク内容の要約
-- [ ] 作業1
-- [ ] 作業2
-- [ ] 作業3
-```
-
-### 2. タスク分解の判断
-
-**分解の粒度基準: 1タスク = 1PR = 1機能（改修）**
-
-- 1つのPRをマージしたとき、その機能・改修が完結する粒度にする
-- PRをマージしても半完成の状態になるような分割はしない
-- 複数の独立した機能・改修が1タスクに混在している場合のみ分割する
-
-タスクが上記基準を超えるスコープを含む場合、サブタスクに分割する:
+- If task content is unclear, investigate and confirm details by examining the code
+- Append the investigated content to the task description:
 
 ```bash
-# 分割後のタスクを新規作成
-agkan task add "<サブタスク名>" "<詳細>"
+agkan task update <id> body "<additional content>"
+```
 
-# 元タスクを分割済みとしてクローズ（または更新）
+- If the task contains multiple pieces of work, organize the content and append it to the description in task list format:
+
+When creating a task list, it is advisable to use the Explore skill to examine the code, understand the task content, and then use Plan mode to create the task list if investigation is needed.
+
+```- Task content summary
+- [ ] Work item 1
+- [ ] Work item 2
+- [ ] Work item 3
+```
+
+### 2. Task Decomposition Decision
+
+**Decomposition Granularity Standard: 1 Task = 1 PR = 1 Feature (Modification)**
+
+- Decompose so that when a PR is merged, that feature or modification is complete
+- Do not divide tasks such that a PR merge results in an incomplete state
+- Only split when multiple independent features or modifications are mixed in a single task
+
+If a task contains scope exceeding the above standard, split it into sub-tasks:
+
+```bash
+# Create new tasks after splitting
+agkan task add "<sub-task name>" "<details>"
+
+# Close the original task as split (or update it)
 agkan task update <id> status closed
 ```
 
-### 3. Ready移動の判断
+### 3. Ready Status Movement Decision
 
-以下を**すべて満たす**場合、Readyに移動する:
+Move to Ready if **all** of the following conditions are met:
 
-- ブロッカーがない（依存タスクが完了済み）
-- 1つのPRとして実装可能なスコープ
-- 実装方針が明確
+- No blockers (dependent tasks are completed)
+- Scope that can be implemented as a single PR
+- Implementation approach is clear
 
 ```bash
 agkan task update <id> status ready
 ```
 
-### 4. 先送りの判断
+### 4. Deferral Decision
 
-「いつかやるが今ではない」タスクには `いつかやる` タグを付け、Backlogのままにする:
+For tasks that are "something to do later but not now," attach the `will-do-later` tag and keep it in Backlog:
 
 ```bash
-# タグが存在しない場合は先に作成
-agkan tag add "いつかやる"
-# タスクにタグを付与
+# Create the tag if it does not exist
+agkan tag add "will-do-later"
+# Attach the tag to the task
 agkan tag attach <task-id> <tag-id>
 ```
 
-先送り基準:
-- 現在の優先事項に対して影響が小さい
-- 依存する別タスクが完了していない
-- リソースや情報が不足している
+Deferral criteria:
+- Low impact on current priorities
+- Dependent tasks are not yet completed
+- Resources or information are insufficient
 
 ---
 
-## タグ優先度
+## Tag Priority
 
-タスクにタグを付ける際は以下の優先順位を基準にする:
+When attaching tags to tasks, use the following priority order:
 
-| 優先度 | タグ名 |
-|--------|-------------|
+| Priority | Tag Name |
+|----------|-------------|
 | 1 | bug |
 | 2 | security |
 | 3 | improvement |
@@ -95,19 +95,19 @@ agkan tag attach <task-id> <tag-id>
 | 6 | refactor |
 | 7 | docs |
 
-タグ付与コマンド:
+Tag attachment command:
 
 ```bash
-# タグが存在しない場合は先に作成
+# Create the tag if it does not exist
 agkan tag add "<tag>"
-# タスクにタグを付与
+# Attach the tag to the task
 agkan tag attach <task-id> <tag-id>
 ```
 
 ---
 
-## 注意事項
+## Notes
 
-- タスク分解時は元タスクの内容を引き継ぐ
-- Readyに移動するのは「今すぐ着手できる」ものだけ
-- このスキルはタスク選択後に使用する（タスク選択は `execute-planning` スキルで行う）
+- When decomposing tasks, inherit the content of the original task
+- Move to Ready only for tasks that can be "started immediately"
+- This skill is used after task selection (task selection is done by the `execute-planning` skill)
