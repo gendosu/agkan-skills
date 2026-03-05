@@ -7,69 +7,69 @@ description: Use when checking review tasks against GitHub PR status to automati
 
 ## Overview
 
-agkanのReviewステータスのタスクを取得し、GitHub PRのマージ・クローズ状態を確認してステータスを自動更新するワークフロー。
+Workflow to retrieve tasks with Review status in agkan, check the merge/close status of GitHub PRs, and automatically update their status.
 
 ---
 
-## ワークフロー
+## Workflow
 
-### 1. Reviewタスクを取得
+### 1. Retrieve Review tasks
 
 ```bash
 agkan task list --status review --json
 ```
 
-### 2. 各タスクのPR URLを確認
+### 2. Confirm PR URL for each task
 
-タスクの本文（body）から `PR: <URL>` 形式でPR URLを抽出する。
+Extract the PR URL from the task body in the format `PR: <URL>`.
 
-URLが見つからない場合はスキップし、手動確認が必要な旨を出力する。
+If no URL is found, skip the task and output a message indicating manual verification is needed.
 
-### 3. PR状態をGitHubで確認
+### 3. Check PR status on GitHub
 
 ```bash
 gh pr view <PR URL> --json state,mergedAt
 ```
 
-| フィールド | 意味 |
+| Field | Meaning |
 |-----------|------|
 | `state` | `OPEN` / `CLOSED` / `MERGED` |
-| `mergedAt` | マージ日時（nullの場合はマージなし） |
+| `mergedAt` | Merge date/time (null if not merged) |
 
-### 4. ステータスに応じて移動
+### 4. Move status based on PR status
 
-| PR状態 | agkanステータス | コマンド |
+| PR State | agkan Status | Command |
 |--------|----------------|---------|
 | `MERGED` | `done` | `agkan task update <id> status done` |
-| `CLOSED`（mergedAt が null） | `closed` | `agkan task update <id> status closed` |
-| `OPEN` | 変更なし | スキップ（まだレビュー中） |
+| `CLOSED` (mergedAt is null) | `closed` | `agkan task update <id> status closed` |
+| `OPEN` | No change | Skip (still under review) |
 
 ---
 
-## 判断フロー
+## Decision Flow
 
 ```
-Reviewタスクを全件取得
+Retrieve all Review tasks
     ↓
-各タスクに対して繰り返す
+Repeat for each task
     ↓
-本文に "PR: <URL>" がある？
-   No  → スキップ（手動確認を促すメッセージを出力）
-   Yes → PR状態を確認
+Does the body contain "PR: <URL>"?
+   No  → Skip (output message prompting manual verification)
+   Yes → Check PR status
     ↓
-PR state は？
-   MERGED  → doneへ移動
-   CLOSED  → closedへ移動
-   OPEN    → スキップ（レビュー待ち）
+What is the PR state?
+   MERGED  → Move to done
+   CLOSED  → Move to closed
+   OPEN    → Skip (waiting for review)
     ↓
-次のタスクへ（全件終了まで繰り返す）
+Move to next task (repeat until all tasks are processed)
 ```
 
 ---
 
-## 注意事項
+## Notes
 
-- PR URLはタスク本文中の `PR: <URL>` 形式を想定する
-- PR URLが見つからない場合は手動確認を促す（タスクはスキップ）
-- `done` は正常完了、`closed` は中断・取り下げを意味する
-- `gh` コマンドが使えない環境では動作しない
+- PR URL is expected in the format `PR: <URL>` within the task body
+- If PR URL is not found, prompt for manual verification (skip task)
+- `done` means successful completion, `closed` means suspended or withdrawn
+- The `gh` command is required and will not work in environments where it is unavailable
