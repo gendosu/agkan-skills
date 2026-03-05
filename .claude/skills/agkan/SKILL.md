@@ -63,14 +63,14 @@ agkan task block list <id>
 
 ```bash
 # Tag management
-agkan task tag add "frontend"
-agkan task tag list
-agkan task tag delete <tag-id>
+agkan tag add "frontend"
+agkan tag list
+agkan tag delete <tag-id>
 
 # Tag tasks
-agkan task tag attach <task-id> <tag-id>
-agkan task tag detach <task-id> <tag-id>
-agkan task tag show <task-id>
+agkan tag attach <task-id> <tag-id>
+agkan tag detach <task-id> <tag-id>
+agkan tag show <task-id>
 ```
 
 ### Metadata Operations
@@ -114,7 +114,7 @@ Use the `--json` flag when machine processing is needed:
 agkan task list --json
 agkan task get 1 --json
 agkan task count --json
-agkan task tag list --json
+agkan tag list --json
 
 # Combine with jq
 agkan task list --status ready --json | jq '.tasks[].id'
@@ -242,7 +242,7 @@ agkan task list --status ready --json | jq '.tasks[].id'
 }
 ```
 
-#### `agkan task tag list --json`
+#### `agkan tag list --json`
 
 ```json
 {
@@ -261,6 +261,31 @@ agkan task list --status ready --json | jq '.tasks[].id'
 ---
 
 ## Typical Workflows
+
+### Icebox Review (execute-icebox)
+
+Icebox holds ideas and candidates that are not yet ready for planning. Review them periodically to decide whether to promote or close each one.
+
+```bash
+# Review icebox tasks
+agkan task list --status icebox
+
+# Promote to backlog when requirements become clear
+agkan task update <id> status backlog
+
+# Close if no longer needed
+agkan task update <id> status closed
+```
+
+**Icebox → Backlog conditions:**
+- Requirements or background are now clear enough to plan
+- External blockers have been resolved
+- Circumstances have changed and the task is now relevant
+
+**Icebox → Closed conditions:**
+- The need no longer exists
+- A duplicate already exists in a later stage
+- Superseded by another approach
 
 ### Receiving Tasks as an Agent
 

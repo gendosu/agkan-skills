@@ -2,6 +2,11 @@
 
 agkanにタスクを登録する。status: backlogで入る。
 
+## execute-icebox
+
+iceboxのタスクを一件ずつ精査し、backlogに昇格させるかcloseするかを判断する。
+要件が明確になったものはbacklogへ、不要になったものはclosedにする。
+
 ## execute-planning
 
 backlogのタスクを一件ずつ精査し、実行できるタスクリスト形式に書き換える。

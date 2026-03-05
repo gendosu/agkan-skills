@@ -61,7 +61,7 @@ Sub-agent reviews and makes decision
   - Content unclear? → Research code → Add to task
   - Can be decomposed? → Split into subtasks → Close original task
   - Ready to implement now? → Move to Ready
-  - Otherwise → Add "someday" tag and keep in Backlog
+  - Otherwise → Add "will-do-later" tag and keep in Backlog
     ↓
 Move to next task (repeat until all are done)
 ```
@@ -86,6 +86,7 @@ When tagging tasks, use the following priority order:
 
 ## Important Notes
 
-- Tasks with the "someday" tag should be reconsidered after all Ready tasks are completed
+- Tasks with the "will-do-later" tag should be reconsidered after all Ready tasks are completed
 - When decomposing tasks, inherit the content from the original task
 - Only move to Ready tasks that are "ready to start immediately"
+- Icebox tasks are **not** handled by this skill — use `execute-icebox` to review and promote icebox tasks to backlog first

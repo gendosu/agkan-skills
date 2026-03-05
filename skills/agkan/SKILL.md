@@ -262,6 +262,31 @@ agkan task list --status ready --json | jq '.tasks[].id'
 
 ## Typical Workflows
 
+### Icebox Review (execute-icebox)
+
+Icebox holds ideas and candidates that are not yet ready for planning. Review them periodically to decide whether to promote or close each one.
+
+```bash
+# Review icebox tasks
+agkan task list --status icebox
+
+# Promote to backlog when requirements become clear
+agkan task update <id> status backlog
+
+# Close if no longer needed
+agkan task update <id> status closed
+```
+
+**Icebox → Backlog conditions:**
+- Requirements or background are now clear enough to plan
+- External blockers have been resolved
+- Circumstances have changed and the task is now relevant
+
+**Icebox → Closed conditions:**
+- The need no longer exists
+- A duplicate already exists in a later stage
+- Superseded by another approach
+
 ### Receiving Tasks as an Agent
 
 ```bash
