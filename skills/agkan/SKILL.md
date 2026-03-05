@@ -63,14 +63,14 @@ agkan task block list <id>
 
 ```bash
 # Tag management
-agkan task tag add "frontend"
-agkan task tag list
-agkan task tag delete <tag-id>
+agkan tag add "frontend"
+agkan tag list
+agkan tag delete <tag-id-or-name>
 
 # Tag tasks
-agkan task tag attach <task-id> <tag-id>
-agkan task tag detach <task-id> <tag-id>
-agkan task tag show <task-id>
+agkan tag attach <task-id> <tag-id-or-name>
+agkan tag detach <task-id> <tag-id-or-name>
+agkan tag show <task-id>
 ```
 
 ### Metadata Operations
@@ -114,7 +114,7 @@ Use the `--json` flag when machine processing is needed:
 agkan task list --json
 agkan task get 1 --json
 agkan task count --json
-agkan task tag list --json
+agkan tag list --json
 
 # Combine with jq
 agkan task list --status ready --json | jq '.tasks[].id'
@@ -242,7 +242,7 @@ agkan task list --status ready --json | jq '.tasks[].id'
 }
 ```
 
-#### `agkan task tag list --json`
+#### `agkan tag list --json`
 
 ```json
 {
