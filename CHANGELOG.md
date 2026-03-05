@@ -5,6 +5,13 @@ All notable changes to the agkan-skills plugin will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-03-05
+
+### Fixed
+
+- **agkan**: Corrected tag management commands from `agkan task tag *` to `agkan tag *`
+  - `agkan task tag add/list/delete/attach/detach/show` → `agkan tag add/list/delete/attach/detach/show`
+
 ## [0.1.0] - 2026-02-19
 
 ### Added
