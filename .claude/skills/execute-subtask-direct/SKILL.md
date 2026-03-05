@@ -8,28 +8,28 @@ user-invokable: false
 
 ## Overview
 
-選択済みタスクを、ブランチ・PR作成なしに直接実装して完了させるワークフロー。
+A workflow to directly implement a selected task without creating a branch or PR and mark it as complete.
 
 ---
 
-## ワークフロー
+## Workflow
 
-### 1. 実装
+### 1. Implementation
 
-タスクの内容に従って実装を行う。
+Implement according to the task requirements.
 
-実装時に/key-guidelinesを参照し、コード品質を保つこと。
+Refer to /key-guidelines during implementation to maintain code quality.
 
-### 2. コミット
+### 2. Commit
 
-変更をコミットする。
+Commit the changes.
 
 ```bash
 git add <files>
 git commit -m "<commit message>"
 ```
 
-### 3. タスクをdoneに更新
+### 3. Update task to done
 
 ```bash
 agkan task update <id> status done
@@ -37,9 +37,9 @@ agkan task update <id> status done
 
 ---
 
-## 注意事項
+## Important Notes
 
-- ブランチを作成しない（カレントブランチに直接作業する）
-- PRを作成しない
-- 実装完了後に直接doneに更新する
-- このスキルはタスク選択後に使用する（タスク選択は `execute-task-direct` スキルで行う）
+- Do not create a branch (work directly on the current branch)
+- Do not create a PR
+- Update directly to done after implementation is complete
+- This skill is used after task selection (task selection is done with the `execute-task-direct` skill)
