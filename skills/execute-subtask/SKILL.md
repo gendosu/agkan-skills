@@ -16,7 +16,7 @@ Workflow to implement a selected task on a fork (worktree), create a PR, and com
 
 ## Workflow
 
-### 2. Create Branch
+### 1. Create Branch
 
 ```bash
 git checkout -b <branch-name>
@@ -24,31 +24,31 @@ git checkout -b <branch-name>
 
 Branch name is generated from task ID and title (example: `feat/42-add-login-page`).
 
-### 3. Write Branch Name to Task
+### 2. Write Branch Name to Task
 
 ```bash
 agkan task update <id> body "<existing body>\n\nBranch: <branch-name>"
 ```
 
-### 4. Implementation
+### 3. Implementation
 
 Implement according to the task content.
 
 Refer to /key-guidelines during implementation to maintain code quality.
 
-### 5. Create PR
+### 4. Create PR
 
 ```bash
 gh pr create --title "<title>" --body "<body>"
 ```
 
-### 6. Add PR Information to Task
+### 5. Add PR Information to Task
 
 ```bash
 agkan task update <id> body "<existing body>\n\nPR: <PR URL>"
 ```
 
-### 7. Update Task to Review
+### 6. Update Task to Review
 
 ```bash
 agkan task update <id> status review
