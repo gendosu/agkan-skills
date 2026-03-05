@@ -7,108 +7,108 @@ description: Use when managing tasks with the agkan CLI tool - creating, listing
 
 ## Overview
 
-`agkan` はSQLiteベースのCLIタスク管理ツール。AIエージェントとの協働に最適化されている。
+`agkan` is an SQLite-based CLI task management tool. It is optimized for collaboration with AI agents.
 
-**7つのステータス:** `icebox` → `backlog` → `ready` → `in_progress` → `review` → `done` → `closed`
+**7 Statuses:** `icebox` → `backlog` → `ready` → `in_progress` → `review` → `done` → `closed`
 
 ---
 
-## クイックリファレンス
+## Quick Reference
 
-### タスク操作
+### Task Operations
 
 ```bash
-# タスク作成
-agkan task add "タイトル" "本文"
-agkan task add "タイトル" --status ready --author "agent"
-agkan task add "サブタスク" --parent 1
-agkan task add "タイトル" --file ./spec.md  # ファイルから本文読み込み
+# Create task
+agkan task add "Title" "Body"
+agkan task add "Title" --status ready --author "agent"
+agkan task add "Subtask" --parent 1
+agkan task add "Title" --file ./spec.md  # Read body from file
 
-# 一覧表示
-agkan task list                    # 全タスク
+# List tasks
+agkan task list                    # All tasks
 agkan task list --status in_progress
-agkan task list --tree             # 階層表示
-agkan task list --root-only        # ルートタスクのみ
-agkan task list --tag 1,2          # タグでフィルタ
+agkan task list --tree             # Hierarchical view
+agkan task list --root-only        # Root tasks only
+agkan task list --tag 1,2          # Filter by tags
 
-# 詳細表示
+# Get details
 agkan task get <id>
 
-# 検索
-agkan task find "キーワード"
-agkan task find "キーワード" --all  # done/closedも含む
+# Search
+agkan task find "keyword"
+agkan task find "keyword" --all  # Include done/closed
 
-# 更新
+# Update
 agkan task update <id> status in_progress
 
-# カウント
+# Count
 agkan task count
-agkan task count --status ready --quiet  # 数値のみ出力
+agkan task count --status ready --quiet  # Output numbers only
 
-# 親子関係の更新
+# Update parent-child relationship
 agkan task update-parent <id> <parent_id>
-agkan task update-parent <id> null  # 親を解除
+agkan task update-parent <id> null  # Remove parent
 ```
 
-### ブロッキング関係
+### Blocking Relationships
 
 ```bash
-# task1がtask2をブロック（task2はtask1完了まで着手不可）
+# task1 blocks task2 (task2 cannot be started until task1 is complete)
 agkan task block add <blocker-id> <blocked-id>
 agkan task block remove <blocker-id> <blocked-id>
 agkan task block list <id>
 ```
 
-### タグ操作
+### Tag Operations
 
 ```bash
-# タグ管理
+# Tag management
 agkan task tag add "frontend"
 agkan task tag list
 agkan task tag delete <tag-id>
 
-# タスクへのタグ付け
+# Tag tasks
 agkan task tag attach <task-id> <tag-id>
 agkan task tag detach <task-id> <tag-id>
 agkan task tag show <task-id>
 ```
 
-### メタデータ操作
+### Metadata Operations
 
 ```bash
-# メタデータ設定
+# Set metadata
 agkan task meta set <task-id> <key> <value>
 
-# メタデータ取得
+# Get metadata
 agkan task meta get <task-id> <key>
 
-# メタデータ一覧
+# List metadata
 agkan task meta list <task-id>
 
-# メタデータ削除
+# Delete metadata
 agkan task meta delete <task-id> <key>
 ```
 
-#### 優先度 (priority)
+#### Priority (priority)
 
-タスクの優先度は `priority` キーで管理する:
+Task priority is managed with the `priority` key:
 
 ```bash
 agkan task meta set <task-id> priority <value>
 ```
 
-| 値 | 意味 |
+| Value | Meaning |
 |-----|------|
-| `critical` | 即時対応が必要。ブロッカーとなっている問題 |
-| `high` | 優先して着手すべきタスク |
-| `medium` | 通常の優先度（デフォルト） |
-| `low` | 余裕があれば対応するタスク |
+| `critical` | Requires immediate attention. Blocking issue |
+| `high` | Should be prioritized |
+| `medium` | Normal priority (default) |
+| `low` | Work on if there is time |
 
 ---
 
-## JSONOutput
+## JSON Output
 
-機械処理が必要な場合は `--json` フラグを使用:
+Use the `--json` flag when machine processing is needed:
 
 ```bash
 agkan task list --json
@@ -116,11 +116,11 @@ agkan task get 1 --json
 agkan task count --json
 agkan task tag list --json
 
-# jqと組み合わせ
+# Combine with jq
 agkan task list --status ready --json | jq '.tasks[].id'
 ```
 
-### JSON出力スキーマ
+### JSON Output Schema
 
 #### `agkan task list --json`
 
@@ -136,8 +136,8 @@ agkan task list --status ready --json | jq '.tasks[].id'
   "tasks": [
     {
       "id": 1,
-      "title": "タスクタイトル",
-      "body": "本文 | null",
+      "title": "Task Title",
+      "body": "Body | null",
       "author": "string | null",
       "status": "icebox | backlog | ready | in_progress | review | done | closed",
       "parent_id": "number | null",
@@ -158,8 +158,8 @@ agkan task list --status ready --json | jq '.tasks[].id'
   "success": true,
   "task": {
     "id": 1,
-    "title": "タスクタイトル",
-    "body": "本文 | null",
+    "title": "Task Title",
+    "body": "Body | null",
     "author": "string | null",
     "status": "backlog | ready | in_progress | review | done | closed",
     "parent_id": "number | null",
@@ -196,14 +196,14 @@ agkan task list --status ready --json | jq '.tasks[].id'
 
 ```json
 {
-  "keyword": "検索ワード",
+  "keyword": "Search keyword",
   "excludeDoneClosed": true,
   "totalCount": 3,
   "tasks": [
     {
       "id": 1,
-      "title": "タスクタイトル",
-      "body": "本文 | null",
+      "title": "Task Title",
+      "body": "Body | null",
       "author": "string | null",
       "status": "ready",
       "parent_id": "number | null",
@@ -223,7 +223,7 @@ agkan task list --status ready --json | jq '.tasks[].id'
 {
   "task": {
     "id": 1,
-    "title": "タスクタイトル",
+    "title": "Task Title",
     "status": "ready"
   },
   "blockedBy": [{ "id": 2, "title": "...", "status": "in_progress" }],
@@ -260,49 +260,49 @@ agkan task list --status ready --json | jq '.tasks[].id'
 
 ---
 
-## 典型的なワークフロー
+## Typical Workflows
 
-### エージェントとしてタスクを受け取る
+### Receiving Tasks as an Agent
 
 ```bash
-# 担当タスクを確認
+# Check assigned tasks
 agkan task list --status ready
 agkan task get <id>
 
-# 着手
+# Start work
 agkan task update <id> status in_progress
 
-# 完了
+# Complete
 agkan task update <id> status done
 ```
 
-### タスクの構造化
+### Structuring Tasks
 
 ```bash
-# 親タスク作成
-agkan task add "機能実装" --status ready
+# Create parent task
+agkan task add "Feature Implementation" --status ready
 
-# サブタスク追加
-agkan task add "設計" --parent 1 --status ready
-agkan task add "実装" --parent 1 --status backlog
-agkan task add "テスト" --parent 1 --status backlog
+# Add subtasks
+agkan task add "Design" --parent 1 --status ready
+agkan task add "Implementation" --parent 1 --status backlog
+agkan task add "Testing" --parent 1 --status backlog
 
-# 依存関係設定（設計→実装→テストの順）
+# Set dependencies (Design → Implementation → Testing)
 agkan task block add 2 3
 agkan task block add 3 4
 
-# 全体を確認
+# View overall structure
 agkan task list --tree
 ```
 
 ---
 
-## 設定
+## Configuration
 
-`.agkan.yml` をプロジェクトルートに配置してDBパスをカスタマイズ:
+Place `.agkan.yml` in the project root to customize the DB path:
 
 ```yaml
 path: ./.agkan/data.db
 ```
 
-または環境変数: `AGENT_KANBAN_DB_PATH=/custom/path/data.db`
+Or use environment variable: `AGENT_KANBAN_DB_PATH=/custom/path/data.db`
