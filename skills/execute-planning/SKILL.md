@@ -7,72 +7,72 @@ description: Use when reviewing backlog tasks to assess decomposition, implement
 
 ## Overview
 
-agkanを使用してBacklogタスクを精査し、分解・Ready移動・先送りの判断を行うプランニングワークフロー。
+A planning workflow that uses agkan to review backlog tasks and make decisions about decomposition, moving to Ready status, and deferring tasks.
 
 ---
 
-## ワークフロー
+## Workflow
 
-### 1. Backlogタスクを取得
+### 1. Retrieve Backlog Tasks
 
 ```bash
 agkan task list --status backlog --json
 ```
 
-### 2. タスクを1件ずつサブエージェントで精査
+### 2. Review Tasks One by One with Sub-agents
 
-各タスクに対して **Task ツール（general-purpose サブエージェント）** を使って精査する。
-`Skill("execute-planning-subtask")` は使わず、サブエージェントに SKILL.md を読み込ませる形で呼び出す:
+For each task, use the **Task tool (general-purpose sub-agent)** to review.
+Do not use `Skill("execute-planning-subtask")`. Instead, invoke it by having the sub-agent read the SKILL.md file:
 
-または、タスクIDが指定されていたら、対象のタスクのみ精査する。
+Or, if a task ID is specified, review only that target task.
 
 ```
 Task(
   subagent_type="general-purpose",
   description="Review task #<id>",
   prompt="""
-以下のBacklogタスクを精査してください。
+Please review the following backlog task.
 
-## タスク情報
+## Task Information
 - ID: <id>
-- タイトル: <title>
-- 本文: <body>
+- Title: <title>
+- Body: <body>
 
-## 手順
-.claude/skills/execute-planning-subtask/SKILL.md を読み込み、その手順に従って精査してください。
+## Procedure
+Read .claude/skills/execute-planning-subtask/SKILL.md and follow its procedures to review.
 """
 )
 ```
 
-### 3. セッション終了 or 繰り返し
+### 3. End Session or Continue
 
-全件処理が終わるまで繰り返す。ユーザによる終了指示がない場合は、次のタスクを選択して同様のワークフロー2から繰り返す。
-
----
-
-## 判断フロー
-
-```
-Backlogタスクを取得
-    ↓
-タスク1件をサブエージェントに委譲
-    ↓
-サブエージェントが精査・判断を実行
-  - 内容が不明確？ → コード調査 → タスクに追記
-  - 分解できる？ → サブタスクに分割 → 元タスクをクローズ
-  - 今すぐ実装可能？ → Readyへ移動
-  - それ以外 → いつかやるタグを付けてBacklogのまま
-    ↓
-次のタスクへ（全件終了まで繰り返す）
-```
+Repeat until all tasks are processed. If there is no end instruction from the user, select the next task and repeat from step 2.
 
 ---
 
-## タグ優先度
+## Decision Flow
 
-タスクにタグを付ける際は以下の優先順位を基準にする:
+```
+Retrieve backlog tasks
+    ↓
+Delegate one task to sub-agent
+    ↓
+Sub-agent reviews and makes decision
+  - Content unclear? → Research code → Add to task
+  - Can be decomposed? → Split into subtasks → Close original task
+  - Ready to implement now? → Move to Ready
+  - Otherwise → Add "someday" tag and keep in Backlog
+    ↓
+Move to next task (repeat until all are done)
+```
 
-| 優先度 | タグ名 |
+---
+
+## Tag Priority
+
+When tagging tasks, use the following priority order:
+
+| Priority | Tag Name |
 |--------|-------------|
 | 1 | bug |
 | 2 | security |
@@ -84,8 +84,8 @@ Backlogタスクを取得
 
 ---
 
-## 注意事項
+## Important Notes
 
-- `いつかやる` タグのタスクは、Readyタスクがなくなった後に再検討する
-- タスク分解時は元タスクの内容を引き継ぐ
-- Readyに移動するのは「今すぐ着手できる」ものだけ
+- Tasks with the "someday" tag should be reconsidered after all Ready tasks are completed
+- When decomposing tasks, inherit the content from the original task
+- Only move to Ready tasks that are "ready to start immediately"
