@@ -5,6 +5,29 @@ All notable changes to the agkan-skills plugin will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-03-05
+
+### Added
+
+- **execute-icebox**: New skill for reviewing icebox tasks and deciding whether to promote them to backlog or close them
+  - Defines icebox as a holding area for unclear requirements, external blockers, or low-priority ideas
+  - Provides structured workflow: promote to backlog / close / keep in icebox
+- **execute-planning-subtask**: New skill for reviewing a single backlog task to assess decomposition and readiness
+- **execute-task-direct**: New skill for implementing tasks directly without creating a branch or PR
+- **execute-subtask-direct**: New skill for implementing subtasks directly without creating a branch or PR
+- **execute-review**: New skill for checking review tasks against GitHub PR status to move them to done or closed
+
+### Fixed
+
+- **execute-task / execute-task-direct**: Replaced non-existent `importance field` with correct `priority` metadata reference (`agkan task meta get <id> priority`)
+- **execute-task**: Corrected duplicate step number (1→2→3→1→4→5 → 1→2→3→4→5→6)
+- **execute-subtask**: Corrected missing step 1 (workflow now starts at step 1 instead of step 2)
+
+### Changed
+
+- Updated agkan SKILL.md Typical Workflows to include icebox review workflow
+- Updated README.md and README.ja.md to reflect version 0.3.0 and all 8 skills
+
 ## [0.2.1] - 2026-03-05
 
 ### Fixed
