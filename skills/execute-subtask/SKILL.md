@@ -10,45 +10,45 @@ metadata:
 
 ## Overview
 
-選択済みタスクを、フォーク（ワークツリー）上で実装してPRを作成し、完了させるワークフロー。
+Workflow to implement a selected task on a fork (worktree), create a PR, and complete the task.
 
 ---
 
-## ワークフロー
+## Workflow
 
-### 2. ブランチ作成
+### 2. Create Branch
 
 ```bash
 git checkout -b <branch-name>
 ```
 
-ブランチ名はタスクIDとタイトルから生成（例: `feat/42-add-login-page`）。
+Branch name is generated from task ID and title (example: `feat/42-add-login-page`).
 
-### 3. ブランチ名をタスクに書き込む
+### 3. Write Branch Name to Task
 
 ```bash
-agkan task update <id> body "<既存本文>\n\nBranch: <branch-name>"
+agkan task update <id> body "<existing body>\n\nBranch: <branch-name>"
 ```
 
-### 4. 実装
+### 4. Implementation
 
-タスクの内容に従って実装を行う。
+Implement according to the task content.
 
-実装時に/key-guidelinesを参照し、コード品質を保つこと。
+Refer to /key-guidelines during implementation to maintain code quality.
 
-### 5. PRを作成
+### 5. Create PR
 
 ```bash
 gh pr create --title "<title>" --body "<body>"
 ```
 
-### 6. PRの情報をタスクに追記
+### 6. Add PR Information to Task
 
 ```bash
-agkan task update <id> body "<既存本文>\n\nPR: <PR URL>"
+agkan task update <id> body "<existing body>\n\nPR: <PR URL>"
 ```
 
-### 7. タスクをreviewに更新
+### 7. Update Task to Review
 
 ```bash
 agkan task update <id> status review
@@ -56,7 +56,7 @@ agkan task update <id> status review
 
 ---
 
-## 注意事項
+## Important Notes
 
-- PRマージ前にタスクをdoneにしない（PRレビュー・マージ後にdoneへ）
-- このスキルはタスク選択後に使用する（タスク選択は `execute-task` スキルで行う）
+- Do not mark task as done before PR is merged (mark as done after PR review and merge)
+- This skill is used after task selection (task selection is done with `execute-task` skill)
