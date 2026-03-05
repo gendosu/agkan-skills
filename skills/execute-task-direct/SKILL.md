@@ -29,12 +29,12 @@ agkan task list --status ready --json
 
 Evaluate tasks using the following criteria in descending order and select the top one:
 
-**Importance (importance field):**
+**Priority (get with `agkan task meta get <id> priority`):**
 ```
 High > Medium > Low
 ```
 
-**Tags (used when importance is the same):**
+**Tags (used when priority is the same):**
 ```
 bug > security > improvement > test > performance > refactor > docs
 ```
@@ -84,9 +84,9 @@ If there is no instruction to end from the user, select the next task and repeat
 ```
 Ready task list
     ↓
-Sort by importance (High → Medium → Low)
+Sort by priority (High → Medium → Low)
     ↓
-Multiple tasks with same importance?
+Multiple tasks with same priority?
    Yes → Sort by tag priority (bug → security → ... → docs)
    No  → Select the top task
     ↓
