@@ -7,98 +7,98 @@ description: Use when starting a development session to pick the highest priorit
 
 ## Overview
 
-agkanのTodoタスクから優先度最高の1件を選び、実装してPRを作成し、完了させるまでの標準ワークフロー。
+Standard workflow to pick the highest priority ready task from agkan, implement it, create a pull request, and complete it.
 
 ---
 
-## ワークフロー
+## Workflow
 
-### 1. ブランチを最新化
+### 1. Update branch to latest
 
 ```bash
 git checkout main && git pull -p
 ```
 
-### 2. Todoタスクを取得
+### 2. Get ready tasks
 
 ```bash
 agkan task list --status ready --json
 ```
 
-### 3. 優先度の高いタスクを1件選択
+### 3. Select the highest priority task
 
-以下の基準で降順に評価し、最上位の1件を選ぶ:
+Evaluate tasks in descending order using the following criteria and select the top one:
 
-**重要度（importance フィールド）:**
+**Importance (importance field):**
 ```
-高 > 中 > 低
+High > Medium > Low
 ```
 
-**タグ（同重要度の場合に参照）:**
+**Tags (refer to when importance is the same):**
 ```
 bug > security > improvement > test > performance > refactor > docs
 ```
 
-**子タスクがある場合・ブロッカータスクがある場合**
-対象の子タスク・ブロッカータスクを優先して選ぶ（重要度・タグの基準は同じ）
+**If there are child tasks or blocker tasks**
+Prioritize the target child tasks or blocker tasks (same importance and tag criteria apply)
 
-### 1. タスクをin_progressに更新
+### 1. Update task to in_progress
 
 ```bash
 agkan task update <id> status in_progress
 ```
 
-### 4. 実装・PR作成・完了
+### 4. Implement, create PR, complete
 
-**Task ツール（general-purpose サブエージェント）** を使って実装する。
-`Skill("execute-subtask")` は使わず、サブエージェントに SKILL.md を読み込ませる形で呼び出す:
+**Use the Task tool (general-purpose sub-agent)** to implement.
+Do not use `Skill("execute-subtask")`, instead call the sub-agent by loading SKILL.md:
 
 ```
 Task(
   subagent_type="general-purpose",
   description="Implement task #<id>",
   prompt="""
-以下のタスクを実装してください。
+Please implement the following task.
 
 load /key-guidelines
 
-## タスク情報
+## Task Information
 - ID: <id>
-- タイトル: <title>
-- 本文: <body>
+- Title: <title>
+- Body: <body>
 
-## 手順
-.claude/skills/execute-subtask/SKILL.md を読み込み、その手順に従って実装してください。
+## Steps
+Read .claude/skills/execute-subtask/SKILL.md and follow its steps to implement.
 """
 )
 ```
 
-### 5. セッション終了 or 繰り返し
+### 5. End session or repeat
 
-ユーザによる終了指示がない場合は、次のタスクを選択して同様のワークフロー1から繰り返す。
-
----
-
-## 優先度判定フロー
-
-```
-Todoタスク一覧
-    ↓
-重要度でソート（高→中→低）
-    ↓
-同じ重要度が複数？
-   Yes → タグ優先度でソート（bug→security→...→docs）
-   No  → 最上位を選択
-    ↓
-1件を選択して着手
-```
+If there are no termination instructions from the user, select the next task and repeat from step 1 of the workflow.
 
 ---
 
-## タグ優先度一覧
+## Priority Determination Flow
 
-| 優先度 | タグ名 |
-|--------|--------|
+```
+Todo task list
+    ↓
+Sort by importance (High → Medium → Low)
+    ↓
+Multiple tasks with same importance?
+   Yes → Sort by tag priority (bug → security → ... → docs)
+   No  → Select top task
+    ↓
+Select 1 task and start work
+```
+
+---
+
+## Tag Priority List
+
+| Priority | Tag Name |
+|----------|----------|
 | 1 | bug |
 | 2 | security |
 | 3 | improvement |
@@ -109,8 +109,8 @@ Todoタスク一覧
 
 ---
 
-## 注意事項
+## Notes
 
-- 必ず1件のみ選択する（複数同時着手しない）
-- タスクが存在しない場合はセッションを終了する
-- PRマージ前にタスクをdoneにしない（PRレビュー・マージ後にdoneへ）
+- Always select only 1 task (do not start multiple tasks simultaneously)
+- If no tasks exist, end the session
+- Do not mark task as done before PR merge (mark as done after PR review and merge)
