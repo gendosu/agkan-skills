@@ -4,7 +4,7 @@ A comprehensive skill collection for task management workflows using the agkan C
 
 ## Overview
 
-The agkan-skills plugin provides four powerful skills for managing development workflows with agkan, a SQLite-based task management tool optimized for AI agent collaboration. These skills enable efficient task planning, execution, and progress tracking through a structured kanban workflow.
+The agkan-skills plugin provides eight powerful skills for managing development workflows with agkan, a SQLite-based task management tool optimized for AI agent collaboration. These skills enable efficient task planning, execution, and progress tracking through a structured kanban workflow.
 
 ## Features
 
@@ -103,6 +103,83 @@ Implement a selected task in isolation, handle in_progress status updates, branc
 4. Create and submit a pull request
 5. Update task status to "review"
 
+### 5. execute-task-direct
+
+Pick the highest priority "ready" task, implement it directly without creating a branch or PR, and mark it as done.
+
+**Use Cases:**
+- Selecting the next highest-priority task from the ready queue
+- Starting a development session with direct implementation (no PR workflow)
+- Following a structured execution workflow without branch management
+
+**Priority Criteria:**
+1. Importance level (high → medium → low)
+2. Tag priority (bug → security → improvement → test → performance → refactor → docs)
+3. Child tasks and blockers are prioritized
+
+**Typical Flow:**
+1. Pull latest changes
+2. Fetch all ready tasks
+3. Evaluate priority using importance and tag hierarchy
+4. Select the highest-priority task and update status to in_progress
+5. Delegate implementation to a sub-agent (execute-subtask-direct)
+6. Mark the task as done
+
+### 6. execute-subtask-direct
+
+Implement a selected task directly without creating a branch or PR and mark it as complete.
+
+**Use Cases:**
+- Implementing a specific selected task without PR workflow
+- Committing changes directly to the current branch
+- Updating task status to done after implementation
+
+**Important:**
+- This skill is not directly invokable by users
+- Used internally by execute-task-direct skill
+- Expects a task to be pre-selected
+
+**Typical Flow:**
+1. Implement the task
+2. Commit changes to the current branch
+3. Update task status to "done"
+
+### 7. execute-review
+
+Check tasks with "review" status against GitHub PR status and automatically move them to done or closed.
+
+**Use Cases:**
+- Reviewing PR merge/close status for tasks awaiting review
+- Automatically updating task status based on PR outcome
+- Batch processing of multiple review tasks
+
+**Typical Flow:**
+1. Fetch all review tasks
+2. For each task, extract PR URL from the task body
+3. Check PR status via GitHub CLI
+4. Move to "done" if PR is merged, "closed" if PR is closed without merge
+
+### 8. execute-planning-subtask
+
+Review a single backlog task to assess decomposition, implementation readiness, and priority ordering.
+
+**Use Cases:**
+- Reviewing a single backlog task for clarity and completeness
+- Determining if a task needs to be decomposed into smaller units
+- Moving a ready task to the "ready" status
+- Tagging tasks that should be deferred
+
+**Important:**
+- This skill is not directly invokable by users
+- Used internally by execute-planning skill
+- Expects a task to be pre-selected
+
+**Typical Flow:**
+1. Review task content and supplement with investigation results
+2. Decide if task decomposition is needed (1 task = 1 PR = 1 feature)
+3. Move to "ready" status if implementation is clear and blockers are resolved
+4. Tag with "will-do-later" if deferrable
+
 ## Installation
 
 ### Add Marketplace
@@ -178,6 +255,7 @@ Tasks progress through the following states:
 
 | Status | Description | Next |
 |--------|-------------|------|
+| `icebox` | Parked ideas not yet ready for planning | `backlog` |
 | `backlog` | Initial state for new unreviewed tasks | `ready` or `closed` |
 | `ready` | Task is clear and ready for implementation | `in_progress` |
 | `in_progress` | Actively being developed | `review` |
@@ -224,10 +302,18 @@ agkan-skills/
 │   │   └── SKILL.md          # Core task management skill
 │   ├── execute-planning/
 │   │   └── SKILL.md          # Planning workflow skill
+│   ├── execute-planning-subtask/
+│   │   └── SKILL.md          # Single task planning skill
 │   ├── execute-task/
-│   │   └── SKILL.md          # Task execution skill
-│   └── execute-subtask/
-│       └── SKILL.md          # Subtask implementation skill
+│   │   └── SKILL.md          # Task execution skill (with PR)
+│   ├── execute-task-direct/
+│   │   └── SKILL.md          # Task execution skill (direct, no PR)
+│   ├── execute-subtask/
+│   │   └── SKILL.md          # Subtask implementation skill (with PR)
+│   ├── execute-subtask-direct/
+│   │   └── SKILL.md          # Subtask implementation skill (direct, no PR)
+│   └── execute-review/
+│       └── SKILL.md          # PR review status checking skill
 ├── README.md                 # This file (English)
 ├── README.ja.md              # Japanese documentation
 ├── CHANGELOG.md              # Version history
@@ -253,4 +339,4 @@ https://github.com/gendosu/gendosu-claude-plugins
 
 ## Version
 
-0.1.0
+0.2.1
