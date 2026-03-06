@@ -5,6 +5,41 @@ All notable changes to the agkan-skills plugin will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-03-06
+
+### Added
+
+- **execute-add**: New skill for creating backlog tasks
+  - Collects title, body, tags, priority, and parent task, then creates it with agkan
+- **dashboard**: New skill for checking overall task status and project health
+  - Shows counts by status, in-progress tasks, and high-priority ready tasks
+- **execute-icebox**: Added sub-agent delegation for single-task icebox review
+- **execute-task / execute-task-direct**: Skip tasks tagged with `will-do-later`
+
+### Changed
+
+- Consolidated tag priority table into agkan/SKILL.md for unified reference
+
+### Fixed
+
+- **execute-planning-subtask**: Corrected Explore skill reference
+- **execute-planning-subtask**: Added `--parent` option to task decomposition command
+- **execute-planning-subtask**: Unified tag attach parameter to `<tag-id-or-name>`
+- **execute-task / execute-task-direct**: Added blocker check step before in_progress update
+- **execute-task / execute-task-direct**: Read priority from list JSON metadata instead of individual meta get command
+- **execute-subtask**: Added git commit and push steps
+- **execute-subtask-direct**: Clarified git add and push steps
+- **execute-subtask**: Restored `context: fork` frontmatter explanation
+- Clarified key-guidelines skill invocation in sub-agent prompts
+- Clarified body append procedure to get existing content before update
+
+### Documentation
+
+- Added missing agkan v1.6.0 commands to agkan/SKILL.md
+- Added `--assignees`, `--blocked-by`, `--blocks` options to agkan task examples
+- Clarified priority setting timing in execute-planning-subtask and agkan skills
+- Explained why SKILL.md path is used instead of Skill() for sub-agents
+
 ## [0.3.0] - 2026-03-05
 
 ### Added
