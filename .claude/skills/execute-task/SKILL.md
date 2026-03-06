@@ -29,7 +29,7 @@ agkan task list --status ready --json
 
 Evaluate tasks in descending order using the following criteria and select the top one:
 
-**Priority (get with `agkan task meta get <id> priority`):**
+**Priority (read from `metadata` field in the list JSON response):**
 ```
 High > Medium > Low
 ```
