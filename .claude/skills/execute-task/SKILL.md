@@ -42,13 +42,21 @@ bug > security > improvement > test > performance > refactor > docs
 **If there are child tasks or blocker tasks**
 Prioritize the target child tasks or blocker tasks (same importance and tag criteria apply)
 
-### 4. Update task to in_progress
+### 4. Check for blockers
+
+```bash
+agkan task block list <id> --json
+```
+
+`blockedBy` に未完了タスクが存在する場合は、そのタスクを選択せず別のタスクを選択するか、ブロッカータスクを先に処理する。
+
+### 5. Update task to in_progress
 
 ```bash
 agkan task update <id> status in_progress
 ```
 
-### 5. Implement, create PR, complete
+### 6. Implement, create PR, complete
 
 **Use the Task tool (general-purpose sub-agent)** to implement.
 Do not use `Skill("execute-subtask")`, instead call the sub-agent by loading SKILL.md:
@@ -73,7 +81,7 @@ Read .claude/skills/execute-subtask/SKILL.md and follow its steps to implement.
 )
 ```
 
-### 6. End session or repeat
+### 7. End session or repeat
 
 If there are no termination instructions from the user, select the next task and repeat from step 1 of the workflow.
 
