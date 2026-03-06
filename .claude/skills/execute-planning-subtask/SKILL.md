@@ -28,7 +28,7 @@ agkan task update <id> body "<existing body>\n\n<additional content>"
 
 - If the task contains multiple pieces of work, organize the content and append it to the description in task list format:
 
-When creating a task list, it is advisable to use the Explore skill to examine the code, understand the task content, and then use Plan mode to create the task list if investigation is needed.
+When creating a task list, it is advisable to use the Explore subagent (Agent tool with subagent_type="Explore") to examine the code, understand the task content, and then use Plan mode to create the task list if investigation is needed.
 
 ```- Task content summary
 - [ ] Work item 1
