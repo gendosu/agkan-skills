@@ -5,6 +5,16 @@ All notable changes to the agkan-skills plugin will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.2] - 2026-03-06
+
+### Documentation
+
+- **agkan**: Add `--all` flag to task list command (includes done/closed statuses)
+- **agkan**: Add named option form for `task update` command (v1.6.0+)
+- **agkan**: Add `--assignees` filter option to task list
+- **agkan**: Add `agent-guide` command to Quick Reference section
+- **execute-review**: Simplify PR URL recovery flow — skip task and prompt manual verification when URL is missing
+
 ## [0.4.1] - 2026-03-06
 
 ### Fixed
