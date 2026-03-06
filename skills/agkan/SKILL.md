@@ -15,6 +15,13 @@ description: Use when managing tasks with the agkan CLI tool - creating, listing
 
 ## Quick Reference
 
+### Agent Guide
+
+```bash
+# Display a comprehensive guide for AI agents (overview, commands, workflows)
+agkan agent-guide
+```
+
 ### Task Operations
 
 ```bash
@@ -36,6 +43,8 @@ agkan task list --tag 1,2          # Filter by tags
 agkan task list --dep-tree         # Dependency (blocking) tree view
 agkan task list --sort title       # Sort by field (id / title / status / created_at / updated_at), default: created_at
 agkan task list --order asc        # Sort order (asc / desc), default: desc
+agkan task list --assignees "alice,bob"  # Filter by assignees (comma-separated)
+agkan task list --all              # Include all statuses (including done and closed)
 
 # Get details
 agkan task get <id>
@@ -44,8 +53,17 @@ agkan task get <id>
 agkan task find "keyword"
 agkan task find "keyword" --all  # Include done/closed
 
-# Update
+# Update (positional argument form - backward compatible)
 agkan task update <id> status in_progress
+
+# Update (named option form - v1.6.0+)
+agkan task update <id> --status in_progress
+agkan task update <id> --title "New Title"
+agkan task update <id> --body "New body text"
+agkan task update <id> --author "agent"
+agkan task update <id> --assignees "alice,bob"
+agkan task update <id> --file ./spec.md  # Read body from file
+agkan task update <id> --status done --title "Updated Title"  # Multiple options
 
 # Count
 agkan task count

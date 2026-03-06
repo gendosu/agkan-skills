@@ -44,6 +44,7 @@ agkan task list --dep-tree         # Dependency (blocking) tree view
 agkan task list --sort title       # Sort by field (id / title / status / created_at / updated_at), default: created_at
 agkan task list --order asc        # Sort order (asc / desc), default: desc
 agkan task list --assignees "alice,bob"  # Filter by assignees (comma-separated)
+agkan task list --all              # Include all statuses (including done and closed)
 
 # Get details
 agkan task get <id>
