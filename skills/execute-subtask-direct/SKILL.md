@@ -25,8 +25,9 @@ Refer to /key-guidelines during implementation to maintain code quality.
 Commit the changes.
 
 ```bash
-git add <files>
+git add -A
 git commit -m "<commit message>"
+git push
 ```
 
 ### 3. Update task to done
