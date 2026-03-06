@@ -62,7 +62,10 @@ agkan task update <id> status in_progress
 ### 6. Implement, create PR, complete
 
 **Use the Task tool (general-purpose sub-agent)** to implement.
-Do not use `Skill("execute-subtask")`, instead call the sub-agent by loading SKILL.md:
+Do not use `Skill("execute-subtask")`; instead, instruct the sub-agent to read the SKILL.md file directly.
+
+> **Why SKILL.md path instead of `Skill()`?**
+> Sub-agents spawned via the Task tool start with a fresh context. `Skill()` loads skill content into the current conversation, but a sub-agent needs its instructions embedded in its prompt. Providing the SKILL.md path directly in the prompt is the reliable way to pass workflow instructions to a sub-agent.
 
 ```
 Task(
