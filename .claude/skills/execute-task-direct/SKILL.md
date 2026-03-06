@@ -29,6 +29,9 @@ agkan task list --status ready --json
 
 Evaluate tasks using the following criteria in descending order and select the top one:
 
+**Skip tasks with `will-do-later` tag:**
+`will-do-later` タグが付いているタスクは意図的に先送りされたタスクであるため、スキップする。`will-do-later` タグが付いていないタスクのみを選択対象とする。
+
 **Priority (read from `metadata` field in the list JSON response):**
 ```
 High > Medium > Low
