@@ -68,7 +68,7 @@ Task(
   prompt="""
 Please implement the following task.
 
-load /key-guidelines
+Invoke the key-guidelines skill using the Skill tool: Skill("key-guidelines")
 
 ## Task Information
 - ID: <id>
