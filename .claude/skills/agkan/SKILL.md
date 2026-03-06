@@ -51,8 +51,17 @@ agkan task get <id>
 agkan task find "keyword"
 agkan task find "keyword" --all  # Include done/closed
 
-# Update
+# Update (positional argument form - backward compatible)
 agkan task update <id> status in_progress
+
+# Update (named option form - v1.6.0+)
+agkan task update <id> --status in_progress
+agkan task update <id> --title "New Title"
+agkan task update <id> --body "New body text"
+agkan task update <id> --author "agent"
+agkan task update <id> --assignees "alice,bob"
+agkan task update <id> --file ./spec.md  # Read body from file
+agkan task update <id> --status done --title "Updated Title"  # Multiple options
 
 # Count
 agkan task count
