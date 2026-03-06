@@ -5,6 +5,16 @@ All notable changes to the agkan-skills plugin will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2026-03-06
+
+### Fixed
+
+- **execute-review**: Clarified handling when PR URL is not found in task body
+  - Added recovery flow: search GitHub for related PRs using task title
+  - If candidates found, ask user to confirm via AskUserQuestion
+  - If no candidates or user answers "なし", ask user to input URL directly
+  - Update task body with confirmed URL and continue processing
+
 ## [0.4.0] - 2026-03-06
 
 ### Added
