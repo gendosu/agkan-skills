@@ -42,13 +42,21 @@ bug > security > improvement > test > performance > refactor > docs
 **When there are subtasks or blocker tasks**
 Prioritize the target subtasks or blocker tasks (using the same importance and tag criteria)
 
-### 4. Update Task Status to in_progress
+### 4. Check for Blockers
+
+```bash
+agkan task block list <id> --json
+```
+
+`blockedBy` に未完了タスクが存在する場合は、そのタスクを選択せず別のタスクを選択するか、ブロッカータスクを先に処理する。
+
+### 5. Update Task Status to in_progress
 
 ```bash
 agkan task update <id> status in_progress
 ```
 
-### 5. Implementation and Completion
+### 6. Implementation and Completion
 
 Use the **Task tool (general-purpose sub-agent)** to implement.
 Do not use `Skill("execute-subtask-direct")`; instead, call it by having the sub-agent load the SKILL.md file:
@@ -73,7 +81,7 @@ Load .claude/skills/execute-subtask-direct/SKILL.md and follow its procedures to
 )
 ```
 
-### 6. End Session or Repeat
+### 7. End Session or Repeat
 
 If there is no instruction to end from the user, select the next task and repeat from step 1 of the same workflow.
 
