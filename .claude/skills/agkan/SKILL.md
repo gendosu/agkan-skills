@@ -15,6 +15,13 @@ description: Use when managing tasks with the agkan CLI tool - creating, listing
 
 ## Quick Reference
 
+### Agent Guide
+
+```bash
+# Display a comprehensive guide for AI agents (overview, commands, workflows)
+agkan agent-guide
+```
+
 ### Task Operations
 
 ```bash
