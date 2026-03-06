@@ -29,41 +29,40 @@ A workflow to review `icebox` tasks and decide whether to promote each one to `b
 agkan task list --status icebox --json
 ```
 
-### 2. Review Tasks One by One
+### 2. Review Tasks One by One with Sub-agents
 
-For each icebox task, evaluate it against the following criteria:
+For each task, use the **Task tool (general-purpose sub-agent)** to review.
+Do not use `Skill("execute-icebox-subtask")`. Instead, invoke it by having the sub-agent read the SKILL.md file:
 
-**Promote to backlog (`backlog`) when:**
-- The requirement or background is now clear enough to plan
-- External blockers have been resolved
-- The task has become relevant due to changed circumstances
+```
+Task(
+  subagent_type="general-purpose",
+  description="Review icebox task #<id>",
+  prompt="""
+Please review the following icebox task.
 
-**Close (`closed`) when:**
-- The need no longer exists
-- A duplicate task already exists in backlog or later stages
-- It was superseded by another approach or decision
+## Task Information
+- ID: <id>
+- Title: <title>
+- Body: <body>
 
-**Keep in icebox when:**
-- Still waiting on external factors
-- Not enough information to decide yet (leave as-is)
-
-### 3. Update Status
-
-```bash
-# Promote to backlog
-agkan task update <id> status backlog
-
-# Close as no longer needed
-agkan task update <id> status closed
+## Procedure
+Read .claude/skills/execute-icebox-subtask/SKILL.md and follow its procedures to review.
+"""
+)
 ```
 
-### 4. Add Notes (Optional)
-
-If the reason for the decision is non-obvious, add context to the task body before updating status:
+If a task ID is specified by the user, retrieve and review only that target task:
 
 ```bash
-agkan task update <id> body "<updated body with reason>"
+agkan task get <id> --json
 ```
+
+Then delegate only that single task to a sub-agent using the same Task call format above.
+
+### 3. End Session or Continue
+
+Repeat until all tasks are processed. If there is no end instruction from the user, select the next task and repeat from step 2.
 
 ---
 
@@ -72,14 +71,14 @@ agkan task update <id> body "<updated body with reason>"
 ```
 Retrieve icebox tasks
     ↓
-Review each task one by one
+Delegate one task to sub-agent
     ↓
-Is the task actionable now?
-  - Yes, requirements are clear → Promote to backlog
+Sub-agent reviews and makes decision
+  - Requirements now clear? → Promote to backlog
   - No longer needed / superseded → Close
   - Still unclear / waiting → Keep in icebox
     ↓
-Repeat until all icebox tasks are reviewed
+Move to next task (repeat until all are done)
 ```
 
 ---
