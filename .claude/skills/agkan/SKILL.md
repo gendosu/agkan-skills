@@ -33,6 +33,9 @@ agkan task list --status in_progress
 agkan task list --tree             # Hierarchical view
 agkan task list --root-only        # Root tasks only
 agkan task list --tag 1,2          # Filter by tags
+agkan task list --dep-tree         # Dependency (blocking) tree view
+agkan task list --sort title       # Sort by field (id / title / status / created_at / updated_at), default: created_at
+agkan task list --order asc        # Sort order (asc / desc), default: desc
 
 # Get details
 agkan task get <id>
@@ -51,6 +54,9 @@ agkan task count --status ready --quiet  # Output numbers only
 # Update parent-child relationship
 agkan task update-parent <id> <parent_id>
 agkan task update-parent <id> null  # Remove parent
+
+# Delete task
+agkan task delete <id>
 ```
 
 ### Blocking Relationships
@@ -69,6 +75,7 @@ agkan task block list <id>
 agkan tag add "frontend"
 agkan tag list
 agkan tag delete <tag-id-or-name>
+agkan tag rename <id-or-name> <new-name>
 
 # Tag tasks
 agkan tag attach <task-id> <tag-id-or-name>
