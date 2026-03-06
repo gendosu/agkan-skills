@@ -71,7 +71,7 @@ For tasks that are "something to do later but not now," attach the `will-do-late
 # Create the tag if it does not exist
 agkan tag add "will-do-later"
 # Attach the tag to the task
-agkan tag attach <task-id> <tag-id>
+agkan tag attach <task-id> <tag-id-or-name>
 ```
 
 Deferral criteria:
@@ -101,7 +101,7 @@ Tag attachment command:
 # Create the tag if it does not exist
 agkan tag add "<tag>"
 # Attach the tag to the task
-agkan tag attach <task-id> <tag-id>
+agkan tag attach <task-id> <tag-id-or-name>
 ```
 
 ---
