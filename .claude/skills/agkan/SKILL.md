@@ -25,6 +25,7 @@ agkan task add "Subtask" --parent 1
 agkan task add "Title" --file ./spec.md  # Read body from file
 agkan task add "Title" --blocked-by 1,2  # Set tasks that block this task
 agkan task add "Title" --blocks 3,4      # Set tasks that this task blocks
+agkan task add "Title" --assignees "alice,bob"  # Set task assignees (comma-separated)
 
 # List tasks
 agkan task list                    # All tasks
