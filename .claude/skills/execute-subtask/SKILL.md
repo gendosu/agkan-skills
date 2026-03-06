@@ -12,10 +12,6 @@ metadata:
 
 Workflow to implement a selected task on a fork (worktree), create a PR, and complete the task.
 
-### About `context: fork` in frontmatter
-
-The `context: fork` field in the frontmatter indicates that this skill is designed to run in an isolated worktree (forked context). When an Agent invokes this skill, it executes in a separate worktree environment rather than the current working directory. This isolation ensures that branch creation and file changes do not interfere with the parent context.
-
 ---
 
 ## Workflow
@@ -40,19 +36,27 @@ Implement according to the task content.
 
 Refer to /key-guidelines during implementation to maintain code quality.
 
-### 4. Create PR
+### 4. Commit and Push
+
+```bash
+git add -A
+git commit -m "<commit message>"
+git push -u origin <branch-name>
+```
+
+### 5. Create PR
 
 ```bash
 gh pr create --title "<title>" --body "<body>"
 ```
 
-### 5. Add PR Information to Task
+### 6. Add PR Information to Task
 
 ```bash
 agkan task update <id> body "<existing body>\n\nPR: <PR URL>"
 ```
 
-### 6. Update Task to Review
+### 7. Update Task to Review
 
 ```bash
 agkan task update <id> status review
