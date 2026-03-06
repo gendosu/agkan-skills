@@ -24,8 +24,6 @@ agkan task list --status backlog --json
 For each task, use the **Task tool (general-purpose sub-agent)** to review.
 Do not use `Skill("execute-planning-subtask")`. Instead, invoke it by having the sub-agent read the SKILL.md file:
 
-Or, if a task ID is specified, review only that target task.
-
 ```
 Task(
   subagent_type="general-purpose",
@@ -43,6 +41,14 @@ Read .claude/skills/execute-planning-subtask/SKILL.md and follow its procedures 
 """
 )
 ```
+
+If a task ID is specified by the user, retrieve and review only that target task:
+
+```bash
+agkan task get <id> --json
+```
+
+Then delegate only that single task to a sub-agent using the same Task call format above.
 
 ### 3. End Session or Continue
 
