@@ -23,6 +23,8 @@ agkan task add "Title" "Body"
 agkan task add "Title" --status ready --author "agent"
 agkan task add "Subtask" --parent 1
 agkan task add "Title" --file ./spec.md  # Read body from file
+agkan task add "Title" --blocked-by 1,2  # Set tasks that block this task
+agkan task add "Title" --blocks 3,4      # Set tasks that this task blocks
 
 # List tasks
 agkan task list                    # All tasks
