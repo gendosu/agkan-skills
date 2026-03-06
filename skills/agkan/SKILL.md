@@ -109,6 +109,24 @@ agkan task meta set <task-id> priority <value>
 
 ---
 
+## Tag Priority
+
+When selecting or tagging tasks, use the following priority order:
+
+| Priority | Tag Name |
+|----------|----------|
+| 1 | bug |
+| 2 | security |
+| 3 | improvement |
+| 4 | test |
+| 5 | performance |
+| 6 | refactor |
+| 7 | docs |
+
+This is the canonical definition. All skills refer to this table.
+
+---
+
 ## JSON Output
 
 Use the `--json` flag when machine processing is needed:

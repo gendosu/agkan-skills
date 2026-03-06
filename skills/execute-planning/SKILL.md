@@ -76,17 +76,7 @@ Move to next task (repeat until all are done)
 
 ## Tag Priority
 
-When tagging tasks, use the following priority order:
-
-| Priority | Tag Name |
-|--------|-------------|
-| 1 | bug |
-| 2 | security |
-| 3 | improvement |
-| 4 | test |
-| 5 | performance |
-| 6 | refactor |
-| 7 | docs |
+See the canonical definition in `agkan/SKILL.md` (Tag Priority section).
 
 ---
 

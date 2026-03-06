@@ -105,15 +105,7 @@ Select one task and start
 
 ## Tag Priority List
 
-| Priority | Tag Name |
-|----------|----------|
-| 1 | bug |
-| 2 | security |
-| 3 | improvement |
-| 4 | test |
-| 5 | performance |
-| 6 | refactor |
-| 7 | docs |
+See the canonical definition in `agkan/SKILL.md` (Tag Priority section).
 
 ---
 
