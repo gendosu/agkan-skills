@@ -64,9 +64,23 @@ Move to Ready if **all** of the following conditions are met:
 - Scope that can be implemented as a single PR
 - Implementation approach is clear
 
+When moving a task to Ready, also set the priority at this point:
+
 ```bash
 agkan task update <id> status ready
+agkan task meta set <id> priority <value>
 ```
+
+Priority values: `critical` / `high` / `medium` / `low`
+
+Priority determination criteria:
+
+| Value | Criteria |
+|-------|----------|
+| `critical` | Production failures, security issues, blockers for other tasks |
+| `high` | Important features with near deadlines, bugs with significant user impact |
+| `medium` | Normal feature additions, improvements (default) |
+| `low` | Nice-to-have, work on if time permits |
 
 ### 4. Deferral Decision
 
