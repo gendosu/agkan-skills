@@ -20,7 +20,10 @@ A sub-workflow that reviews a single Backlog task in agkan, makes decisions on d
 - Append the investigated content to the task description:
 
 ```bash
-agkan task update <id> body "<additional content>"
+# First, retrieve the existing body
+agkan task get <id> --json
+# Then update by concatenating existing body with new content
+agkan task update <id> body "<existing body>\n\n<additional content>"
 ```
 
 - If the task contains multiple pieces of work, organize the content and append it to the description in task list format:

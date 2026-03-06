@@ -31,6 +31,9 @@ Branch name is generated from task ID and title (example: `feat/42-add-login-pag
 ### 2. Write Branch Name to Task
 
 ```bash
+# First, retrieve the existing body
+agkan task get <id> --json
+# Then update by concatenating existing body with branch name
 agkan task update <id> body "<existing body>\n\nBranch: <branch-name>"
 ```
 
@@ -57,6 +60,9 @@ gh pr create --title "<title>" --body "<body>"
 ### 6. Add PR Information to Task
 
 ```bash
+# First, retrieve the existing body
+agkan task get <id> --json
+# Then update by concatenating existing body with PR URL
 agkan task update <id> body "<existing body>\n\nPR: <PR URL>"
 ```
 
