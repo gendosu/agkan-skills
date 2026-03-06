@@ -45,7 +45,9 @@ If a task contains scope exceeding the above standard, split it into sub-tasks:
 
 ```bash
 # Create new tasks after splitting
-agkan task add "<sub-task name>" "<details>"
+# Use --parent to maintain the parent-child relationship with the original task
+# This makes the task hierarchy visible in `agkan task list --tree`
+agkan task add "<sub-task name>" "<details>" --parent <original-id>
 
 # Close the original task as split (or update it)
 agkan task update <id> status closed
