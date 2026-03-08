@@ -87,9 +87,17 @@ Read .claude/skills/execute-subtask/SKILL.md and follow its steps to implement.
 )
 ```
 
-### 7. End session or repeat
+### 7. Re-fetch task list and continue or end session
 
-If there are no termination instructions from the user, select the next task and repeat from step 1 of the workflow.
+After the sub-agent completes, re-fetch the task list to pick up any newly added ready tasks:
+
+```bash
+agkan task list --status ready --json
+```
+
+If there are no termination instructions from the user and ready tasks exist (including newly added ones), select the next task and repeat from step 3 of the workflow.
+
+If no ready tasks remain, end the session.
 
 ---
 
