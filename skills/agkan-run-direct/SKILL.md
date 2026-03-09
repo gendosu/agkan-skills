@@ -15,6 +15,12 @@ A workflow to select the highest priority ready task from agkan, implement it di
 
 ### 1. Update Branch
 
+このスキルはカレントブランチ（mainまたはtopic branch）に直接コミットすることを想定している。
+そのため、`git pull -p` のみを実行する（`agkan-run` とは異なり、mainから新しいブランチを切る必要はない）。
+
+- topic branch上で実行する場合: そのままカレントブランチに実装する
+- mainから始める場合: 必要に応じて事前に `git checkout main && git pull -p` を実行しておくこと
+
 ```bash
 git pull -p
 ```
