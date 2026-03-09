@@ -45,11 +45,15 @@ Refer to /key-guidelines during implementation to maintain code quality.
 
 ### 4. Commit and Push
 
+変更ファイルを明示的に指定してステージングする。`git add -A` は `.env` や credentials など意図しないファイルが含まれるリスクがあるため使用しない。
+
 ```bash
-git add -A
+git add <file1> <file2> ...
 git commit -m "<commit message>"
 git push -u origin <branch-name>
 ```
+
+> **注意**: `git add -A` や `git add .` は使用しないこと。`.env`、`credentials.*`、秘密情報を含むファイルが意図せずコミットされる可能性がある。
 
 ### 5. Create PR
 
