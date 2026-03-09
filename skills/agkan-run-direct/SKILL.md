@@ -34,7 +34,7 @@ Evaluate tasks using the following criteria in descending order and select the t
 
 **Priority (read from `metadata` field in the list JSON response):**
 ```
-High > Medium > Low
+Critical > High > Medium > Low
 ```
 
 **Tags (used when priority is the same):**
@@ -106,7 +106,7 @@ If no ready tasks remain, end the session.
 ```
 Ready task list
     ↓
-Sort by priority (High → Medium → Low)
+Sort by priority (Critical → High → Medium → Low)
     ↓
 Multiple tasks with same priority?
    Yes → Sort by tag priority (bug → security → ... → docs)

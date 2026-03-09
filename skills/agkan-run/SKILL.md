@@ -34,7 +34,7 @@ Evaluate tasks in descending order using the following criteria and select the t
 
 **Priority (read from `metadata` field in the list JSON response):**
 ```
-High > Medium > Low
+Critical > High > Medium > Low
 ```
 
 **Tags (refer to when priority is the same):**
@@ -106,7 +106,7 @@ If no ready tasks remain, end the session.
 ```
 Todo task list
     ↓
-Sort by priority (High → Medium → Low)
+Sort by priority (Critical → High → Medium → Low)
     ↓
 Multiple tasks with same priority?
    Yes → Sort by tag priority (bug → security → ... → docs)
