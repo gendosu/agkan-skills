@@ -60,9 +60,17 @@ agkan task get <id> --json
 
 Then delegate only that single task to a sub-agent using the same Task call format above.
 
-### 3. End Session or Continue
+### 3. Re-fetch Icebox Tasks and Continue or End Session
 
-Repeat until all tasks are processed. If there is no end instruction from the user, select the next task and repeat from step 2.
+After the sub-agent completes, re-fetch the icebox task list to pick up any tasks added during processing:
+
+```bash
+agkan task list --status icebox --json
+```
+
+If there is no instruction to end from the user and icebox tasks remain, select the next task and repeat from step 2.
+
+If no icebox tasks remain, end the session.
 
 ---
 
