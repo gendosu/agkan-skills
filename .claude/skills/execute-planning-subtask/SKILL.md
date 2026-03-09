@@ -1,8 +1,11 @@
 ---
 name: execute-planning-subtask
-description: Use when reviewing a single backlog task to assess decomposition, implementation readiness, and priority ordering.
+description: "[DEPRECATED] Use agkan-planning-subtask instead. Use when reviewing a single backlog task to assess decomposition, implementation readiness, and priority ordering."
 user-invokable: false
 ---
+
+> **DEPRECATED**: This skill has been renamed. Please use `agkan-planning-subtask` instead.
+> `Skill("agkan-planning-subtask")`
 
 # execute-planning-subtask
 

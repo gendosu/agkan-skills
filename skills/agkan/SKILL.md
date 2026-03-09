@@ -132,7 +132,7 @@ agkan task meta set <task-id> priority <value>
 | `medium` | Normal priority (default) |
 | `low` | Work on if there is time |
 
-**When to set priority:** Priority is set during the planning phase (`execute-planning-subtask`), at the same time the task is moved from `backlog` to `ready`. This is the responsibility of the planning skill. Skills that select tasks for execution (e.g., `execute-task`) read this value to determine which task to work on next.
+**When to set priority:** Priority is set during the planning phase (`agkan-planning-subtask`), at the same time the task is moved from `backlog` to `ready`. This is the responsibility of the planning skill. Skills that select tasks for execution (e.g., `agkan-run`) read this value to determine which task to work on next.
 
 ---
 
@@ -310,7 +310,7 @@ agkan task list --status ready --json | jq '.tasks[].id'
 
 ## Typical Workflows
 
-### Icebox Review (execute-icebox)
+### Icebox Review (agkan-icebox)
 
 Icebox holds ideas and candidates that are not yet ready for planning. Review them periodically to decide whether to promote or close each one.
 

@@ -1,7 +1,10 @@
 ---
 name: execute-add
-description: Use when adding a new task to the backlog — collects title, body, tags, priority, and parent task, then creates it with agkan.
+description: "[DEPRECATED] Use agkan-add instead. Use when adding a new task to the backlog — collects title, body, tags, priority, and parent task, then creates it with agkan."
 ---
+
+> **DEPRECATED**: This skill has been renamed. Please use `agkan-add` instead.
+> `Skill("agkan-add")`
 
 # execute-add
 

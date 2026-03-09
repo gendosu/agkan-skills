@@ -1,7 +1,10 @@
 ---
 name: execute-task
-description: Use when starting a development session to pick the highest priority Todo task from agkan, implement it, create a pull request, and mark it done.
+description: "[DEPRECATED] Use agkan-run instead. Use when starting a development session to pick the highest priority Todo task from agkan, implement it, create a pull request, and mark it done."
 ---
+
+> **DEPRECATED**: This skill has been renamed. Please use `agkan-run` instead.
+> `Skill("agkan-run")`
 
 # execute-task
 

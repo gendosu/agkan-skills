@@ -41,7 +41,7 @@ agkan task tag add "feature"
 agkan task meta set <id> priority high
 ```
 
-### 2. execute-planning
+### 2. agkan-planning
 
 Review backlog tasks to assess decomposition, implementation readiness, and priority ordering before development begins.
 
@@ -60,7 +60,7 @@ Review backlog tasks to assess decomposition, implementation readiness, and prio
    - Move to "ready" status if implementation is clear and blockers are resolved
    - Tag with "いつかやる" if deferrable
 
-### 3. execute-task
+### 3. agkan-run
 
 Pick the highest priority "ready" task, implement it, create a pull request, and mark it as done.
 
@@ -81,7 +81,7 @@ Pick the highest priority "ready" task, implement it, create a pull request, and
 4. Delegate implementation to a sub-agent
 5. Mark the task as complete or move to next task
 
-### 4. execute-subtask
+### 4. agkan-subtask
 
 Implement a selected task in isolation, handle in_progress status updates, branch creation, implementation, PR creation, and completion.
 
@@ -93,7 +93,7 @@ Implement a selected task in isolation, handle in_progress status updates, branc
 
 **Important:**
 - This skill is not directly invokable by users
-- Used internally by execute-task skill
+- Used internally by agkan-run skill
 - Expects a task to be pre-selected
 
 **Typical Flow:**
@@ -103,7 +103,7 @@ Implement a selected task in isolation, handle in_progress status updates, branc
 4. Create and submit a pull request
 5. Update task status to "review"
 
-### 5. execute-task-direct
+### 5. agkan-run-direct
 
 Pick the highest priority "ready" task, implement it directly without creating a branch or PR, and mark it as done.
 
@@ -122,10 +122,10 @@ Pick the highest priority "ready" task, implement it directly without creating a
 2. Fetch all ready tasks
 3. Evaluate priority using importance and tag hierarchy
 4. Select the highest-priority task and update status to in_progress
-5. Delegate implementation to a sub-agent (execute-subtask-direct)
+5. Delegate implementation to a sub-agent (agkan-subtask-direct)
 6. Mark the task as done
 
-### 6. execute-subtask-direct
+### 6. agkan-subtask-direct
 
 Implement a selected task directly without creating a branch or PR and mark it as complete.
 
@@ -136,7 +136,7 @@ Implement a selected task directly without creating a branch or PR and mark it a
 
 **Important:**
 - This skill is not directly invokable by users
-- Used internally by execute-task-direct skill
+- Used internally by agkan-run-direct skill
 - Expects a task to be pre-selected
 
 **Typical Flow:**
@@ -144,7 +144,7 @@ Implement a selected task directly without creating a branch or PR and mark it a
 2. Commit changes to the current branch
 3. Update task status to "done"
 
-### 7. execute-review
+### 7. agkan-review
 
 Check tasks with "review" status against GitHub PR status and automatically move them to done or closed.
 
@@ -159,7 +159,7 @@ Check tasks with "review" status against GitHub PR status and automatically move
 3. Check PR status via GitHub CLI
 4. Move to "done" if PR is merged, "closed" if PR is closed without merge
 
-### 8. execute-planning-subtask
+### 8. agkan-planning-subtask
 
 Review a single backlog task to assess decomposition, implementation readiness, and priority ordering.
 
@@ -171,7 +171,7 @@ Review a single backlog task to assess decomposition, implementation readiness, 
 
 **Important:**
 - This skill is not directly invokable by users
-- Used internally by execute-planning skill
+- Used internally by agkan-planning skill
 - Expects a task to be pre-selected
 
 **Typical Flow:**
@@ -227,7 +227,7 @@ Update task status:
 
 Review and plan backlog tasks:
 ```
-Please use execute-planning skill to review our backlog tasks and prepare them for implementation.
+Please use agkan-planning skill to review our backlog tasks and prepare them for implementation.
 ```
 
 ### Execution Session
@@ -300,19 +300,25 @@ agkan-skills/
 ├── skills/
 │   ├── agkan/
 │   │   └── SKILL.md          # Core task management skill
-│   ├── execute-planning/
+│   ├── agkan-add/
+│   │   └── SKILL.md          # Task creation skill
+│   ├── agkan-icebox/
+│   │   └── SKILL.md          # Icebox review workflow skill
+│   ├── agkan-icebox-subtask/
+│   │   └── SKILL.md          # Single icebox task review skill
+│   ├── agkan-planning/
 │   │   └── SKILL.md          # Planning workflow skill
-│   ├── execute-planning-subtask/
+│   ├── agkan-planning-subtask/
 │   │   └── SKILL.md          # Single task planning skill
-│   ├── execute-task/
+│   ├── agkan-run/
 │   │   └── SKILL.md          # Task execution skill (with PR)
-│   ├── execute-task-direct/
+│   ├── agkan-run-direct/
 │   │   └── SKILL.md          # Task execution skill (direct, no PR)
-│   ├── execute-subtask/
+│   ├── agkan-subtask/
 │   │   └── SKILL.md          # Subtask implementation skill (with PR)
-│   ├── execute-subtask-direct/
+│   ├── agkan-subtask-direct/
 │   │   └── SKILL.md          # Subtask implementation skill (direct, no PR)
-│   └── execute-review/
+│   └── agkan-review/
 │       └── SKILL.md          # PR review status checking skill
 ├── README.md                 # This file (English)
 ├── README.ja.md              # Japanese documentation
@@ -339,4 +345,4 @@ https://github.com/gendosu/gendosu-claude-plugins
 
 ## Version
 
-0.3.0
+0.5.0

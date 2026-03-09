@@ -1,8 +1,11 @@
 ---
 name: execute-subtask-direct
-description: Use when a task has been selected and you need to implement it directly without PR/branch creation - handles implementation and marking done.
+description: "[DEPRECATED] Use agkan-subtask-direct instead. Use when a task has been selected and you need to implement it directly without PR/branch creation - handles implementation and marking done."
 user-invokable: false
 ---
+
+> **DEPRECATED**: This skill has been renamed. Please use `agkan-subtask-direct` instead.
+> `Skill("agkan-subtask-direct")`
 
 # execute-subtask-direct
 

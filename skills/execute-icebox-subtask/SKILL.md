@@ -1,8 +1,11 @@
 ---
 name: execute-icebox-subtask
-description: Use when reviewing a single icebox task to decide whether to promote it to backlog or close it.
+description: "[DEPRECATED] Use agkan-icebox-subtask instead. Use when reviewing a single icebox task to decide whether to promote it to backlog or close it."
 user-invokable: false
 ---
+
+> **DEPRECATED**: This skill has been renamed. Please use `agkan-icebox-subtask` instead.
+> `Skill("agkan-icebox-subtask")`
 
 # execute-icebox-subtask
 

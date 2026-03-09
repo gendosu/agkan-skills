@@ -1,10 +1,13 @@
 ---
 name: execute-subtask
-description: Use when a task has been selected and you need to implement it in an isolated (forked) context - handles in_progress update, branch creation, implementation, PR creation, and marking done.
+description: "[DEPRECATED] Use agkan-subtask instead. Use when a task has been selected and you need to implement it in an isolated (forked) context - handles in_progress update, branch creation, implementation, PR creation, and marking done."
 user-invokable: false
 metadata:
   context: fork
 ---
+
+> **DEPRECATED**: This skill has been renamed. Please use `agkan-subtask` instead.
+> `Skill("agkan-subtask")`
 
 # execute-subtask
 

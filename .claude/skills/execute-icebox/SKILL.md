@@ -1,7 +1,10 @@
 ---
 name: execute-icebox
-description: Use when reviewing icebox tasks to decide whether to promote them to backlog or close them as no longer needed.
+description: "[DEPRECATED] Use agkan-icebox instead. Use when reviewing icebox tasks to decide whether to promote them to backlog or close them as no longer needed."
 ---
+
+> **DEPRECATED**: This skill has been renamed. Please use `agkan-icebox` instead.
+> `Skill("agkan-icebox")`
 
 # execute-icebox
 

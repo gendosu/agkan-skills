@@ -41,7 +41,7 @@ agkan task tag add "feature"
 agkan task meta set <id> priority high
 ```
 
-### 2. execute-planning
+### 2. agkan-planning
 
 開発開始前に、バックログタスクを確認し、分解度、実装準備状態、優先順位の順序を評価します。
 
@@ -60,7 +60,7 @@ agkan task meta set <id> priority high
    - 実装が明確で障害物がない場合、「ready」ステータスに移行
    - 保留可能な場合、「いつかやる」タグを付与
 
-### 3. execute-task
+### 3. agkan-run
 
 「ready」キューから最も優先度の高いタスクを選択し、実装してプルリクエストを作成し、完了とします。
 
@@ -81,7 +81,7 @@ agkan task meta set <id> priority high
 4. サブエージェントに実装を委譲
 5. タスクを完了とするか、次のタスクに移行
 
-### 4. execute-subtask
+### 4. agkan-subtask
 
 選択されたタスクを単独で実装し、in_progress ステータスの更新、ブランチ作成、実装、プルリクエスト作成、完了処理を行います。
 
@@ -93,7 +93,7 @@ agkan task meta set <id> priority high
 
 **重要:**
 - このスキルはユーザーが直接呼び出すことはできません
-- execute-task スキルにより内部的に使用されます
+- agkan-run スキルにより内部的に使用されます
 - タスクが事前に選択されていることが前提です
 
 **典型的なフロー:**
@@ -103,7 +103,7 @@ agkan task meta set <id> priority high
 4. プルリクエストを作成して提出
 5. タスクステータスを「review」に更新
 
-### 5. execute-task-direct
+### 5. agkan-run-direct
 
 「ready」キューから最も優先度の高いタスクを選択し、ブランチやPRを作成せずに直接実装して完了とします。
 
@@ -122,10 +122,10 @@ agkan task meta set <id> priority high
 2. すべての ready タスクを取得
 3. 重要度とタグ階層を使用して優先度を評価
 4. 最も優先度の高いタスクを選択して in_progress に更新
-5. サブエージェント（execute-subtask-direct）に実装を委譲
+5. サブエージェント（agkan-subtask-direct）に実装を委譲
 6. タスクを done に更新
 
-### 6. execute-subtask-direct
+### 6. agkan-subtask-direct
 
 選択されたタスクをブランチやPRを作成せずに直接実装し、完了とします。
 
@@ -136,7 +136,7 @@ agkan task meta set <id> priority high
 
 **重要:**
 - このスキルはユーザーが直接呼び出すことはできません
-- execute-task-direct スキルにより内部的に使用されます
+- agkan-run-direct スキルにより内部的に使用されます
 - タスクが事前に選択されていることが前提です
 
 **典型的なフロー:**
@@ -144,7 +144,7 @@ agkan task meta set <id> priority high
 2. 現在のブランチに変更をコミット
 3. タスクステータスを「done」に更新
 
-### 7. execute-review
+### 7. agkan-review
 
 「review」ステータスのタスクを GitHub PR ステータスと照合し、自動的に done または closed に変更します。
 
@@ -159,7 +159,7 @@ agkan task meta set <id> priority high
 3. GitHub CLI で PR ステータスを確認
 4. PR がマージ済みなら「done」、クローズ（マージなし）なら「closed」に移行
 
-### 8. execute-planning-subtask
+### 8. agkan-planning-subtask
 
 単一のバックログタスクを確認し、分解度、実装準備状態、優先順位の順序を評価します。
 
@@ -171,7 +171,7 @@ agkan task meta set <id> priority high
 
 **重要:**
 - このスキルはユーザーが直接呼び出すことはできません
-- execute-planning スキルにより内部的に使用されます
+- agkan-planning スキルにより内部的に使用されます
 - タスクが事前に選択されていることが前提です
 
 **典型的なフロー:**
@@ -227,7 +227,7 @@ ready 状態のすべてのタスクを一覧表示:
 
 バックログタスクを確認して実装に向けて準備:
 ```
-execute-planning スキルを使用して、バックログタスクを確認し、実装に向けて準備してください。
+agkan-planning スキルを使用して、バックログタスクを確認し、実装に向けて準備してください。
 ```
 
 ### 実行セッション
@@ -300,19 +300,25 @@ agkan-skills/
 ├── skills/
 │   ├── agkan/
 │   │   └── SKILL.md          # コアタスク管理スキル
-│   ├── execute-planning/
+│   ├── agkan-add/
+│   │   └── SKILL.md          # タスク作成スキル
+│   ├── agkan-icebox/
+│   │   └── SKILL.md          # iceboxレビューワークフロースキル
+│   ├── agkan-icebox-subtask/
+│   │   └── SKILL.md          # 単一iceboxタスクレビュースキル
+│   ├── agkan-planning/
 │   │   └── SKILL.md          # 計画ワークフロースキル
-│   ├── execute-planning-subtask/
+│   ├── agkan-planning-subtask/
 │   │   └── SKILL.md          # 単一タスク計画スキル
-│   ├── execute-task/
+│   ├── agkan-run/
 │   │   └── SKILL.md          # タスク実行スキル（PR あり）
-│   ├── execute-task-direct/
+│   ├── agkan-run-direct/
 │   │   └── SKILL.md          # タスク実行スキル（直接実装・PR なし）
-│   ├── execute-subtask/
+│   ├── agkan-subtask/
 │   │   └── SKILL.md          # サブタスク実装スキル（PR あり）
-│   ├── execute-subtask-direct/
+│   ├── agkan-subtask-direct/
 │   │   └── SKILL.md          # サブタスク実装スキル（直接実装・PR なし）
-│   └── execute-review/
+│   └── agkan-review/
 │       └── SKILL.md          # PRレビューステータス確認スキル
 ├── README.md                 # このファイル（英語版）
 ├── README.ja.md              # 日本語ドキュメント
@@ -339,4 +345,4 @@ https://github.com/gendosu/gendosu-claude-plugins
 
 ## バージョン
 
-0.3.0
+0.5.0

@@ -5,6 +5,34 @@ All notable changes to the agkan-skills plugin will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-03-09
+
+### Added
+
+- **agkan-add**: New skill name for `execute-add` (renamed with `agkan-` prefix)
+- **agkan-icebox**: New skill name for `execute-icebox` (renamed with `agkan-` prefix)
+- **agkan-icebox-subtask**: New skill name for `execute-icebox-subtask` (renamed with `agkan-` prefix)
+- **agkan-planning**: New skill name for `execute-planning` (renamed with `agkan-` prefix)
+- **agkan-planning-subtask**: New skill name for `execute-planning-subtask` (renamed with `agkan-` prefix)
+- **agkan-run**: New skill name for `execute-task` (renamed from `execute-task` to `agkan-run`)
+- **agkan-run-direct**: New skill name for `execute-task-direct` (renamed from `execute-task-direct` to `agkan-run-direct`)
+- **agkan-subtask**: New skill name for `execute-subtask` (renamed with `agkan-` prefix)
+- **agkan-subtask-direct**: New skill name for `execute-subtask-direct` (renamed with `agkan-` prefix)
+- **agkan-review**: New skill name for `execute-review` (renamed with `agkan-` prefix)
+
+### Deprecated
+
+- **execute-add**: Deprecated in favor of `agkan-add`
+- **execute-icebox**: Deprecated in favor of `agkan-icebox`
+- **execute-icebox-subtask**: Deprecated in favor of `agkan-icebox-subtask`
+- **execute-planning**: Deprecated in favor of `agkan-planning`
+- **execute-planning-subtask**: Deprecated in favor of `agkan-planning-subtask`
+- **execute-task**: Deprecated in favor of `agkan-run`
+- **execute-task-direct**: Deprecated in favor of `agkan-run-direct`
+- **execute-subtask**: Deprecated in favor of `agkan-subtask`
+- **execute-subtask-direct**: Deprecated in favor of `agkan-subtask-direct`
+- **execute-review**: Deprecated in favor of `agkan-review`
+
 ## [0.4.4] - 2026-03-09
 
 ### Fixed

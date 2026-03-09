@@ -1,7 +1,10 @@
 ---
 name: execute-planning
-description: Use when reviewing backlog tasks to assess decomposition, implementation readiness, and priority ordering before development begins.
+description: "[DEPRECATED] Use agkan-planning instead. Use when reviewing backlog tasks to assess decomposition, implementation readiness, and priority ordering before development begins."
 ---
+
+> **DEPRECATED**: This skill has been renamed. Please use `agkan-planning` instead.
+> `Skill("agkan-planning")`
 
 # execute-planning
 

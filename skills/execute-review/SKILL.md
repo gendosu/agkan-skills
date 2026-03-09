@@ -1,7 +1,10 @@
 ---
 name: execute-review
-description: Use when checking review tasks against GitHub PR status to automatically move them to done or closed.
+description: "[DEPRECATED] Use agkan-review instead. Use when checking review tasks against GitHub PR status to automatically move them to done or closed."
 ---
+
+> **DEPRECATED**: This skill has been renamed. Please use `agkan-review` instead.
+> `Skill("agkan-review")`
 
 # execute-review
 

@@ -1,7 +1,10 @@
 ---
 name: execute-task-direct
-description: Use when starting a development session to pick the highest priority Todo task from agkan, implement it directly without PR/branch, and mark it done.
+description: "[DEPRECATED] Use agkan-run-direct instead. Use when starting a development session to pick the highest priority Todo task from agkan, implement it directly without PR/branch, and mark it done."
 ---
+
+> **DEPRECATED**: This skill has been renamed. Please use `agkan-run-direct` instead.
+> `Skill("agkan-run-direct")`
 
 # execute-task-direct
 
