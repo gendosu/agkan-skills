@@ -75,6 +75,13 @@ agkan task update-parent <id> null  # Remove parent
 
 # Delete task
 agkan task delete <id>
+
+# Purge old done/closed tasks
+agkan task purge                        # Delete done/closed tasks older than 3 days ago (default)
+agkan task purge --before 2026-01-01    # Purge tasks last updated before the given date (ISO 8601)
+agkan task purge --status done          # Target specific statuses (default: done,closed)
+agkan task purge --dry-run              # Preview tasks that would be purged without deleting
+agkan task purge --json                 # Output in JSON format
 ```
 
 ### Blocking Relationships
