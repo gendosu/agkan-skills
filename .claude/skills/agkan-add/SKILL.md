@@ -63,6 +63,18 @@ If priority is `medium` (the default), the `--priority` flag can be omitted:
 agkan task add "<title>" "<body>"
 ```
 
+**bodyに改行を含める場合は `$'...'` 構文を使うこと。**
+
+通常のダブルクォート内で `\n` を使うと、リテラルの `\n` として渡されてしまい改行にならない。
+
+```bash
+# NG: \n がリテラル文字列として渡される
+agkan task add "タイトル" "1行目\n2行目"
+
+# OK: $'...' 構文を使うと \n が実際の改行として展開される
+agkan task add "タイトル" $'1行目\n2行目\n\n## 詳細\n内容はここに'
+```
+
 Note the task ID returned from the command output.
 
 ### 3. Attach Tags (if any)
