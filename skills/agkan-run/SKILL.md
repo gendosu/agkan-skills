@@ -45,6 +45,14 @@ bug > security > improvement > test > performance > refactor > docs
 **If there are child tasks or blocker tasks**
 Prioritize the target child tasks or blocker tasks (same importance and tag criteria apply)
 
+To check for child tasks of a selected task:
+
+```bash
+agkan task get <id> --json
+```
+
+The `children` field in the JSON response contains the list of child tasks. If child tasks exist, prioritize them using the same priority and tag criteria.
+
 ### 4. Check for blockers
 
 ```bash
