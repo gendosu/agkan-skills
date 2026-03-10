@@ -5,6 +5,26 @@ All notable changes to the agkan-skills plugin will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-03-10
+
+### Removed
+
+- **execute-add**: Removed deprecated skill (use `agkan-add` instead)
+- **execute-icebox**: Removed deprecated skill (use `agkan-icebox` instead)
+- **execute-icebox-subtask**: Removed deprecated skill (use `agkan-icebox-subtask` instead)
+- **execute-planning**: Removed deprecated skill (use `agkan-planning` instead)
+- **execute-planning-subtask**: Removed deprecated skill (use `agkan-planning-subtask` instead)
+- **execute-task**: Removed deprecated skill (use `agkan-run` instead)
+- **execute-task-direct**: Removed deprecated skill (use `agkan-run-direct` instead)
+- **execute-subtask**: Removed deprecated skill (use `agkan-subtask` instead)
+- **execute-subtask-direct**: Removed deprecated skill (use `agkan-subtask-direct` instead)
+- **execute-review**: Removed deprecated skill (use `agkan-review` instead)
+
+### Documentation
+
+- **agkan-run**: Add child task check command in step 3 for clarity
+- **agkan-run-direct**: Add child task check command in step 3 for clarity
+
 ## [0.5.0] - 2026-03-09
 
 ### Added
