@@ -180,6 +180,31 @@ agkan task meta set <id> priority high
 3. 実装が明確で障害物がない場合、「ready」ステータスに移行
 4. 保留可能な場合、「will-do-later」タグを付与
 
+### 9. release
+
+バージョンアップ、CHANGELOG 更新、タグ打ち、プッシュ、オプションで npm publish までのリリースプロセス全体を自動化します。
+
+**用途:**
+- プロジェクトのバージョンリリースを実施
+- バージョンバンプ、git タグ、プッシュを一連のワークフローで自動化
+- リリースノートの生成と CHANGELOG の更新
+- デプロイの終端として npm publish を実行
+
+**バージョン種別:**
+- **patch**: バグ修正と後方互換の改善
+- **minor**: 後方互換の新機能追加
+- **major**: 破壊的変更
+
+**典型的なフロー:**
+1. バージョンバンプ種別を決定（patch/minor/major）
+2. テストとビルドを実行してプロジェクトの健全性を確認
+3. CHANGELOG.md を更新（Unreleased セクションをバージョンセクションに移動）
+4. `npm version <type> --no-git-tag-version` で `package.json` のバージョンを更新
+5. `package.json` と `CHANGELOG.md` をコミット
+6. 注釈付き git タグを作成（`v1.2.0`）
+7. コミットとタグを origin にプッシュ
+8. オプションで `npm publish` を実行
+
 ## インストール
 
 ### マーケットプレイスを追加
@@ -318,8 +343,10 @@ agkan-skills/
 │   │   └── SKILL.md          # サブタスク実装スキル（PR あり）
 │   ├── agkan-subtask-direct/
 │   │   └── SKILL.md          # サブタスク実装スキル（直接実装・PR なし）
-│   └── agkan-review/
-│       └── SKILL.md          # PRレビューステータス確認スキル
+│   ├── agkan-review/
+│   │   └── SKILL.md          # PRレビューステータス確認スキル
+│   └── release/
+│       └── SKILL.md          # リリース管理スキル
 ├── README.md                 # このファイル（英語版）
 ├── README.ja.md              # 日本語ドキュメント
 ├── CHANGELOG.md              # バージョン履歴

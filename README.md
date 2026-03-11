@@ -180,6 +180,31 @@ Review a single backlog task to assess decomposition, implementation readiness, 
 3. Move to "ready" status if implementation is clear and blockers are resolved
 4. Tag with "will-do-later" if deferrable
 
+### 9. release
+
+Automate the full release process: version bumping, CHANGELOG update, tagging, pushing, and optional npm publish.
+
+**Use Cases:**
+- Performing a versioned release of the project
+- Automating version bump, git tag, and push in one workflow
+- Generating release notes and updating CHANGELOG
+- Triggering npm publish as the final deploy step
+
+**Version Types:**
+- **patch**: Bug fixes and backward-compatible improvements
+- **minor**: New backward-compatible features
+- **major**: Breaking changes
+
+**Typical Flow:**
+1. Determine version bump type (patch/minor/major)
+2. Run tests and build to verify project health
+3. Update CHANGELOG.md (move Unreleased to versioned section)
+4. Run `npm version <type> --no-git-tag-version` to bump `package.json`
+5. Commit `package.json` and `CHANGELOG.md`
+6. Create annotated git tag (`v1.2.0`)
+7. Push commits and tags to origin
+8. Optionally run `npm publish`
+
 ## Installation
 
 ### Add Marketplace
@@ -318,8 +343,10 @@ agkan-skills/
 │   │   └── SKILL.md          # Subtask implementation skill (with PR)
 │   ├── agkan-subtask-direct/
 │   │   └── SKILL.md          # Subtask implementation skill (direct, no PR)
-│   └── agkan-review/
-│       └── SKILL.md          # PR review status checking skill
+│   ├── agkan-review/
+│   │   └── SKILL.md          # PR review status checking skill
+│   └── release/
+│       └── SKILL.md          # Release management skill
 ├── README.md                 # This file (English)
 ├── README.ja.md              # Japanese documentation
 ├── CHANGELOG.md              # Version history
