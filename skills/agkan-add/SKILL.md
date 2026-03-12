@@ -57,6 +57,18 @@ If no body is provided:
 agkan task add "<title>"
 ```
 
+**When including line breaks in body, use the `$'...'` syntax.**
+
+Using `\n` within regular double quotes will pass it as a literal `\n` string and will not create a line break.
+
+```bash
+# NG: \n is passed as a literal string
+agkan task add "タイトル" "1行目\n2行目"
+
+# OK: Using $'...' syntax expands \n as an actual line break
+agkan task add "タイトル" $'1行目\n2行目\n\n## 詳細\n内容はここに'
+```
+
 Note the task ID returned from the command output.
 
 ### 3. Attach Tags (if any)

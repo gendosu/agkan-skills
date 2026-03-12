@@ -48,30 +48,24 @@ Gather the following from the user. Fields marked optional can be skipped if not
 ### 2. Create the Task
 
 ```bash
-agkan task add "<title>" "<body>" --priority <value>
+agkan task add "<title>" "<body>"
 ```
 
 If no body is provided:
 
 ```bash
-agkan task add "<title>" --priority <value>
+agkan task add "<title>"
 ```
 
-If priority is `medium` (the default), the `--priority` flag can be omitted:
+**When including line breaks in body, use the `$'...'` syntax.**
+
+Using `\n` within regular double quotes will pass it as a literal `\n` string and will not create a line break.
 
 ```bash
-agkan task add "<title>" "<body>"
-```
-
-**bodyに改行を含める場合は `$'...'` 構文を使うこと。**
-
-通常のダブルクォート内で `\n` を使うと、リテラルの `\n` として渡されてしまい改行にならない。
-
-```bash
-# NG: \n がリテラル文字列として渡される
+# NG: \n is passed as a literal string
 agkan task add "タイトル" "1行目\n2行目"
 
-# OK: $'...' 構文を使うと \n が実際の改行として展開される
+# OK: Using $'...' syntax expands \n as an actual line break
 agkan task add "タイトル" $'1行目\n2行目\n\n## 詳細\n内容はここに'
 ```
 
@@ -85,13 +79,21 @@ For each tag:
 agkan tag attach <task-id> <tag-name>
 ```
 
-### 4. Set Parent Task (if applicable)
+### 4. Set Priority (if not medium)
+
+```bash
+agkan task meta set <task-id> priority <value>
+```
+
+Skip this step if priority is `medium` (the default).
+
+### 5. Set Parent Task (if applicable)
 
 ```bash
 agkan task update-parent <task-id> <parent-id>
 ```
 
-### 5. Show Summary
+### 6. Show Summary
 
 Retrieve and display the created task:
 

@@ -45,6 +45,8 @@ agkan task list --sort title       # Sort by field (id / title / status / create
 agkan task list --order asc        # Sort order (asc / desc), default: desc
 agkan task list --assignees "alice,bob"  # Filter by assignees (comma-separated)
 agkan task list --all              # Include all statuses (including done and closed)
+agkan task list --priority high,critical  # Filter by priority
+agkan task list --sort priority           # Sort by priority
 
 # Get details
 agkan task get <id>

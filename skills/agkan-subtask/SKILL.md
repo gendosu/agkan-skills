@@ -22,7 +22,7 @@ Workflow to implement a selected task on a new branch, create a PR, and move to 
 agkan task update <id> status in_progress
 ```
 
-### 3. Create Branch
+### 2. Create Branch
 
 ```bash
 git checkout -b <branch-name>
@@ -30,7 +30,7 @@ git checkout -b <branch-name>
 
 Branch name is generated from task ID and title (example: `feat/42-add-login-page`).
 
-### 4. Write Branch Name to Task
+### 3. Write Branch Name to Task
 
 ```bash
 # First, retrieve the existing body
@@ -39,13 +39,13 @@ agkan task get <id> --json
 agkan task update <id> body "<existing body>\n\nBranch: <branch-name>"
 ```
 
-### 5. Implementation
+### 4. Implementation
 
 Implement according to the task content.
 
 Refer to /key-guidelines during implementation to maintain code quality.
 
-### 6. Commit and Push
+### 5. Commit and Push
 
 Stage files by specifying them explicitly. Do not use `git add -A` as it risks including unintended files such as `.env` or credentials.
 
@@ -57,13 +57,13 @@ git push -u origin <branch-name>
 
 > **Note**: Do not use `git add -A` or `git add .`. Files containing `.env`, `credentials.*`, or secrets may be committed unintentionally.
 
-### 7. Create PR
+### 6. Create PR
 
 ```bash
 gh pr create --title "<title>" --body "<body>"
 ```
 
-### 8. Add PR Information to Task
+### 7. Add PR Information to Task
 
 ```bash
 # First, retrieve the existing body
@@ -72,7 +72,7 @@ agkan task get <id> --json
 agkan task update <id> body "<existing body>\n\nPR: <PR URL>"
 ```
 
-### 9. Update Task to Review
+### 8. Update Task to Review
 
 ```bash
 agkan task update <id> status review

@@ -30,11 +30,11 @@ agkan task list --status ready --json
 Evaluate tasks in descending order using the following criteria and select the top one:
 
 **Skip tasks with `will-do-later` tag:**
-`will-do-later` タグが付いているタスクは意図的に先送りされたタスクであるため、スキップする。`will-do-later` タグが付いていないタスクのみを選択対象とする。
+Tasks with the `will-do-later` tag are intentionally postponed tasks, so skip them. Only select tasks that do not have the `will-do-later` tag.
 
 **Priority (read from `metadata` field in the list JSON response):**
 ```
-High > Medium > Low
+Critical > High > Medium > Low
 ```
 
 **Tags (refer to when priority is the same):**
@@ -51,7 +51,7 @@ Prioritize the target child tasks or blocker tasks (same importance and tag crit
 agkan task block list <id> --json
 ```
 
-`blockedBy` に未完了タスクが存在する場合は、そのタスクを選択せず別のタスクを選択するか、ブロッカータスクを先に処理する。
+If there are incomplete tasks in `blockedBy`, do not select that task. Instead, select a different task or process the blocker task first.
 
 ### 5. Update task to in_progress
 
@@ -106,7 +106,7 @@ If no ready tasks remain, end the session.
 ```
 Todo task list
     ↓
-Sort by priority (High → Medium → Low)
+Sort by priority (Critical → High → Medium → Low)
     ↓
 Multiple tasks with same priority?
    Yes → Sort by tag priority (bug → security → ... → docs)

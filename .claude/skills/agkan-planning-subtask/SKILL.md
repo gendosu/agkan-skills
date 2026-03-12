@@ -67,7 +67,8 @@ Move to Ready if **all** of the following conditions are met:
 When moving a task to Ready, also set the priority at this point:
 
 ```bash
-agkan task update <id> --status ready --priority <value>
+agkan task update <id> status ready
+agkan task meta set <id> priority <value>
 ```
 
 Priority values: `critical` / `high` / `medium` / `low`

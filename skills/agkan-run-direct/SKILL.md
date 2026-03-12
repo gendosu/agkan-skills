@@ -15,11 +15,11 @@ A workflow to select the highest priority ready task from agkan, implement it di
 
 ### 1. Update Branch
 
-このスキルはカレントブランチ（mainまたはtopic branch）に直接コミットすることを想定している。
-そのため、`git pull -p` のみを実行する（`agkan-run` とは異なり、mainから新しいブランチを切る必要はない）。
+This skill is designed to commit directly to the current branch (main or topic branch).
+Therefore, only execute `git pull -p` (unlike `agkan-run`, there is no need to create a new branch from main).
 
-- topic branch上で実行する場合: そのままカレントブランチに実装する
-- mainから始める場合: 必要に応じて事前に `git checkout main && git pull -p` を実行しておくこと
+- When running on a topic branch: implement directly on the current branch
+- When starting from main: execute `git checkout main && git pull -p` beforehand if necessary
 
 ```bash
 git pull -p
@@ -36,7 +36,7 @@ agkan task list --status ready --json
 Evaluate tasks using the following criteria in descending order and select the top one:
 
 **Skip tasks with `will-do-later` tag:**
-`will-do-later` タグが付いているタスクは意図的に先送りされたタスクであるため、スキップする。`will-do-later` タグが付いていないタスクのみを選択対象とする。
+Tasks with the `will-do-later` tag are intentionally deferred tasks, so skip them. Only select tasks without the `will-do-later` tag.
 
 **Priority (read from `metadata` field in the list JSON response):**
 ```
@@ -57,7 +57,7 @@ Prioritize the target subtasks or blocker tasks (using the same importance and t
 agkan task block list <id> --json
 ```
 
-`blockedBy` に未完了タスクが存在する場合は、そのタスクを選択せず別のタスクを選択するか、ブロッカータスクを先に処理する。
+If incomplete tasks exist in `blockedBy`, do not select that task; instead, select a different task or process the blocker tasks first.
 
 ### 5. Update Task Status to in_progress
 
