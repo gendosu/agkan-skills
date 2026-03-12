@@ -88,7 +88,7 @@ git add package.json CHANGELOG.md
 git commit -m "chore: release vX.Y.Z"
 ```
 
-> **注意**: `git add -A` や `git add .` は使用しないこと。`.env`、`credentials.*`、秘密情報を含むファイルが意図せずコミットされる可能性がある。
+> **Warning**: Do not use `git add -A` or `git add .`. Files like `.env`, `credentials.*`, and files containing sensitive information may be unintentionally committed.
 
 ### 8. Create Git Tag
 

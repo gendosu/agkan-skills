@@ -33,7 +33,7 @@ agkan task list --status ready --json
 Evaluate tasks using the following criteria in descending order and select the top one:
 
 **Skip tasks with `will-do-later` tag:**
-`will-do-later` タグが付いているタスクは意図的に先送りされたタスクであるため、スキップする。`will-do-later` タグが付いていないタスクのみを選択対象とする。
+Tasks with the `will-do-later` tag are intentionally deferred tasks, so skip them. Only select from tasks that do not have the `will-do-later` tag.
 
 **Priority (read from `metadata` field in the list JSON response):**
 ```
@@ -54,7 +54,7 @@ Prioritize the target subtasks or blocker tasks (using the same importance and t
 agkan task block list <id> --json
 ```
 
-`blockedBy` に未完了タスクが存在する場合は、そのタスクを選択せず別のタスクを選択するか、ブロッカータスクを先に処理する。
+If there are incomplete tasks in `blockedBy`, do not select that task. Instead, select a different task or handle the blocker tasks first.
 
 ### 5. Update Task Status to in_progress
 
