@@ -1,27 +1,27 @@
-このskillsの使い方
+How to use these skills
 
-agkanにタスクを登録する。status: backlogで入る。
+Register tasks in agkan. They enter with status: backlog.
 
 ## agkan-icebox
 
-iceboxのタスクを一件ずつ精査し、backlogに昇格させるかcloseするかを判断する。
-要件が明確になったものはbacklogへ、不要になったものはclosedにする。
+Review icebox tasks one by one and decide whether to promote them to backlog or close them.
+Tasks with clear requirements move to backlog, and tasks that are no longer needed are closed.
 
 ## agkan-planning
 
-backlogのタスクを一件ずつ精査し、実行できるタスクリスト形式に書き換える。
-迷いなく実行できる状態であればstatus: readyにする。
-全件処理が終わるまで繰り返す。
+Review backlog tasks one by one and rewrite them into executable task list format.
+Tasks that can be executed without hesitation should have status: ready.
+Repeat until all tasks are processed.
 
 ## agkan-run
 
-readyのタスクで優先度高い物から一つ選び、in_progressに変える。
-サブタスクに実行を委譲する。
+Select one task from ready tasks with the highest priority and change it to in_progress.
+Delegate execution to subtasks.
 
 ## agkan-run-direct
 
-readyのタスクで優先度高い物から一つ選び、ブランチ・PRを作成せずにカレントブランチへ直接実装してdoneにする。
+Select one task from ready tasks with the highest priority, implement it directly to the current branch without creating a branch or PR, and mark it as done.
 
 ## agkan-review
 
-status: reviewのタスクで、github prがクローズかmergedの場合に、close or doneに変える。
+For tasks with status: review where the github pr is closed or merged, change them to close or done.
