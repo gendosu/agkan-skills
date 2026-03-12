@@ -1,6 +1,6 @@
 ---
 name: agkan-subtask
-description: Use when a task has been selected and you need to implement it in an isolated (forked) context - handles in_progress update, branch creation, implementation, PR creation, and marking done.
+description: Use when a task has been selected and you need to implement it in an isolated (forked) context - handles in_progress update, branch creation, implementation, PR creation, and marking review.
 user-invokable: false
 metadata:
   context: fork
@@ -10,17 +10,19 @@ metadata:
 
 ## Overview
 
-Workflow to implement a selected task on a fork (worktree), create a PR, and complete the task.
-
-### About `context: fork` in frontmatter
-
-The `context: fork` field in the frontmatter indicates that this skill is designed to run in an isolated worktree (forked context). When an Agent invokes this skill, it executes in a separate worktree environment rather than the current working directory. This isolation ensures that branch creation and file changes do not interfere with the parent context.
+Workflow to implement a selected task on a new branch, create a PR, and move to review.
 
 ---
 
 ## Workflow
 
-### 1. Create Branch
+### 1. Update Task to In Progress
+
+```bash
+agkan task update <id> status in_progress
+```
+
+### 3. Create Branch
 
 ```bash
 git checkout -b <branch-name>
@@ -28,7 +30,7 @@ git checkout -b <branch-name>
 
 Branch name is generated from task ID and title (example: `feat/42-add-login-page`).
 
-### 2. Write Branch Name to Task
+### 4. Write Branch Name to Task
 
 ```bash
 # First, retrieve the existing body
@@ -37,15 +39,15 @@ agkan task get <id> --json
 agkan task update <id> body "<existing body>\n\nBranch: <branch-name>"
 ```
 
-### 3. Implementation
+### 5. Implementation
 
 Implement according to the task content.
 
 Refer to /key-guidelines during implementation to maintain code quality.
 
-### 4. Commit and Push
+### 6. Commit and Push
 
-変更ファイルを明示的に指定してステージングする。`git add -A` は `.env` や credentials など意図しないファイルが含まれるリスクがあるため使用しない。
+Stage files by specifying them explicitly. Do not use `git add -A` as it risks including unintended files such as `.env` or credentials.
 
 ```bash
 git add <file1> <file2> ...
@@ -53,15 +55,15 @@ git commit -m "<commit message>"
 git push -u origin <branch-name>
 ```
 
-> **注意**: `git add -A` や `git add .` は使用しないこと。`.env`、`credentials.*`、秘密情報を含むファイルが意図せずコミットされる可能性がある。
+> **Note**: Do not use `git add -A` or `git add .`. Files containing `.env`, `credentials.*`, or secrets may be committed unintentionally.
 
-### 5. Create PR
+### 7. Create PR
 
 ```bash
 gh pr create --title "<title>" --body "<body>"
 ```
 
-### 6. Add PR Information to Task
+### 8. Add PR Information to Task
 
 ```bash
 # First, retrieve the existing body
@@ -70,7 +72,7 @@ agkan task get <id> --json
 agkan task update <id> body "<existing body>\n\nPR: <PR URL>"
 ```
 
-### 7. Update Task to Review
+### 9. Update Task to Review
 
 ```bash
 agkan task update <id> status review
