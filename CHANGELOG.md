@@ -5,6 +5,34 @@ All notable changes to the agkan-skills plugin will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-03-13
+
+### Added
+
+- **release**: New skill for automated release management (version bump, CHANGELOG, tagging, push, npm publish)
+- **agkan-run / agkan-run-direct**: Add `critical` priority support in task selection
+- **agkan-subtask-direct**: Add `in_progress` status update step before implementation
+
+### Changed
+
+- **agkan-subtask**: Restore `context: fork` metadata and update workflow for bidirectional sync
+- **agkan-subtask / deprecated skills**: Add English translations for all skill files
+
+### Fixed
+
+- **agkan-add**: Use `--priority` flag instead of `meta set` for priority setting
+- **agkan-planning-subtask**: Use `--priority` flag for priority setting
+- **agkan-subtask**: Use explicit file staging instead of `git add -A`
+- **agkan-icebox**: Add re-fetch logic in step 3
+
+### Documentation
+
+- Add `--priority` filter and `--sort priority` options to agkan/SKILL.md
+- Add task purge command to agkan/SKILL.md Quick Reference
+- Add `$'...'` syntax guidance for newlines in agkan-add body
+- Add English translation of CLAUDE.md
+- Document release skill in README
+
 ## [0.5.0] - 2026-03-09
 
 ### Added
