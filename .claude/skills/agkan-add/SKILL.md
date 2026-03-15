@@ -48,12 +48,19 @@ Gather the following from the user. Fields marked optional can be skipped if not
 ### 2. Create the Task
 
 ```bash
-agkan task add "<title>" "<body>"
+agkan task add "<title>" "<body>" --priority <value>
 ```
 
 If no body is provided:
 
 ```bash
+agkan task add "<title>" --priority <value>
+```
+
+If priority is `medium` (the default), the `--priority` flag can be omitted:
+
+```bash
+agkan task add "<title>" "<body>"
 agkan task add "<title>"
 ```
 
@@ -79,21 +86,13 @@ For each tag:
 agkan tag attach <task-id> <tag-name>
 ```
 
-### 4. Set Priority (if not medium)
-
-```bash
-agkan task meta set <task-id> priority <value>
-```
-
-Skip this step if priority is `medium` (the default).
-
-### 5. Set Parent Task (if applicable)
+### 4. Set Parent Task (if applicable)
 
 ```bash
 agkan task update-parent <task-id> <parent-id>
 ```
 
-### 6. Show Summary
+### 5. Show Summary
 
 Retrieve and display the created task:
 
