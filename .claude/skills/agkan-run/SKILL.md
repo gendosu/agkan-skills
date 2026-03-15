@@ -9,6 +9,8 @@ description: Use when starting a development session to pick the highest priorit
 
 Standard workflow to pick the highest priority ready task from agkan, implement it, create a pull request, and complete it.
 
+**CRITICAL: This is a loop. After each task completes (including handling any interruptions), ALWAYS re-fetch the task list and continue unless explicitly told to stop.**
+
 ---
 
 ## Workflow
@@ -115,9 +117,24 @@ If the status is still `in_progress`, update it:
 agkan task update <id> status review
 ```
 
-### 8. Re-fetch task list and continue or end session
+### 8. Handle interruptions, then ALWAYS re-fetch and continue
 
-After confirming the task status, re-fetch the task list to pick up any newly added ready tasks:
+**After confirming the task status**, there may be interruptions before you can proceed:
+
+#### Interruption types and how to handle them
+
+| Interruption | How to handle | Then... |
+|---|---|---|
+| IDE diagnostic (linter, RuboCop, type error) | Fix the issue immediately | **Resume step 8** |
+| User question about the current task | Answer, then fix if needed | **Resume step 8** |
+| User explicitly says "stop" / "exit" | Stop the workflow | End session |
+
+**IDE diagnostics (e.g., `<new-diagnostics>` in system-reminder) are part of the current task's implementation — not a reason to end the workflow.** Fix them and continue.
+
+**After handling any interruption, always ask yourself:**
+> "Am I in the middle of an agkan-run workflow? If yes, go back to step 8."
+
+Re-fetch the task list to pick up any newly added ready tasks:
 
 ```bash
 agkan task list --status ready --json
@@ -126,6 +143,44 @@ agkan task list --status ready --json
 If there are no termination instructions from the user and ready tasks exist (including newly added ones), select the next task and repeat from step 3 of the workflow.
 
 If no ready tasks remain, end the session.
+
+---
+
+## Loop Structure
+
+```
+START
+  ↓
+git pull & get ready tasks
+  ↓
+No tasks? → END SESSION
+  ↓
+Select highest priority task (skip will-do-later)
+  ↓
+Check blockers → blocked? → select different task
+  ↓
+Update status: in_progress
+  ↓
+Launch sub-agent to implement & create PR
+  ↓
+Sub-agent done?
+  ↓
+Interruption occurred? (diagnostic, user question)
+  Yes → Handle it → RETURN HERE
+  No  ↓
+Re-fetch task list  ←──────────────────────────┐
+  ↓                                              │
+Ready tasks exist AND no stop instruction? ─Yes─┘
+  ↓ No
+END SESSION
+```
+
+**Red flags — you are breaking the loop:**
+- Sub-agent completed, you fixed a diagnostic, then stopped
+- Sub-agent completed, user asked a question, you answered, then stopped
+- You forgot to re-fetch the task list after any action
+
+**All of these mean: Go back to step 7. Re-fetch the task list.**
 
 ---
 
@@ -156,3 +211,4 @@ See the canonical definition in `agkan/SKILL.md` (Tag Priority section).
 - Always select only 1 task (do not start multiple tasks simultaneously)
 - If no tasks exist, end the session
 - Do not mark task as done before PR merge (mark as done after PR review and merge)
+- **Never stop mid-workflow due to interruptions** — handle them and resume

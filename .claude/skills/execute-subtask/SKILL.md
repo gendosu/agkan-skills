@@ -13,7 +13,11 @@ metadata:
 
 ## Overview
 
-Workflow to implement a selected task on a new branch, create a PR, and complete the task.
+Workflow to implement a selected task on a fork (worktree), create a PR, and complete the task.
+
+### About `context: fork` in frontmatter
+
+The `context: fork` field in the frontmatter indicates that this skill is designed to run in an isolated worktree (forked context). When an Agent invokes this skill, it executes in a separate worktree environment rather than the current working directory. This isolation ensures that branch creation and file changes do not interfere with the parent context.
 
 ---
 
