@@ -64,6 +64,14 @@ Move to Ready if **all** of the following conditions are met:
 - Scope that can be implemented as a single PR
 - Implementation approach is clear
 
+Before moving to Ready, verify there are no blocking tasks:
+
+```bash
+agkan task block list <id> --json
+```
+
+If blockers exist, do not move to Ready. Keep in Backlog and apply the `will-do-later` tag (see Step 4).
+
 When moving a task to Ready, also set the priority at this point:
 
 ```bash
