@@ -67,8 +67,7 @@ Move to Ready if **all** of the following conditions are met:
 When moving a task to Ready, also set the priority at this point:
 
 ```bash
-agkan task update <id> status ready
-agkan task meta set <id> priority <value>
+agkan task update <id> --status ready --priority <value>
 ```
 
 Priority values: `critical` / `high` / `medium` / `low`
@@ -120,3 +119,15 @@ agkan tag attach <task-id> <tag-id-or-name>
 - When decomposing tasks, inherit the content of the original task
 - Move to Ready only for tasks that can be "started immediately"
 - This skill is used after task selection (task selection is done by the `agkan-planning` skill)
+
+---
+
+## STRICT PROHIBITION
+
+**Do NOT implement tasks.** This skill's sole responsibility is to review tasks and update their status in agkan. The following actions are strictly forbidden:
+
+- Editing source code files
+- Creating or modifying any files in the codebase (other than agkan task updates via CLI)
+- Implementing features, fixes, or any code changes described in the task
+
+If a task is ready for implementation, move it to Ready status and stop. Implementation is handled by a separate workflow (`agkan-run`).
