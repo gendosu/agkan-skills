@@ -41,6 +41,10 @@ Please review the following backlog task.
 
 ## Procedure
 Read .claude/skills/agkan-planning-subtask/SKILL.md and follow its procedures to review.
+
+## Important Constraint
+Your role is ONLY to review the task and update its status in agkan (e.g., move to ready, decompose, or tag for deferral).
+Do NOT implement the task. Do NOT edit any source code or codebase files.
 """
 )
 ```
