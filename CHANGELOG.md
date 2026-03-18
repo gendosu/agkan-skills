@@ -5,6 +5,23 @@ All notable changes to the agkan-skills plugin will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-03-18
+
+### Added
+
+- **agkan-add**: Add `--priority` flag support for task creation
+
+### Fixed
+
+- **agkan-subtask-direct**: Replace `git add -A` with explicit file staging to prevent accidental commits
+- **agkan-planning-subtask**: Add blocker check command (`agkan task block list`) in Step 3 before moving to Ready
+
+### Documentation
+
+- **agkan-run**: Clarify Step 8 trigger and merge Step 9 into Step 8
+- **agkan-planning-subtask**: Add STRICT PROHIBITION section; fix command syntax
+- **agkan-planning**: Add implementation constraint warning to sub-agent prompt
+
 ## [0.6.3] - 2026-03-18
 
 ### Fixed
