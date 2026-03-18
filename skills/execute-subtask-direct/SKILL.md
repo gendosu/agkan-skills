@@ -25,13 +25,15 @@ Refer to /key-guidelines during implementation to maintain code quality.
 
 ### 2. Commit
 
-Commit the changes.
+Stage files by specifying them explicitly. Do not use `git add -A` as it risks including unintended files such as `.env` or credentials.
 
 ```bash
-git add -A
+git add <file1> <file2> ...
 git commit -m "<commit message>"
 git push
 ```
+
+> **Note**: Do not use `git add -A` or `git add .`. Files containing `.env`, `credentials.*`, or secrets may be committed unintentionally.
 
 ### 3. Update task to done
 
