@@ -15,6 +15,20 @@ Standard workflow to pick the highest priority ready task from agkan, implement 
 
 ### 1. Update branch to latest
 
+Before switching to main, check for uncommitted changes:
+
+```bash
+git status --porcelain
+```
+
+If there are uncommitted changes, stash them first:
+
+```bash
+git stash push -m "agkan-run: stash before switching to main"
+```
+
+Then update to latest:
+
 ```bash
 git checkout main && git pull -p
 ```
@@ -87,9 +101,23 @@ Read .claude/skills/agkan-subtask/SKILL.md and follow its steps to implement.
 )
 ```
 
-### 7. Re-fetch task list and continue or end session
+### 7. Verify task status after sub-agent completes
 
-After the sub-agent completes, re-fetch the task list to pick up any newly added ready tasks:
+After the sub-agent completes, check whether the task has been moved out of `in_progress`. If it is still `in_progress`, move it to `review` (since a PR was created):
+
+```bash
+agkan task get <id> --json
+```
+
+If the status is still `in_progress`, update it:
+
+```bash
+agkan task update <id> status review
+```
+
+### 8. Re-fetch task list and continue or end session
+
+After confirming the task status, re-fetch the task list to pick up any newly added ready tasks:
 
 ```bash
 agkan task list --status ready --json

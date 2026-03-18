@@ -17,6 +17,20 @@ Standard workflow to pick the highest priority ready task from agkan, implement 
 
 ### 1. Update branch to latest
 
+Before switching to main, check for uncommitted changes:
+
+```bash
+git status --porcelain
+```
+
+If there are uncommitted changes, stash them first:
+
+```bash
+git stash push -m "agkan-run: stash before switching to main"
+```
+
+Then update to latest:
+
 ```bash
 git checkout main && git pull -p
 ```
@@ -89,7 +103,21 @@ Read .claude/skills/agkan-subtask/SKILL.md and follow its steps to implement.
 )
 ```
 
-### 7. Handle interruptions, then ALWAYS re-fetch and continue
+### 7. Verify task status after sub-agent completes
+
+After the sub-agent completes, check whether the task has been moved out of `in_progress`. If it is still `in_progress`, move it to `review` (since a PR was created):
+
+```bash
+agkan task get <id> --json
+```
+
+If the status is still `in_progress`, update it:
+
+```bash
+agkan task update <id> status review
+```
+
+### 8. Handle interruptions, then ALWAYS re-fetch and continue
 
 **After the sub-agent completes**, there may be interruptions before you can proceed:
 
@@ -97,16 +125,18 @@ Read .claude/skills/agkan-subtask/SKILL.md and follow its steps to implement.
 
 | Interruption | How to handle | Then... |
 |---|---|---|
-| IDE diagnostic (linter, RuboCop, type error) | Fix the issue immediately | **Resume step 7** |
-| User question about the current task | Answer, then fix if needed | **Resume step 7** |
+| IDE diagnostic (linter, RuboCop, type error) | Fix the issue immediately | **Resume step 8** |
+| User question about the current task | Answer, then fix if needed | **Resume step 8** |
 | User explicitly says "stop" / "exit" | Stop the workflow | End session |
 
 **IDE diagnostics (e.g., `<new-diagnostics>` in system-reminder) are part of the current task's implementation — not a reason to end the workflow.** Fix them and continue.
 
 **After handling any interruption, always ask yourself:**
-> "Am I in the middle of an agkan-run workflow? If yes, go back to step 7."
+> "Am I in the middle of an agkan-run workflow? If yes, go back to step 8."
 
-Re-fetch the task list:
+### 9. Re-fetch task list and continue or end session
+
+After confirming the task status, re-fetch the task list to pick up any newly added ready tasks:
 
 ```bash
 agkan task list --status ready --json
