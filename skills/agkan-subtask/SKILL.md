@@ -74,13 +74,24 @@ agkan task update <id> body "<existing body>\n\nPR: <PR URL>"
 
 ### 8. Update Task to Review
 
+This step is **mandatory** and must always be executed, even if earlier steps had issues.
+
 ```bash
 agkan task update <id> status review
 ```
+
+Confirm the update succeeded:
+
+```bash
+agkan task get <id> --json
+```
+
+Verify that the status is `review`. If it is still `in_progress`, retry the update command.
 
 ---
 
 ## Important Notes
 
 - Do not mark task as done before PR is merged (mark as done after PR review and merge)
+- **Step 7 (status → review) must always be executed without fail** — this is the most critical step
 - This skill is used after task selection (task selection is done with `agkan-run` skill)
