@@ -95,6 +95,20 @@ agkan task block remove <blocker-id> <blocked-id>
 agkan task block list <id>
 ```
 
+### Comment Operations
+
+```bash
+# Add a comment to a task
+agkan task comment add <task-id> <content>
+agkan task comment add <task-id> <content> --author "agent"
+
+# List all comments for a task
+agkan task comment list <task-id>
+
+# Delete a comment by ID
+agkan task comment delete <comment-id>
+```
+
 ### Tag Operations
 
 ```bash
