@@ -47,33 +47,33 @@ Gather the following from the user. Fields marked optional can be skipped if not
 
 ### 2. Create the Task
 
+**Single-line body:** Pass directly as an argument.
+
 ```bash
 agkan task add "<title>" "<body>" --priority <value>
-```
-
-If no body is provided:
-
-```bash
-agkan task add "<title>" --priority <value>
-```
-
-If priority is `medium` (the default), the `--priority` flag can be omitted:
-
-```bash
-agkan task add "<title>" "<body>"
+agkan task add "<title>" --priority <value>  # no body
+agkan task add "<title>" "<body>"            # medium priority (default, flag omitted)
 agkan task add "<title>"
 ```
 
-**When including line breaks in body, use the `$'...'` syntax.**
+**Multi-line body: MUST use `--file`.**
 
-Using `\n` within regular double quotes will pass it as a literal `\n` string and will not create a line break.
+Write the body to a temporary file first, then pass it with `--file`. NEVER use `$'...'` syntax or `\n` in arguments for multi-line content.
 
 ```bash
-# NG: \n is passed as a literal string
-agkan task add "タイトル" "1行目\n2行目"
+# Step 1: Write body to a temp file (use Write tool)
+# /tmp/task_body.md:
+# 1行目
+# 2行目
+#
+# ## 詳細
+# 内容はここに
 
-# OK: Using $'...' syntax expands \n as an actual line break
-agkan task add "タイトル" $'1行目\n2行目\n\n## 詳細\n内容はここに'
+# Step 2: Create task with --file
+agkan task add "<title>" --file /tmp/task_body.md
+
+# Step 3: Delete the temp file
+rm /tmp/task_body.md
 ```
 
 Note the task ID returned from the command output.
