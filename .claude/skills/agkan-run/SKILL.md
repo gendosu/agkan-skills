@@ -77,6 +77,23 @@ If there are incomplete tasks in `blockedBy`, do not select that task. Instead, 
 agkan task update <id> status in_progress
 ```
 
+### 5a. Inspect task body for existing Branch/PR
+
+Before launching the sub-agent, retrieve the full task body and parse it for `Branch:` and `PR:` labels (see `agkan/SKILL.md` — Body Conventions):
+
+```bash
+agkan task get <id> --json
+```
+
+Extract any values matching these patterns from the task body:
+
+```
+Branch: <branch-name>
+PR: <URL>
+```
+
+Pass these values to the sub-agent prompt (Step 6) so it can resume work on the existing branch/PR instead of creating new ones.
+
 ### 6. Implement, create PR, complete
 
 **Use the Task tool (general-purpose sub-agent)** to implement.
@@ -98,6 +115,14 @@ Invoke the key-guidelines skill using the Skill tool: Skill("key-guidelines")
 - ID: <id>
 - Title: <title>
 - Body: <body>
+
+## Existing Branch/PR (if any)
+- Branch: <existing-branch-name or "none">
+- PR: <existing-PR-URL or "none">
+
+If Branch or PR values above are set (not "none"), use them to resume work on the
+existing branch and PR rather than creating new ones (as described in agkan-subtask
+SKILL.md Step 2).
 
 ## Steps
 Read .claude/skills/agkan-subtask/SKILL.md and follow its steps to implement.
