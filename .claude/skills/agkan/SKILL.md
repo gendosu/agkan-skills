@@ -393,6 +393,29 @@ agkan task list --tree
 
 ---
 
+## Body Conventions
+
+Skills that create branches and PRs write structured labels into the task body. These labels are used by subsequent skill executions to resume work on the correct branch and PR instead of starting fresh.
+
+### Format
+
+```
+Branch: <branch-name>
+PR: <URL>
+```
+
+### Rules
+
+- **Branch label** is written by `agkan-subtask` after the branch is created (Step 3).
+- **PR label** is written by `agkan-subtask` after the PR is opened (Step 7).
+- Both labels are appended to the existing task body, separated by a blank line.
+- Skills that start work on a task **must** parse these labels from the task body before creating a new branch or PR.
+  - If a `Branch:` label is present → check out the existing branch and continue work on it.
+  - If a `PR:` label is present → push to that branch to update the existing PR instead of opening a new one.
+  - If neither label is present → proceed with the default flow (create a new branch, open a new PR).
+
+---
+
 ## Configuration
 
 Place `.agkan.yml` in the project root to customize the DB path:

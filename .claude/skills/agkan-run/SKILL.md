@@ -17,7 +17,7 @@ Standard workflow to pick the highest priority ready task from agkan, implement 
 
 ### 1. Update branch to latest
 
-Before switching to main, check for uncommitted changes:
+Before switching to the default branch, check for uncommitted changes:
 
 ```bash
 git status --porcelain
@@ -26,13 +26,15 @@ git status --porcelain
 If there are uncommitted changes, stash them first:
 
 ```bash
-git stash push -m "agkan-run: stash before switching to main"
+git stash push -m "agkan-run: stash before switching to default branch"
 ```
 
-Then update to latest:
+Then get the default branch name dynamically and update to latest:
 
 ```bash
-git checkout main && git pull -p
+DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@') && \
+  [ -z "$DEFAULT_BRANCH" ] && DEFAULT_BRANCH=$(gh repo view --json defaultBranchRef -q '.defaultBranchRef.name' 2>/dev/null) && \
+  git checkout "$DEFAULT_BRANCH" && git pull -p
 ```
 
 ### 2. Get ready tasks
@@ -75,6 +77,23 @@ If there are incomplete tasks in `blockedBy`, do not select that task. Instead, 
 agkan task update <id> status in_progress
 ```
 
+### 5a. Inspect task body for existing Branch/PR
+
+Before launching the sub-agent, retrieve the full task body and parse it for `Branch:` and `PR:` labels (see `agkan/SKILL.md` — Body Conventions):
+
+```bash
+agkan task get <id> --json
+```
+
+Extract any values matching these patterns from the task body:
+
+```
+Branch: <branch-name>
+PR: <URL>
+```
+
+Pass these values to the sub-agent prompt (Step 6) so it can resume work on the existing branch/PR instead of creating new ones.
+
 ### 6. Implement, create PR, complete
 
 **Use the Task tool (general-purpose sub-agent)** to implement.
@@ -96,6 +115,14 @@ Invoke the key-guidelines skill using the Skill tool: Skill("key-guidelines")
 - ID: <id>
 - Title: <title>
 - Body: <body>
+
+## Existing Branch/PR (if any)
+- Branch: <existing-branch-name or "none">
+- PR: <existing-PR-URL or "none">
+
+If Branch or PR values above are set (not "none"), use them to resume work on the
+existing branch and PR rather than creating new ones (as described in agkan-subtask
+SKILL.md Step 2).
 
 ## Steps
 Read .claude/skills/agkan-subtask/SKILL.md and follow its steps to implement.
@@ -151,7 +178,7 @@ If no ready tasks remain, end the session.
 ```
 START
   ↓
-git pull & get ready tasks
+git pull (default branch) & get ready tasks
   ↓
 No tasks? → END SESSION
   ↓

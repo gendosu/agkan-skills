@@ -1,4 +1,10 @@
-How to use these skills
+# rules
+
+commit: English
+pull-request: English
+.claude/rules content: English
+
+# How to use these skills
 
 Register tasks in agkan. They enter with status: backlog.
 

@@ -22,13 +22,55 @@ Workflow to implement a selected task on a new branch, create a PR, and move to 
 agkan task update <id> status in_progress
 ```
 
-### 2. Create Branch
+### 2. Check for Existing Branch/PR
+
+Before creating a new branch, inspect the task body for existing branch and PR associations (see `agkan/SKILL.md` — Body Conventions).
+
+```bash
+agkan task get <id> --json
+```
+
+Parse the task body for the following labels:
+
+```
+Branch: <branch-name>
+PR: <URL>
+```
+
+**Case A — Branch label found:**
+
+Check out the existing branch:
+
+```bash
+git fetch origin
+git checkout <existing-branch-name>
+```
+
+Then check for conflicts with the default branch:
+
+```bash
+DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
+git merge-base --is-ancestor origin/$DEFAULT_BRANCH HEAD
+```
+
+If this check fails (exit code non-zero), the branch has diverged and there may be conflicts. Surface a clear error and stop:
+
+```
+ERROR: Branch '<existing-branch-name>' has conflicts with '$DEFAULT_BRANCH'.
+Please resolve the conflicts manually before resuming this task.
+```
+
+If no conflicts are detected, continue from Step 4 (skip Step 3, as the branch name is already recorded).
+
+**Case B — No branch label found:**
+
+Create a new branch. Branch name is generated from task ID and title (example: `feat/42-add-login-page`).
 
 ```bash
 git checkout -b <branch-name>
 ```
 
-Branch name is generated from task ID and title (example: `feat/42-add-login-page`).
+Then continue to Step 3.
 
 ### 3. Write Branch Name to Task
 
@@ -59,11 +101,19 @@ git push -u origin <branch-name>
 
 ### 6. Create PR
 
+If a `PR:` label was found in the task body (Step 2, Case A), skip PR creation — the existing PR will be updated automatically when commits are pushed to the branch.
+
+Otherwise, create a new PR:
+
 ```bash
 gh pr create --title "<title>" --body "<body>"
 ```
 
 ### 7. Add PR Information to Task
+
+If a `PR:` label was already present in the task body (Step 2, Case A), skip this step.
+
+Otherwise, record the newly created PR URL:
 
 ```bash
 # First, retrieve the existing body
