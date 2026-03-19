@@ -17,7 +17,7 @@ Standard workflow to pick the highest priority ready task from agkan, implement 
 
 ### 1. Update branch to latest
 
-Before switching to main, check for uncommitted changes:
+Before switching to the default branch, check for uncommitted changes:
 
 ```bash
 git status --porcelain
@@ -26,13 +26,15 @@ git status --porcelain
 If there are uncommitted changes, stash them first:
 
 ```bash
-git stash push -m "agkan-run: stash before switching to main"
+git stash push -m "agkan-run: stash before switching to default branch"
 ```
 
-Then update to latest:
+Then get the default branch name dynamically and update to latest:
 
 ```bash
-git checkout main && git pull -p
+DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@') && \
+  [ -z "$DEFAULT_BRANCH" ] && DEFAULT_BRANCH=$(gh repo view --json defaultBranchRef -q '.defaultBranchRef.name' 2>/dev/null) && \
+  git checkout "$DEFAULT_BRANCH" && git pull -p
 ```
 
 ### 2. Get ready tasks
@@ -151,7 +153,7 @@ If no ready tasks remain, end the session.
 ```
 START
   ↓
-git pull & get ready tasks
+git pull (default branch) & get ready tasks
   ↓
 No tasks? → END SESSION
   ↓
