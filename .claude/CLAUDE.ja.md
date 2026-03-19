@@ -1,4 +1,10 @@
-このskillsの使い方
+# rules
+
+commit: 英語
+pull-request: 英語
+.claude/rulesの記述: 英語
+
+# このskillsの使い方
 
 agkanにタスクを登録する。status: backlogで入る。
 
