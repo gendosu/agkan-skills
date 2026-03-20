@@ -242,6 +242,7 @@ agkan task list --status ready --json | jq '.tasks[].id'
   "blockedBy": [{ "id": 2, "title": "..." }],
   "blocking": [{ "id": 3, "title": "..." }],
   "tags": [{ "id": 1, "name": "bug" }],
+  "comments": [{ "id": 1, "task_id": 1, "author": "string | null", "content": "...", "created_at": "2026-01-01T00:00:00.000Z", "updated_at": "2026-01-01T00:00:00.000Z" }],
   "attachments": []
 }
 ```
