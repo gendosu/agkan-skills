@@ -67,7 +67,9 @@ If no conflicts are detected, continue from Step 4 (skip Step 3, as the branch n
 Create a new branch. Branch name is generated from task ID and title (example: `feat/42-add-login-page`).
 
 ```bash
-git checkout -b <branch-name>
+DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
+git fetch origin
+git checkout -b <branch-name> origin/$DEFAULT_BRANCH
 ```
 
 Then continue to Step 3.
