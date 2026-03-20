@@ -95,10 +95,10 @@ Pass these values to the sub-agent prompt (Step 6) so it can resume work on the 
 ### 6. Implement, create PR, complete
 
 **Use the Task tool (general-purpose sub-agent)** to implement.
-Do not use `Skill("agkan-subtask")`; instead, instruct the sub-agent to read the SKILL.md file directly.
+Do not use `Skill("agkan-subtask")`; instead, embed the workflow steps directly in the sub-agent prompt.
 
-> **Why SKILL.md path instead of `Skill()`?**
-> Sub-agents spawned via the Task tool start with a fresh context. `Skill()` loads skill content into the current conversation, but a sub-agent needs its instructions embedded in its prompt. Providing the SKILL.md path directly in the prompt is the reliable way to pass workflow instructions to a sub-agent.
+> **Why embed steps instead of referencing a file path?**
+> Sub-agents spawned via the Task tool start with a fresh context. When installed as a plugin, the skill files may reside at a path unknown to the sub-agent (e.g., under a plugin cache directory), so instructing the sub-agent to read a relative or installation-specific path is unreliable. Embedding the workflow steps directly in the prompt makes the instructions path-independent.
 
 ```
 Task(
@@ -119,11 +119,135 @@ Invoke the key-guidelines skill using the Skill tool: Skill("key-guidelines")
 - PR: <existing-PR-URL or "none">
 
 If Branch or PR values above are set (not "none"), use them to resume work on the
-existing branch and PR rather than creating new ones (as described in agkan-subtask
-SKILL.md Step 2).
+existing branch and PR rather than creating new ones (as described in Step 2 below).
 
 ## Steps
-Read .claude/skills/agkan-subtask/SKILL.md and follow its steps to implement.
+
+Follow these steps to implement the task:
+
+### 1. Update Task to In Progress
+
+```bash
+agkan task update <id> status in_progress
+```
+
+### 2. Check for Existing Branch/PR
+
+Before creating a new branch, inspect the task body for existing branch and PR
+associations. Parse the "Existing Branch/PR" values provided above.
+
+**Case A — Branch label found (not "none"):**
+
+Check out the existing branch:
+
+```bash
+git fetch origin
+git checkout <existing-branch-name>
+```
+
+Then check for conflicts with the default branch:
+
+```bash
+DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
+git merge-base --is-ancestor origin/$DEFAULT_BRANCH HEAD
+```
+
+If this check fails (exit code non-zero), the branch has diverged and there may be
+conflicts. Surface a clear error and stop:
+
+```
+ERROR: Branch '<existing-branch-name>' has conflicts with '$DEFAULT_BRANCH'.
+Please resolve the conflicts manually before resuming this task.
+```
+
+If no conflicts are detected, continue from Step 4 (skip Step 3, as the branch name
+is already recorded).
+
+**Case B — No branch label found (value is "none"):**
+
+Create a new branch. Branch name is generated from task ID and title
+(example: `feat/42-add-login-page`).
+
+```bash
+git checkout -b <branch-name>
+```
+
+Then continue to Step 3.
+
+### 3. Write Branch Name to Task
+
+```bash
+# First, retrieve the existing body
+agkan task get <id> --json
+# Then update by concatenating existing body with branch name
+agkan task update <id> body "<existing body>\n\nBranch: <branch-name>"
+```
+
+### 4. Implementation
+
+Implement according to the task content.
+
+Refer to /key-guidelines during implementation to maintain code quality.
+
+### 5. Commit and Push
+
+Stage files by specifying them explicitly. Do not use `git add -A` as it risks
+including unintended files such as `.env` or credentials.
+
+```bash
+git add <file1> <file2> ...
+git commit -m "<commit message>"
+git push -u origin <branch-name>
+```
+
+> **Note**: Do not use `git add -A` or `git add .`. Files containing `.env`,
+> `credentials.*`, or secrets may be committed unintentionally.
+
+### 6. Create PR
+
+If a `PR:` label was found in the task body (Step 2, Case A), skip PR creation —
+the existing PR will be updated automatically when commits are pushed to the branch.
+
+Otherwise, create a new PR:
+
+```bash
+gh pr create --title "<title>" --body "<body>"
+```
+
+### 7. Add PR Information to Task
+
+If a `PR:` label was already present in the task body (Step 2, Case A), skip this step.
+
+Otherwise, record the newly created PR URL:
+
+```bash
+# First, retrieve the existing body
+agkan task get <id> --json
+# Then update by concatenating existing body with PR URL
+agkan task update <id> body "<existing body>\n\nPR: <PR URL>"
+```
+
+### 8. Update Task to Review
+
+This step is **mandatory** and must always be executed, even if earlier steps had issues.
+
+```bash
+agkan task update <id> status review
+```
+
+Confirm the update succeeded:
+
+```bash
+agkan task get <id> --json
+```
+
+Verify that the status is `review`. If it is still `in_progress`, retry the update
+command.
+
+## Important Notes
+
+- Do not mark task as done before PR is merged (mark as done after PR review and merge)
+- **Step 8 (status → review) must always be executed without fail** — this is the most critical step
 """
 )
 ```
