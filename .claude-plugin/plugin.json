@@ -1,6 +1,6 @@
 {
   "name": "agkan-skills",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "agkan task management workflow skills",
   "skills": [
     "./skills/"
