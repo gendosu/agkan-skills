@@ -183,6 +183,8 @@ Then continue to Step 3.
 agkan task get <id> --json
 # Then update by concatenating existing body with branch name
 agkan task update <id> body "<existing body>\n\nBranch: <branch-name>"
+# Also store as metadata so the board detail panel can display it
+agkan task meta set <id> branch <branch-name>
 ```
 
 ### 4. Implementation
@@ -227,6 +229,8 @@ Otherwise, record the newly created PR URL:
 agkan task get <id> --json
 # Then update by concatenating existing body with PR URL
 agkan task update <id> body "<existing body>\n\nPR: <PR URL>"
+# Also store as metadata so the board detail panel can display it
+agkan task meta set <id> pr <PR URL>
 ```
 
 ### 8. Update Task to Review
