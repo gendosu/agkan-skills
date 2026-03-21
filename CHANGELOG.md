@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-03-21
+
+### Added
+
+- **agkan-subtask / agkan-run**: Call `agkan task meta set` to store branch and PR URL as task metadata after creation
+
 ## [0.8.3] - 2026-03-20
 
 ### Fixed
