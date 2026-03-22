@@ -25,7 +25,7 @@ Ask or determine the version bump type based on the changes since the last relea
 ### 2. Check Current Version
 
 ```bash
-cat .claude-plugin/plugin.json | python3 -c "import sys,json; print(json.load(sys.stdin)['version'])"
+jq -r '.version' .claude-plugin/plugin.json
 ```
 
 ### 3. Update CHANGELOG.md
@@ -59,7 +59,7 @@ Edit `.claude-plugin/plugin.json` and update the `version` field manually:
 
 Verify the version was updated:
 ```bash
-cat .claude-plugin/plugin.json | python3 -c "import sys,json; print(json.load(sys.stdin)['version'])"
+jq -r '.version' .claude-plugin/plugin.json
 ```
 
 ### 5. Commit Changes

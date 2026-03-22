@@ -282,7 +282,7 @@ agkan task update <id> status review
 
 | Interruption | How to handle | Then... |
 |---|---|---|
-| IDE diagnostic (linter, RuboCop, type error) | Fix the issue immediately | **Resume step 8** |
+| IDE diagnostic (linter, type error, etc.) | Fix the issue immediately | **Resume step 8** |
 | User question about the current task | Answer, then fix if needed | **Resume step 8** |
 | User explicitly says "stop" / "exit" | Stop the workflow | End session |
 
