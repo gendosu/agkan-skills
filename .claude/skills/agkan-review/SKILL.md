@@ -52,6 +52,31 @@ gh pr view <PR URL> --json state,mergedAt
 | `CLOSED` (mergedAt is null) | `closed` | `agkan task update <id> status closed` |
 | `OPEN` | No change | Skip (still under review) |
 
+### 5. Add comment recording the reason for status change
+
+After updating status to `done` or `closed`, record the merge date/time and reason:
+
+```bash
+agkan task comment add <id> "<comment>"
+```
+
+Comment format by status:
+
+| Status | Comment Example |
+|--------|----------------|
+| `done` | `Merged at <mergedAt>. PR was merged and task is complete.` |
+| `closed` | `PR was closed without merging. Task moved to closed.` |
+
+Example commands:
+
+```bash
+# When merged
+agkan task comment add <id> "Merged at 2026-03-22T10:00:00Z. PR was merged and task is complete."
+
+# When closed without merge
+agkan task comment add <id> "PR was closed without merging. Task moved to closed."
+```
+
 ---
 
 ## Decision Flow
@@ -71,8 +96,8 @@ Does the body contain "PR: <URL>"?
 Check PR status
     ↓
 What is the PR state?
-   MERGED  → Move to done
-   CLOSED  → Move to closed
+   MERGED  → Move to done → Add comment with mergedAt timestamp
+   CLOSED  → Move to closed → Add comment noting PR closed without merge
    OPEN    → Skip (waiting for review)
     ↓
 Move to next task (repeat until all tasks are processed)
