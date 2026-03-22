@@ -26,15 +26,17 @@ Implement according to the task requirements.
 
 Refer to /key-guidelines during implementation to maintain code quality.
 
-### 3. Type Check (if TypeScript project)
+### 3. Static Analysis / Lint Check (if applicable)
 
-If the project contains TypeScript files (`tsconfig.json` exists), run the type checker before committing:
+If the project has a static analysis or lint tool configured, run it before committing:
 
-```bash
-npx tsc --noEmit 2>&1 | head -30
-```
+- TypeScript: `npx tsc --noEmit`
+- ESLint: `npx eslint .`
+- RuboCop: `bundle exec rubocop`
+- Ruff (Python): `ruff check .`
+- Other: run the appropriate tool for the project language
 
-Fix any type errors before proceeding.
+Fix any errors before proceeding.
 
 ### 4. Commit
 

@@ -134,4 +134,4 @@ See the canonical definition in `agkan/SKILL.md` (Tag Priority section).
 - Always select only one task (do not work on multiple tasks simultaneously)
 - If no tasks exist, end the session
 - Do not create branches or PRs (commit directly to the current branch)
-- Task status update to done and TypeScript checks are handled inside the sub-agent (agkan-subtask-direct), not in the main thread
+- Task status update to done and static analysis checks are handled inside the sub-agent (agkan-subtask-direct), not in the main thread
