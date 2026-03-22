@@ -19,7 +19,16 @@ Workflow to retrieve tasks with Review status in agkan, check the merge/close st
 agkan task list --status review --json
 ```
 
-### 2. Confirm PR URL for each task
+### 2. Initialize summary counters
+
+Before processing tasks, initialize the following counters to track results:
+
+- `done_count = 0`
+- `closed_count = 0`
+- `skipped_open_count = 0`
+- `no_pr_count = 0`
+
+### 3. Confirm PR URL for each task
 
 First, extract the PR URL from the task body in the format `PR: <URL>`.
 
@@ -31,9 +40,9 @@ agkan task meta list <id>
 
 Use the value of the `pr` key if present.
 
-If no URL is found in either the body or metadata, skip the task and output a message indicating manual verification is needed.
+If no URL is found in either the body or metadata, increment `no_pr_count`, skip the task and output a message indicating manual verification is needed.
 
-### 3. Check PR status on GitHub
+### 4. Check PR status on GitHub
 
 ```bash
 gh pr view <PR URL> --json state,mergedAt
@@ -44,13 +53,27 @@ gh pr view <PR URL> --json state,mergedAt
 | `state` | `OPEN` / `CLOSED` / `MERGED` |
 | `mergedAt` | Merge date/time (null if not merged) |
 
-### 4. Move status based on PR status
+### 5. Move status based on PR status
 
-| PR State | agkan Status | Command |
-|--------|----------------|---------|
-| `MERGED` | `done` | `agkan task update <id> status done` |
-| `CLOSED` (mergedAt is null) | `closed` | `agkan task update <id> status closed` |
-| `OPEN` | No change | Skip (still under review) |
+| PR State | agkan Status | Command | Counter |
+|--------|----------------|---------|---------|
+| `MERGED` | `done` | `agkan task update <id> status done` | Increment `done_count` |
+| `CLOSED` (mergedAt is null) | `closed` | `agkan task update <id> status closed` | Increment `closed_count` |
+| `OPEN` | No change | Skip (still under review) | Increment `skipped_open_count` |
+
+### 6. Display summary after all tasks are processed
+
+After processing all tasks, display a summary of the results:
+
+```
+done: <done_count>件, closed: <closed_count>件, スキップ(OPEN): <skipped_open_count>件, PR未設定: <no_pr_count>件
+```
+
+Example output:
+
+```
+done: 2件, closed: 0件, スキップ(OPEN): 0件, PR未設定: 6件
+```
 
 ### 5. Add comment recording the reason for status change
 
@@ -84,6 +107,8 @@ agkan task comment add <id> "PR was closed without merging. Task moved to closed
 ```
 Retrieve all Review tasks
     ↓
+Initialize counters (done=0, closed=0, skipped_open=0, no_pr=0)
+    ↓
 Repeat for each task
     ↓
 Does the body contain "PR: <URL>"?
@@ -91,16 +116,18 @@ Does the body contain "PR: <URL>"?
    No  → Check metadata: agkan task meta list <id>
             Does metadata contain "pr" key?
                Yes → Use that URL
-               No  → Skip (output message prompting manual verification)
+               No  → Increment no_pr_count → Skip (output message prompting manual verification)
     ↓
 Check PR status
     ↓
 What is the PR state?
-   MERGED  → Move to done → Add comment with mergedAt timestamp
-   CLOSED  → Move to closed → Add comment noting PR closed without merge
-   OPEN    → Skip (waiting for review)
+   MERGED  → Move to done → Increment done_count → Add comment with mergedAt timestamp
+   CLOSED  → Move to closed → Increment closed_count → Add comment noting PR closed without merge
+   OPEN    → Skip (waiting for review) → Increment skipped_open_count
     ↓
 Move to next task (repeat until all tasks are processed)
+    ↓
+Display summary: done: X件, closed: X件, スキップ(OPEN): X件, PR未設定: X件
 ```
 
 ---
