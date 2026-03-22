@@ -26,7 +26,17 @@ Implement according to the task requirements.
 
 Refer to /key-guidelines during implementation to maintain code quality.
 
-### 3. Commit
+### 3. Type Check (if TypeScript project)
+
+If the project contains TypeScript files (`tsconfig.json` exists), run the type checker before committing:
+
+```bash
+npx tsc --noEmit 2>&1 | head -30
+```
+
+Fix any type errors before proceeding.
+
+### 4. Commit
 
 Stage files by specifying them explicitly. Do not use `git add -A` as it risks including unintended files such as `.env` or credentials.
 
@@ -38,7 +48,7 @@ git push
 
 > **Note**: Do not use `git add -A` or `git add .`. Files containing `.env`, `credentials.*`, or secrets may be committed unintentionally.
 
-### 4. Update task to done
+### 5. Update task to done
 
 ```bash
 agkan task update <id> status done
