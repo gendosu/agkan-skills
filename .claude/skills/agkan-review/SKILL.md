@@ -21,9 +21,17 @@ agkan task list --status review --json
 
 ### 2. Confirm PR URL for each task
 
-Extract the PR URL from the task body in the format `PR: <URL>`.
+First, extract the PR URL from the task body in the format `PR: <URL>`.
 
-If no URL is found, skip the task and output a message indicating manual verification is needed.
+If no URL is found in the body, check the task metadata as a fallback:
+
+```bash
+agkan task meta list <id>
+```
+
+Use the value of the `pr` key if present.
+
+If no URL is found in either the body or metadata, skip the task and output a message indicating manual verification is needed.
 
 ### 3. Check PR status on GitHub
 
@@ -54,8 +62,13 @@ Retrieve all Review tasks
 Repeat for each task
     ↓
 Does the body contain "PR: <URL>"?
-   No  → Skip (output message prompting manual verification)
-   Yes → Check PR status
+   Yes → Use that URL
+   No  → Check metadata: agkan task meta list <id>
+            Does metadata contain "pr" key?
+               Yes → Use that URL
+               No  → Skip (output message prompting manual verification)
+    ↓
+Check PR status
     ↓
 What is the PR state?
    MERGED  → Move to done
@@ -69,7 +82,8 @@ Move to next task (repeat until all tasks are processed)
 
 ## Notes
 
-- PR URL is expected in the format `PR: <URL>` within the task body
-- If PR URL is not found, prompt for manual verification (skip task)
+- PR URL is first looked up in the task body in the format `PR: <URL>`
+- If not found in the body, the `pr` key from `agkan task meta list <id>` is used as a fallback
+- If PR URL is not found in either location, prompt for manual verification (skip task)
 - `done` means successful completion, `closed` means suspended or withdrawn
 - The `gh` command is required and will not work in environments where it is unavailable
