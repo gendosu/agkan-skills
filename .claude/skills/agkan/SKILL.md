@@ -124,6 +124,35 @@ agkan tag detach <task-id> <tag-id-or-name>
 agkan tag show <task-id>
 ```
 
+### Export / Import Operations
+
+```bash
+# Export all tasks to JSON (output to stdout)
+agkan export
+
+# Export to file
+agkan export > backup.json
+
+# Import tasks from a JSON export file
+agkan import <file>
+agkan import backup.json
+```
+
+**Export behavior:**
+- Outputs all tasks in JSON format to stdout
+- Redirect to a file for backup or migration
+
+**Import behavior:**
+- Imports tasks from a JSON file created by `agkan export`
+- Preserves timestamps from the exported data
+- Automatically creates any tags that are missing in the target project
+- ID mapping is handled internally (new IDs are assigned in the target DB)
+
+**Use cases:**
+- Task backup before destructive operations
+- Migrating tasks to another project
+- CI/CD pipeline task management
+
 ### Metadata Operations
 
 ```bash
