@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-03-25
+
+### Added
+
+- **agkan-review**: Add summary display at end of review session
+- **agkan-review**: Add comment step when updating task status to done/closed
+- **agkan-review**: Add metadata `pr` key as fallback for PR URL lookup
+
+### Documentation
+
+- **agkan**: Add export/import commands to SKILL.md
+
 ## [0.9.1] - 2026-03-22
 
 ### Changed
