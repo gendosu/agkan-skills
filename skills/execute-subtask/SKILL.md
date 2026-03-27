@@ -36,8 +36,13 @@ Branch name is generated from task ID and title (example: `feat/42-add-login-pag
 ```bash
 # First, retrieve the existing body
 agkan task get <id> --json
-# Then update by concatenating existing body with branch name
-agkan task update <id> body "<existing body>\n\nBranch: <branch-name>"
+# Write body to tmp file and update using --file to preserve newlines
+cat > /tmp/agkan_body_$$.md << 'BODY'
+<existing body>
+
+Branch: <branch-name>
+BODY
+agkan task update <id> --file /tmp/agkan_body_$$.md
 ```
 
 ### 3. Implementation
@@ -65,8 +70,13 @@ gh pr create --title "<title>" --body "<body>"
 ```bash
 # First, retrieve the existing body
 agkan task get <id> --json
-# Then update by concatenating existing body with PR URL
-agkan task update <id> body "<existing body>\n\nPR: <PR URL>"
+# Write body to tmp file and update using --file to preserve newlines
+cat > /tmp/agkan_body_$$.md << 'BODY'
+<existing body>
+
+PR: <PR URL>
+BODY
+agkan task update <id> --file /tmp/agkan_body_$$.md
 ```
 
 ### 7. Update Task to Review

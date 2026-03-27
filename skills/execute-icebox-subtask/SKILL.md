@@ -48,8 +48,13 @@ If the reason for the decision is non-obvious, add context to the task body befo
 ```bash
 # First, retrieve the existing body
 agkan task get <id> --json
-# Then update by concatenating existing body with new content
-agkan task update <id> body "<existing body>\n\n<reason for decision>"
+# Write body to tmp file and update using --file to preserve newlines
+cat > /tmp/agkan_body_$$.md << 'BODY'
+<existing body>
+
+<reason for decision>
+BODY
+agkan task update <id> --file /tmp/agkan_body_$$.md
 ```
 
 ### 4. Update Status

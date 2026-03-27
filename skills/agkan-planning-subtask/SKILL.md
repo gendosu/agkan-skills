@@ -22,8 +22,13 @@ A sub-workflow that reviews a single Backlog task in agkan, makes decisions on d
 ```bash
 # First, retrieve the existing body
 agkan task get <id> --json
-# Then update by concatenating existing body with new content
-agkan task update <id> body "<existing body>\n\n<additional content>"
+# Write body to tmp file and update using --file to preserve newlines
+cat > /tmp/agkan_body_$$.md << 'BODY'
+<existing body>
+
+<additional content>
+BODY
+agkan task update <id> --file /tmp/agkan_body_$$.md
 ```
 
 - If the task contains multiple pieces of work, organize the content and append it to the description in task list format:

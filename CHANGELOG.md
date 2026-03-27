@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.1] - 2026-03-27
+
+### Fixed
+
+- **agkan-planning-subtask**, **agkan-icebox-subtask**, **agkan-subtask**, **agkan-run**, **execute-subtask**, **execute-planning-subtask**, **execute-icebox-subtask**: Fix newline escaping issue when updating task body. Use `--file` option with a tmp file instead of inline body argument to preserve multiline formatting
+
 ## [0.10.0] - 2026-03-25
 
 ### Added
