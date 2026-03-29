@@ -130,7 +130,18 @@ agkan task meta set <id> pr <PR URL>
 
 ### 8. Update Task to Review
 
-This step is **mandatory** and must always be executed, even if earlier steps had issues.
+Only execute this step if implementation succeeded — specifically, if git push (Step 5) and PR creation (Step 6) both completed without critical errors (permission errors, push failures, etc.).
+
+**If a critical error occurred** (e.g., git push failed, PR creation failed, permission denied), do NOT update the status to review. Leave the task as `in_progress` and record the error details in the task body:
+
+```bash
+# On error: record what went wrong in the task body (optional but recommended)
+agkan task get <id> --json
+agkan task update <id> body "<existing body>\n\nError: <error description>"
+# Do NOT run: agkan task update <id> status review
+```
+
+**If implementation succeeded**, update to review:
 
 ```bash
 agkan task update <id> status review
@@ -149,5 +160,6 @@ Verify that the status is `review`. If it is still `in_progress`, retry the upda
 ## Important Notes
 
 - Do not mark task as done before PR is merged (mark as done after PR review and merge)
-- **Step 7 (status → review) must always be executed without fail** — this is the most critical step
+- **Step 8 (status → review) must only be executed when implementation succeeded** — do not update to review if a critical error occurred
+- If a critical error occurs (git push failure, PR creation failure, permission error), keep the task as `in_progress` and record the error
 - This skill is used after task selection (task selection is done with `agkan-run` skill)
