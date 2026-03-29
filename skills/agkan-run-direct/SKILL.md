@@ -15,13 +15,17 @@ A workflow to select the highest priority ready task from agkan, implement it di
 
 ### 1. Update Branch
 
-This skill is designed to commit directly to the current branch (main or topic branch).
-Therefore, only execute `git pull -p` (unlike `agkan-run`, there is no need to create a new branch from main).
+This skill is designed to commit directly to the current branch (default branch or topic branch).
+Therefore, only execute `git pull -p` (unlike `agkan-run`, there is no need to create a new branch from the default branch).
 
 - When running on a topic branch: implement directly on the current branch
-- When starting from main: execute `git checkout main && git pull -p` beforehand if necessary
+- When starting from the default branch: get the default branch name dynamically and execute checkout + pull beforehand if necessary
 
 ```bash
+# Get the default branch name dynamically
+DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@') && \
+  [ -z "$DEFAULT_BRANCH" ] && DEFAULT_BRANCH=$(gh repo view --json defaultBranchRef -q '.defaultBranchRef.name' 2>/dev/null)
+# Then pull
 git pull -p
 ```
 
@@ -89,11 +93,38 @@ Invoke the key-guidelines skill using the Skill tool: Skill("key-guidelines")
 
 ## Procedure
 Load .claude/skills/agkan-subtask-direct/SKILL.md and follow its procedures to implement.
+
+## Error Handling
+If a critical error occurs during implementation (git push failure, commit failure,
+permission denied, etc.), do NOT update the task status to done. Leave the task as
+`in_progress` and record the error in the task body:
+```bash
+agkan task get <id> --json
+agkan task update <id> body "<existing body>\n\nError: <error description>"
+```
+Only update to done if implementation and all commits/pushes succeeded.
 """
 )
 ```
 
-### 7. Re-fetch Task List and Continue or End Session
+### 7. Verify Task Status After Sub-Agent Completes
+
+After the sub-agent completes, check whether the task has been moved out of `in_progress`:
+
+```bash
+agkan task get <id> --json
+```
+
+If the status is still `in_progress`, determine whether the sub-agent encountered a critical error (git push failure, commit failure, permission error). Check the task body for any recorded error messages.
+
+- **If a critical error occurred**: Do NOT update to `done`. Leave the task as `in_progress` so the issue can be resolved manually.
+- **If no critical error occurred** and implementation succeeded but the sub-agent forgot to update the status, update it manually:
+
+```bash
+agkan task update <id> status done
+```
+
+### 8. Re-fetch Task List and Continue or End Session
 
 After the sub-agent completes, re-fetch the task list to pick up any newly added ready tasks:
 

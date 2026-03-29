@@ -93,11 +93,38 @@ Invoke the key-guidelines skill using the Skill tool: Skill("key-guidelines")
 
 ## Procedure
 Load .claude/skills/agkan-subtask-direct/SKILL.md and follow its procedures to implement.
+
+## Error Handling
+If a critical error occurs during implementation (git push failure, commit failure,
+permission denied, etc.), do NOT update the task status to done. Leave the task as
+`in_progress` and record the error in the task body:
+```bash
+agkan task get <id> --json
+agkan task update <id> body "<existing body>\n\nError: <error description>"
+```
+Only update to done if implementation and all commits/pushes succeeded.
 """
 )
 ```
 
-### 7. Re-fetch Task List and Continue or End Session
+### 7. Verify Task Status After Sub-Agent Completes
+
+After the sub-agent completes, check whether the task has been moved out of `in_progress`:
+
+```bash
+agkan task get <id> --json
+```
+
+If the status is still `in_progress`, determine whether the sub-agent encountered a critical error (git push failure, commit failure, permission error). Check the task body for any recorded error messages.
+
+- **If a critical error occurred**: Do NOT update to `done`. Leave the task as `in_progress` so the issue can be resolved manually.
+- **If no critical error occurred** and implementation succeeded but the sub-agent forgot to update the status, update it manually:
+
+```bash
+agkan task update <id> status done
+```
+
+### 8. Re-fetch Task List and Continue or End Session
 
 After the sub-agent completes, re-fetch the task list to pick up any newly added ready tasks:
 

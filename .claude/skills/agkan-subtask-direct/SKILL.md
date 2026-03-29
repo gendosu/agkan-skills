@@ -52,6 +52,19 @@ git push
 
 ### 5. Update task to done
 
+Only execute this step if implementation succeeded — specifically, if the commit (Step 4) completed without critical errors (permission errors, push failures, etc.).
+
+**If a critical error occurred** (e.g., git push failed, permission denied, commit failed), do NOT update the status to done. Leave the task as `in_progress` and record the error details in the task body:
+
+```bash
+# On error: record what went wrong in the task body (optional but recommended)
+agkan task get <id> --json
+agkan task update <id> body "<existing body>\n\nError: <error description>"
+# Do NOT run: agkan task update <id> status done
+```
+
+**If implementation succeeded**, update to done:
+
 ```bash
 agkan task update <id> status done
 ```
@@ -62,5 +75,6 @@ agkan task update <id> status done
 
 - Do not create a branch (work directly on the current branch)
 - Do not create a PR
-- Update directly to done after implementation is complete
+- **Only update to done if implementation succeeded** — if a critical error occurred, keep the task as `in_progress`
+- If a critical error occurs (git push failure, commit failure, permission error), keep the task as `in_progress` and record the error
 - This skill is used after task selection (task selection is done with the `agkan-run-direct` skill)
