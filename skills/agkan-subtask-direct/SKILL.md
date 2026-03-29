@@ -20,13 +20,27 @@ A workflow to directly implement a selected task without creating a branch or PR
 agkan task update <id> status in_progress
 ```
 
-### 2. Implementation
+### 2. Check for Pre-assigned Branch
+
+Before implementing, check if a branch has been pre-assigned via task metadata:
+
+```bash
+BRANCH=$(agkan task meta get <id> branch 2>/dev/null)
+if [ -n "$BRANCH" ]; then
+  git fetch origin
+  git checkout "$BRANCH"
+fi
+```
+
+If `$BRANCH` is set, all subsequent commits and pushes must target that branch.
+
+### 3. Implementation
 
 Implement according to the task requirements.
 
 Refer to /key-guidelines during implementation to maintain code quality.
 
-### 3. Static Analysis / Lint Check (if applicable)
+### 4. Static Analysis / Lint Check (if applicable)
 
 If the project has a static analysis or lint tool configured, run it before committing:
 
@@ -38,19 +52,20 @@ If the project has a static analysis or lint tool configured, run it before comm
 
 Fix any errors before proceeding.
 
-### 4. Commit
+### 5. Commit
 
 Stage files by specifying them explicitly. Do not use `git add -A` as it risks including unintended files such as `.env` or credentials.
 
 ```bash
 git add <file1> <file2> ...
 git commit -m "<commit message>"
-git push
+# If a branch was checked out from metadata, push to it; otherwise push to current branch
+git push -u origin <branch-name-or-current>
 ```
 
 > **Note**: Do not use `git add -A` or `git add .`. Files containing `.env`, `credentials.*`, or secrets may be committed unintentionally.
 
-### 5. Update task to done
+### 6. Update task to done
 
 Only execute this step if implementation succeeded — specifically, if the commit (Step 4) completed without critical errors (permission errors, push failures, etc.).
 

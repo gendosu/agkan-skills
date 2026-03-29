@@ -24,7 +24,15 @@ agkan task update <id> status in_progress
 
 ### 2. Check for Existing Branch/PR
 
-Before creating a new branch, inspect the task body for existing branch and PR associations (see `agkan/SKILL.md` — Body Conventions).
+Before creating a new branch, check for an existing branch in two places:
+
+1. **Task metadata** (primary source):
+
+```bash
+BRANCH=$(agkan task meta get <id> branch 2>/dev/null)
+```
+
+2. **Task body** (fallback — only if metadata is empty):
 
 ```bash
 agkan task get <id> --json
@@ -37,7 +45,9 @@ Branch: <branch-name>
 PR: <URL>
 ```
 
-**Case A — Branch label found:**
+If `$BRANCH` from metadata is empty, parse the body for `Branch: <branch-name>` and use that value.
+
+**Case A — Branch found (via metadata or body label):**
 
 Check out the existing branch:
 
