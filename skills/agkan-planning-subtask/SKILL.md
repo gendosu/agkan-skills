@@ -22,13 +22,12 @@ A sub-workflow that reviews a single Backlog task in agkan, makes decisions on d
 ```bash
 # First, retrieve the existing body
 agkan task get <id> --json
-# Write body to tmp file and update using --file to preserve newlines
-cat > /tmp/agkan_body_$$.md << 'BODY'
+# Then update by concatenating existing body with new content
+agkan task update <id> body --file /dev/stdin << 'EOF'
 <existing body>
 
 <additional content>
-BODY
-agkan task update <id> --file /tmp/agkan_body_$$.md
+EOF
 ```
 
 - If the task contains multiple pieces of work, organize the content and append it to the description in task list format:
@@ -39,6 +38,18 @@ When creating a task list, it is advisable to use the Explore subagent (Agent to
 - [ ] Work item 1
 - [ ] Work item 2
 - [ ] Work item 3
+```
+
+**MANDATORY: After completing content review and creating the task list, you MUST write the planning results back to the task body. This step is REQUIRED and must NOT be skipped under any circumstances.**
+
+```bash
+# REQUIRED: Write planning results to task body
+# Always execute this step regardless of whether content was changed
+agkan task get <id> --json
+# Then update with the full body including planning results
+agkan task update <id> body --file /dev/stdin << 'EOF'
+<full updated body with planning results, scope, implementation approach, and task list>
+EOF
 ```
 
 ### 2. Task Decomposition Decision
