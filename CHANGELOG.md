@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.2] - 2026-03-30
+
+### Fixed
+
+- **agkan-subtask-direct**: Add branch metadata check step; checkout pre-assigned branch from `agkan task meta get <id> branch` before implementation and push to it after commit
+- **agkan-subtask**: Check task metadata (`agkan task meta get <id> branch`) as primary branch source before falling back to body `Branch:` label parsing
+- **agkan-subtask**, **agkan-run**: Keep tasks `in_progress` on critical errors instead of moving to review/done
+- **agkan-planning-subtask**: Enforce body update step to preserve task body content
+
 ## [0.10.1] - 2026-03-27
 
 ### Fixed
