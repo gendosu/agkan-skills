@@ -23,7 +23,7 @@ A sub-workflow that reviews a single Backlog task in agkan, makes decisions on d
 # First, retrieve the existing body
 agkan task get <id> --json
 # Then update by concatenating existing body with new content
-agkan task update <id> body --file /dev/stdin << 'EOF'
+agkan task update <id> --file /dev/stdin << 'EOF'
 <existing body>
 
 <additional content>
@@ -47,7 +47,7 @@ When creating a task list, it is advisable to use the Explore subagent (Agent to
 # Always execute this step regardless of whether content was changed
 agkan task get <id> --json
 # Then update with the full body including planning results
-agkan task update <id> body --file /dev/stdin << 'EOF'
+agkan task update <id> --file /dev/stdin << 'EOF'
 <full updated body with planning results, scope, implementation approach, and task list>
 EOF
 ```
@@ -69,7 +69,7 @@ If a task contains scope exceeding the above standard, split it into sub-tasks:
 agkan task add "<sub-task name>" "<details>" --parent <original-id>
 
 # Close the original task as split (or update it)
-agkan task update <id> status closed
+agkan task update <id> --status closed
 ```
 
 ### 3. Ready Status Movement Decision

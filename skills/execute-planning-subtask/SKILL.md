@@ -61,7 +61,7 @@ If a task contains scope exceeding the above standard, split it into sub-tasks:
 agkan task add "<sub-task name>" "<details>" --parent <original-id>
 
 # Close the original task as split (or update it)
-agkan task update <id> status closed
+agkan task update <id> --status closed
 ```
 
 ### 3. Ready Status Movement Decision
@@ -75,7 +75,7 @@ Move to Ready if **all** of the following conditions are met:
 When moving a task to Ready, also set the priority at this point:
 
 ```bash
-agkan task update <id> status ready
+agkan task update <id> --status ready
 agkan task meta set <id> priority <value>
 ```
 
