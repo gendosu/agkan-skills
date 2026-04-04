@@ -58,10 +58,10 @@ agkan task update <id> --file /tmp/agkan_body_$$.md
 
 ```bash
 # Promote to backlog
-agkan task update <id> status backlog
+agkan task update <id> --status backlog
 
 # Close as no longer needed
-agkan task update <id> status closed
+agkan task update <id> --status closed
 
 # Keep in icebox — no update needed
 ```

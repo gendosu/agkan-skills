@@ -43,8 +43,8 @@ gh pr view <PR URL> --json state,mergedAt
 
 | PR State | agkan Status | Command |
 |--------|----------------|---------|
-| `MERGED` | `done` | `agkan task update <id> status done` |
-| `CLOSED` (mergedAt is null) | `closed` | `agkan task update <id> status closed` |
+| `MERGED` | `done` | `agkan task update <id> --status done` |
+| `CLOSED` (mergedAt is null) | `closed` | `agkan task update <id> --status closed` |
 | `OPEN` | No change | Skip (still under review) |
 
 ---
