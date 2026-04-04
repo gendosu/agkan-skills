@@ -159,6 +159,14 @@ agkan import backup.json
 - Migrating tasks to another project
 - CI/CD pipeline task management
 
+### Process Operations
+
+```bash
+agkan ps                   # Show list of running Claude processes
+agkan ps --port <number>   # Specify port
+agkan ps --json            # Output in JSON format
+```
+
 ### Metadata Operations
 
 ```bash
