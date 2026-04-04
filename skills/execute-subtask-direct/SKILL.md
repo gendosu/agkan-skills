@@ -38,7 +38,7 @@ git push
 ### 3. Update task to done
 
 ```bash
-agkan task update <id> status done
+agkan task update <id> --status done
 ```
 
 ---

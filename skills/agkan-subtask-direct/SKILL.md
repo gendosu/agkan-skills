@@ -17,7 +17,7 @@ A workflow to directly implement a selected task without creating a branch or PR
 ### 1. Update Task to In Progress
 
 ```bash
-agkan task update <id> status in_progress
+agkan task update <id> --status in_progress
 ```
 
 ### 2. Check for Pre-assigned Branch
@@ -74,14 +74,20 @@ Only execute this step if implementation succeeded — specifically, if the comm
 ```bash
 # On error: record what went wrong in the task body (optional but recommended)
 agkan task get <id> --json
-agkan task update <id> body "<existing body>\n\nError: <error description>"
-# Do NOT run: agkan task update <id> status done
+# Write body to tmp file and update using --file to preserve newlines
+cat > /tmp/agkan_body_$$.md << 'BODY'
+<existing body>
+
+Error: <error description>
+BODY
+agkan task update <id> --file /tmp/agkan_body_$$.md
+# Do NOT run: agkan task update <id> --status done
 ```
 
 **If implementation succeeded**, update to done:
 
 ```bash
-agkan task update <id> status done
+agkan task update <id> --status done
 ```
 
 ---

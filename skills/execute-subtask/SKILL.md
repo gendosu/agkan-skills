@@ -82,7 +82,7 @@ agkan task update <id> --file /tmp/agkan_body_$$.md
 ### 7. Update Task to Review
 
 ```bash
-agkan task update <id> status review
+agkan task update <id> --status review
 ```
 
 ---
