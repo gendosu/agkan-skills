@@ -396,10 +396,10 @@ Icebox holds ideas and candidates that are not yet ready for planning. Review th
 agkan task list --status icebox
 
 # Promote to backlog when requirements become clear
-agkan task update <id> status backlog
+agkan task update <id> --status backlog
 
 # Close if no longer needed
-agkan task update <id> status closed
+agkan task update <id> --status closed
 ```
 
 **Icebox → Backlog conditions:**
@@ -420,10 +420,10 @@ agkan task list --status ready
 agkan task get <id>
 
 # Start work
-agkan task update <id> status in_progress
+agkan task update <id> --status in_progress
 
 # Complete
-agkan task update <id> status done
+agkan task update <id> --status done
 ```
 
 ### Structuring Tasks
