@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.4] - 2026-04-04
+
+### Fixed
+
+- **agkan**, **agkan-icebox**, **agkan-review**, **agkan-subtask**, **agkan-run**, **agkan-planning-subtask**: Correct `--status` flag syntax in task update commands
+
+### Documentation
+
+- **agkan**: Add `task find --status` option to SKILL.md
+- **agkan**: Add `board` subcommand details to SKILL.md
+
 ## [0.10.3] - 2026-04-03
 
 ### Documentation
