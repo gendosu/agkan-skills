@@ -54,6 +54,7 @@ agkan task get <id>
 # Search
 agkan task find "keyword"
 agkan task find "keyword" --all  # Include done/closed
+agkan task find "keyword" --status todo,in_progress   # Filter by status
 
 # Update (positional argument form - backward compatible)
 agkan task update <id> status in_progress
