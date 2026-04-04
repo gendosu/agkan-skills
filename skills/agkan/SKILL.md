@@ -75,11 +75,11 @@ agkan task count --status ready --quiet  # Output numbers only
 agkan task update-parent <id> <parent_id>
 agkan task update-parent <id> null  # Remove parent
 
-# Copy a task
-agkan task copy <id>
-agkan task copy <id> --status ready    # Specify destination status (default: backlog)
-agkan task copy <id> --no-tags         # Do not copy tags
-agkan task copy <id> --json            # Output in JSON format
+# Copy task
+agkan task copy <id>               # タスクをコピーしてbacklogステータスで作成
+agkan task copy <id> -s ready      # ステータスを指定してコピー
+agkan task copy <id> --no-tags     # タグをコピーしない
+agkan task copy <id> --json        # JSON形式で出力
 
 # Delete task
 agkan task delete <id>
