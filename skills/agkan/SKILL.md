@@ -168,6 +168,15 @@ agkan ps --port <number>   # Specify port
 agkan ps --json            # Output in JSON format
 ```
 
+### Board Operations
+
+```bash
+agkan board start [--port <number>] [--title <title>]   # Start the board
+agkan board stop                                         # Stop the board
+agkan board restart [--port <number>]                   # Restart the board
+agkan board status [--port <number>]                    # Check board status
+```
+
 ### Metadata Operations
 
 ```bash
