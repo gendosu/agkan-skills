@@ -66,7 +66,7 @@ If incomplete tasks exist in `blockedBy`, do not select that task; instead, sele
 ### 5. Update Task Status to in_progress
 
 ```bash
-agkan task update <id> status in_progress
+agkan task update <id> --status in_progress
 ```
 
 ### 6. Implementation and Completion
@@ -100,7 +100,13 @@ permission denied, etc.), do NOT update the task status to done. Leave the task 
 `in_progress` and record the error in the task body:
 ```bash
 agkan task get <id> --json
-agkan task update <id> body "<existing body>\n\nError: <error description>"
+# Write body to tmp file and update using --file to preserve newlines
+cat > /tmp/agkan_body_$$.md << 'BODY'
+<existing body>
+
+Error: <error description>
+BODY
+agkan task update <id> --file /tmp/agkan_body_$$.md
 ```
 Only update to done if implementation and all commits/pushes succeeded.
 """
@@ -121,7 +127,7 @@ If the status is still `in_progress`, determine whether the sub-agent encountere
 - **If no critical error occurred** and implementation succeeded but the sub-agent forgot to update the status, update it manually:
 
 ```bash
-agkan task update <id> status done
+agkan task update <id> --status done
 ```
 
 ### 8. Re-fetch Task List and Continue or End Session

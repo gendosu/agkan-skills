@@ -59,7 +59,7 @@ If there are incomplete tasks in `blockedBy`, do not select that task. Instead, 
 ### 5. Update Task Status to in_progress
 
 ```bash
-agkan task update <id> status in_progress
+agkan task update <id> --status in_progress
 ```
 
 ### 6. Implementation and Completion

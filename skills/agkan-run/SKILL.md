@@ -74,7 +74,7 @@ If there are incomplete tasks in `blockedBy`, do not select that task. Instead, 
 ### 5. Update task to in_progress
 
 ```bash
-agkan task update <id> status in_progress
+agkan task update <id> --status in_progress
 ```
 
 ### 5a. Inspect task body for existing Branch/PR
@@ -130,7 +130,7 @@ Follow these steps to implement the task:
 ### 1. Update Task to In Progress
 
 ```bash
-agkan task update <id> status in_progress
+agkan task update <id> --status in_progress
 ```
 
 ### 2. Check for Existing Branch/PR
@@ -183,8 +183,13 @@ Then continue to Step 3.
 ```bash
 # First, retrieve the existing body
 agkan task get <id> --json
-# Then update by concatenating existing body with branch name
-agkan task update <id> body "<existing body>\n\nBranch: <branch-name>"
+# Write body to tmp file and update using --file to preserve newlines
+cat > /tmp/agkan_body_$$.md << 'BODY'
+<existing body>
+
+Branch: <branch-name>
+BODY
+agkan task update <id> --file /tmp/agkan_body_$$.md
 # Also store as metadata so the board detail panel can display it
 agkan task meta set <id> branch <branch-name>
 ```
@@ -229,8 +234,13 @@ Otherwise, record the newly created PR URL:
 ```bash
 # First, retrieve the existing body
 agkan task get <id> --json
-# Then update by concatenating existing body with PR URL
-agkan task update <id> body "<existing body>\n\nPR: <PR URL>"
+# Write body to tmp file and update using --file to preserve newlines
+cat > /tmp/agkan_body_$$.md << 'BODY'
+<existing body>
+
+PR: <PR URL>
+BODY
+agkan task update <id> --file /tmp/agkan_body_$$.md
 # Also store as metadata so the board detail panel can display it
 agkan task meta set <id> pr <PR URL>
 ```
@@ -248,14 +258,20 @@ the error details in the task body:
 ```bash
 # On error: record what went wrong in the task body (optional but recommended)
 agkan task get <id> --json
-agkan task update <id> body "<existing body>\n\nError: <error description>"
-# Do NOT run: agkan task update <id> status review
+# Write body to tmp file and update using --file to preserve newlines
+cat > /tmp/agkan_body_$$.md << 'BODY'
+<existing body>
+
+Error: <error description>
+BODY
+agkan task update <id> --file /tmp/agkan_body_$$.md
+# Do NOT run: agkan task update <id> --status review
 ```
 
 **If implementation succeeded**, update to review:
 
 ```bash
-agkan task update <id> status review
+agkan task update <id> --status review
 ```
 
 Confirm the update succeeded:
@@ -290,7 +306,7 @@ If the status is still `in_progress`, determine whether the sub-agent encountere
 - **If no critical error occurred** and implementation succeeded but the sub-agent forgot to update the status, update it manually:
 
 ```bash
-agkan task update <id> status review
+agkan task update <id> --status review
 ```
 
 ### 8. Handle interruptions, then ALWAYS re-fetch and continue
