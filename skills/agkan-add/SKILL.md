@@ -92,7 +92,20 @@ agkan tag attach <task-id> <tag-name>
 agkan task update-parent <task-id> <parent-id>
 ```
 
-### 5. Show Summary
+### 5. Set Blocking Dependencies (if applicable)
+
+If this task depends on other tasks (i.e., cannot start until another task is done), set the blocking relationship.
+
+- `<blocker-id>` is the task that must complete first
+- `<blocked-id>` is the new task being added
+
+```bash
+agkan task block add <blocker-id> <task-id>
+```
+
+Ask the user whether there are any tasks this new task is blocked by, or any tasks this new task blocks.
+
+### 6. Show Summary
 
 Retrieve and display the created task:
 
