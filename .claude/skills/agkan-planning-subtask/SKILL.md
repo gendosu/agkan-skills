@@ -86,7 +86,7 @@ Before moving to Ready, verify there are no blocking tasks:
 agkan task block list <id> --json
 ```
 
-If blockers exist, do not move to Ready. Keep in Backlog and apply the `will-do-later` tag (see Step 4).
+If blockers exist, do not move to Ready. Keep in Backlog as-is (no tag needed). Only apply the `will-do-later` tag if the task is intentionally deferred beyond the current cycle — see Step 4 for criteria.
 
 When moving a task to Ready, also set the priority at this point:
 
