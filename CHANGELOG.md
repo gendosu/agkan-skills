@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.6] - 2026-04-13
+
+### Fixed
+
+- **agkan-planning-subtask**: Separate blocker handling from `will-do-later` deferral — tasks with blockers now stay in Backlog without a tag; the `will-do-later` tag is reserved for intentional deferral beyond the current cycle
+
 ## [0.10.5] - 2026-04-13
 
 ### Documentation
