@@ -52,7 +52,31 @@ agkan task update <id> --file /dev/stdin << 'EOF'
 EOF
 ```
 
-### 2. Task Decomposition Decision
+### 2. Blocking Relationship Setup
+
+During planning, identify dependencies between this task and other tasks, and register them formally.
+
+```bash
+# List tasks to find related tasks
+agkan task list --json
+
+# Check existing blocking relationships for this task
+agkan task block list <id> --json
+
+# Register: another task blocks this task (this task is blocked by <blocker-id>)
+agkan task block add <blocker-id> <id>
+
+# Register: this task blocks another task (this task blocks <other-id>)
+agkan task block add <id> <other-id>
+```
+
+Register blocking relationships when:
+- This task depends on another task that is not yet done (register as blocked)
+- Another task cannot start until this task is done (register as blocker)
+
+---
+
+### 3. Task Decomposition Decision
 
 **Decomposition Granularity Standard: 1 Task = 1 PR = 1 Feature (Modification)**
 
@@ -72,21 +96,20 @@ agkan task add "<sub-task name>" "<details>" --parent <original-id>
 agkan task update <id> --status closed
 ```
 
-### 3. Ready Status Movement Decision
+### 4. Ready Status Movement Decision
 
 Move to Ready if **all** of the following conditions are met:
 
-- No blockers (dependent tasks are completed)
 - Scope that can be implemented as a single PR
 - Implementation approach is clear
 
-Before moving to Ready, verify there are no blocking tasks:
+Blockers do **not** prevent moving to Ready. If planning is complete and the task would be executable once blockers are resolved, move it to Ready. The blocking relationships registered in Step 2 already capture the dependency — when the blocker task is done, this task can be picked up immediately.
+
+Check blocking relationships (already done in Step 2, but verify if needed):
 
 ```bash
 agkan task block list <id> --json
 ```
-
-If blockers exist, do not move to Ready. Keep in Backlog as-is (no tag needed). Only apply the `will-do-later` tag if the task is intentionally deferred beyond the current cycle — see Step 4 for criteria.
 
 When moving a task to Ready, also set the priority at this point:
 
@@ -105,7 +128,7 @@ Priority determination criteria:
 | `medium` | Normal feature additions, improvements (default) |
 | `low` | Nice-to-have, work on if time permits |
 
-### 4. Deferral Decision
+### 5. Deferral Decision
 
 For tasks that are "something to do later but not now," attach the `will-do-later` tag and keep it in Backlog:
 
@@ -118,8 +141,8 @@ agkan tag attach <task-id> <tag-id-or-name>
 
 Deferral criteria:
 - Low impact on current priorities
-- Dependent tasks are not yet completed
 - Resources or information are insufficient
+- The task itself is not yet well-defined enough to implement
 
 ---
 
