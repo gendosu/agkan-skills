@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-04-14
+
+### Added
+
+- **agkan-planning-subtask**: Add blocking relationship setup step using `agkan task block add` for both directions (blocks/blocked-by) during planning
+- **agkan-planning-subtask**: Allow tasks to move to Ready even when blocked — planning completeness (single PR scope, clear implementation approach) is the deciding factor, not whether blockers are resolved
+
+### Changed
+
+- **agkan-planning-subtask**: Remove "dependent tasks not completed" from deferral criteria — blocked tasks no longer stay in Backlog solely due to unresolved blockers
+
 ## [0.10.6] - 2026-04-13
 
 ### Fixed
