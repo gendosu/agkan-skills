@@ -65,9 +65,31 @@ git push -u origin <branch-name-or-current>
 
 > **Note**: Do not use `git add -A` or `git add .`. Files containing `.env`, `credentials.*`, or secrets may be committed unintentionally.
 
-### 6. Update task to done
+### 6. Self-Review
 
-Only execute this step if implementation succeeded — specifically, if the commit (Step 4) completed without critical errors (permission errors, push failures, etc.).
+Before updating the task status, perform a self-review of the implementation using the `superpowers:code-reviewer` sub-agent:
+
+```
+Agent(
+  subagent_type="superpowers:code-reviewer",
+  description="Self-review task #<id> implementation",
+  prompt="""Review the implementation of the following task.
+
+Task #<id>: <title>
+
+Task body:
+<body>
+
+Review the git changes (run `git diff HEAD~1 HEAD` to see them) against the original plan and coding standards. Check for correctness, security issues, and code quality. Report critical issues that must be fixed before completing the task.
+"""
+)
+```
+
+If the code reviewer identifies critical issues, fix them and commit the fixes before proceeding.
+
+### 7. Update task to done
+
+Only execute this step if implementation succeeded — specifically, if the commit (Step 5) completed without critical errors (permission errors, push failures, etc.).
 
 **If a critical error occurred** (e.g., git push failed, permission denied, commit failed), do NOT update the status to done. Leave the task as `in_progress` and record the error details in the task body:
 

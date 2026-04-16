@@ -148,7 +148,29 @@ agkan task update <id> --file /tmp/agkan_body_$$.md
 agkan task meta set <id> pr <PR URL>
 ```
 
-### 8. Update Task to Review
+### 8. Self-Review
+
+Before updating the task status, perform a self-review of the implementation using the `superpowers:code-reviewer` sub-agent:
+
+```
+Agent(
+  subagent_type="superpowers:code-reviewer",
+  description="Self-review task #<id> implementation",
+  prompt="""Review the implementation of the following task.
+
+Task #<id>: <title>
+
+Task body:
+<body>
+
+Review the git changes (run `git diff origin/<default-branch>...HEAD` to see them) against the original plan and coding standards. Check for correctness, security issues, and code quality. Report critical issues that must be fixed before completing the task.
+"""
+)
+```
+
+If the code reviewer identifies critical issues, fix them, commit and push the fixes, before proceeding.
+
+### 9. Update Task to Review
 
 Only execute this step if implementation succeeded — specifically, if git push (Step 5) and PR creation (Step 6) both completed without critical errors (permission errors, push failures, etc.).
 
@@ -186,6 +208,6 @@ Verify that the status is `review`. If it is still `in_progress`, retry the upda
 ## Important Notes
 
 - Do not mark task as done before PR is merged (mark as done after PR review and merge)
-- **Step 8 (status → review) must only be executed when implementation succeeded** — do not update to review if a critical error occurred
+- **Step 9 (status → review) must only be executed when implementation succeeded** — do not update to review if a critical error occurred
 - If a critical error occurs (git push failure, PR creation failure, permission error), keep the task as `in_progress` and record the error
 - This skill is used after task selection (task selection is done with `agkan-run` skill)
