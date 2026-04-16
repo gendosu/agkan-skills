@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-04-16
+
+### Added
+
+- **agkan-subtask**, **agkan-subtask-direct**: Add self-review step using `superpowers:code-reviewer` sub-agent before final status update — catches critical issues in the same session before marking a task done or ready for review
+
+### Fixed
+
+- **agkan-run-direct**: Use `Skill()` tool invocation instead of SKILL.md file path in sub-agent prompt — fixes incorrect path resolution that pointed to global cache
+
+### Removed
+
+- Remove deprecated `execute-*` prefix skills from `./skills` directory (already deprecated in previous releases)
+
 ## [0.11.0] - 2026-04-14
 
 ### Added
