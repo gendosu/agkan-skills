@@ -40,7 +40,7 @@ agkan task list --status ready --json
 Evaluate tasks using the following criteria in descending order and select the top one:
 
 **Skip tasks with `will-do-later` tag:**
-Tasks with the `will-do-later` tag are intentionally deferred tasks, so skip them. Only select tasks without the `will-do-later` tag.
+Tasks with the `will-do-later` tag are intentionally deferred tasks. Skip them **unless** they are in `ready` status — a task promoted to `ready` is executable regardless of the tag.
 
 **Priority (read from `metadata` field in the list JSON response):**
 ```
