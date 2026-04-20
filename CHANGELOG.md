@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-04-20
+
+### Added
+
+- **agkan-run**, **agkan-run-direct**: Treat `will-do-later` tagged tasks as executable when in `ready` status — `ready` status is the authoritative signal for executability regardless of the tag
+
+### Fixed
+
+- **agkan-planning-subtask**: Prevent moving tasks to `ready` status when unresolved questions exist
+
 ## [0.12.0] - 2026-04-16
 
 ### Added
