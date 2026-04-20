@@ -17,6 +17,10 @@ A sub-workflow that reviews a single Backlog task in agkan, makes decisions on d
 ### 1. Content Review, Supplementation, and Task List Creation
 
 - If task content is unclear, investigate and confirm details by examining the code
+- **If questions arise that cannot be resolved through code investigation alone:**
+  - Use `AskUserQuestion` to ask the user before proceeding
+  - Do NOT move to Ready until the question is resolved
+  - Record the question and the user's answer in the task body
 - Append the investigated content to the task description:
 
 ```bash
@@ -102,6 +106,7 @@ Move to Ready if **all** of the following conditions are met:
 
 - Scope that can be implemented as a single PR
 - Implementation approach is clear
+- No unresolved questions that require user input
 
 Blockers do **not** prevent moving to Ready. If planning is complete and the task would be executable once blockers are resolved, move it to Ready. The blocking relationships registered in Step 2 already capture the dependency — when the blocker task is done, this task can be picked up immediately.
 
