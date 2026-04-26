@@ -237,9 +237,26 @@ agkan task meta set <id> pr <PR URL>
 
 ### 8. Update Task to Review
 
-Only execute this step if implementation succeeded — specifically, if git push (Step 5)
-and PR creation (Step 6) both completed without critical errors (permission errors, push
-failures, etc.).
+Only execute this step if implementation succeeded — specifically, if ALL of the following conditions are met:
+
+**Implementation succeeded** means ALL of the following:
+- At least one `git commit` was executed in this session (verify with `git log --oneline -1`)
+- Actual code/file changes were committed (not just task management operations)
+- `git push` completed without errors
+- PR was created or already exists
+
+**The following do NOT count as implementation:**
+- `agkan task comment add` (comment additions only)
+- `agkan task update --body` / `--file` (body/metadata updates only)
+- Discussion or planning without code commits
+
+**Before updating to review, verify a commit was made:**
+
+```bash
+git log --oneline -1
+```
+
+If no commits were made in this session, do NOT update the status to review. Leave the task as `in_progress`.
 
 **If a critical error occurred** (e.g., git push failed, PR creation failed, permission
 denied), do NOT update the status to review. Leave the task as `in_progress` and record
@@ -252,7 +269,9 @@ agkan task update <id> body "<existing body>\n\nError: <error description>"
 # Do NOT run: agkan task update <id> status review
 ```
 
-**If implementation succeeded**, update to review:
+**If only task management operations were performed** (comments, body updates, no commits), do NOT update the status to review. Leave the task as `in_progress`.
+
+**If implementation succeeded** (commits were made and pushed, PR created), update to review:
 
 ```bash
 agkan task update <id> status review
@@ -271,7 +290,9 @@ command.
 
 - Do not mark task as done before PR is merged (mark as done after PR review and merge)
 - **Step 8 (status → review) must only be executed when implementation succeeded** — do not update to review if a critical error occurred
+- **Step 8 (status → review) requires at least one `git commit` to have been made** — task management operations alone (comments, body updates) do NOT qualify as implementation
 - If a critical error occurs (git push failure, PR creation failure, permission error), keep the task as `in_progress` and record the error
+- If only task management operations were performed (no commits), keep the task as `in_progress`
 """
 )
 ```
@@ -287,11 +308,20 @@ agkan task get <id> --json
 If the status is still `in_progress`, determine whether the sub-agent encountered a critical error (git push failure, PR creation failure, permission error). Check the task body for any recorded error messages.
 
 - **If a critical error occurred**: Do NOT update to `review`. Leave the task as `in_progress` so the issue can be resolved manually.
-- **If no critical error occurred** and implementation succeeded but the sub-agent forgot to update the status, update it manually:
+- **If only task management operations were performed** (comment additions, body updates, discussion — no actual commits): Do NOT update to `review`. Leave the task as `in_progress`.
+- **If implementation succeeded** (at least one `git commit` was made and pushed, PR created) but the sub-agent forgot to update the status, verify with `git log --oneline -1` on the task's branch and update manually only if a commit exists:
 
 ```bash
+# Verify a commit was actually made before marking review
+git log --oneline -1
+# Only if a commit is confirmed:
 agkan task update <id> status review
 ```
+
+**The following do NOT qualify as implementation success:**
+- `agkan task comment add` (comment additions only)
+- `agkan task update --body` / `--file` (body/metadata updates only)
+- Discussion or planning without code commits
 
 ### 8. Handle interruptions, then ALWAYS re-fetch and continue
 

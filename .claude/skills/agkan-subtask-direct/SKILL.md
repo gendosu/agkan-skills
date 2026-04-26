@@ -89,7 +89,25 @@ If the code reviewer identifies critical issues, fix them and commit the fixes b
 
 ### 7. Update task to done
 
-Only execute this step if implementation succeeded — specifically, if the commit (Step 5) completed without critical errors (permission errors, push failures, etc.).
+Only execute this step if implementation succeeded — specifically, if ALL of the following conditions are met:
+
+**Implementation succeeded** means ALL of the following:
+- At least one `git commit` was executed in this session (verify with `git log --oneline -1`)
+- Actual code/file changes were committed (not just task management operations)
+- `git push` completed without errors
+
+**The following do NOT count as implementation:**
+- `agkan task comment add` (comment additions only)
+- `agkan task update --body` / `--file` (body/metadata updates only)
+- Discussion or planning without code changes
+
+**Before updating to done, verify a commit was made:**
+
+```bash
+git log --oneline -1
+```
+
+If no commits were made in this session (output is empty or only shows pre-existing commits), do NOT update the status to done. Leave the task as `in_progress`.
 
 **If a critical error occurred** (e.g., git push failed, permission denied, commit failed), do NOT update the status to done. Leave the task as `in_progress` and record the error details in the task body:
 
@@ -100,7 +118,9 @@ agkan task update <id> body "<existing body>\n\nError: <error description>"
 # Do NOT run: agkan task update <id> status done
 ```
 
-**If implementation succeeded**, update to done:
+**If only task management operations were performed** (comments, body updates, no commits), do NOT update the status to done. Leave the task as `in_progress`.
+
+**If implementation succeeded** (commits were made and pushed), update to done:
 
 ```bash
 agkan task update <id> status done
@@ -113,5 +133,7 @@ agkan task update <id> status done
 - Do not create a branch (work directly on the current branch)
 - Do not create a PR
 - **Only update to done if implementation succeeded** — if a critical error occurred, keep the task as `in_progress`
+- **Only update to done if at least one `git commit` was made** — task management operations alone (comments, body updates) do NOT qualify as implementation
 - If a critical error occurs (git push failure, commit failure, permission error), keep the task as `in_progress` and record the error
+- If only task management operations were performed (no commits), keep the task as `in_progress`
 - This skill is used after task selection (task selection is done with the `agkan-run-direct` skill)
