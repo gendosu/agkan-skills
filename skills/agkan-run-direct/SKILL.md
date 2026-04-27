@@ -66,7 +66,7 @@ If incomplete tasks exist in `blockedBy`, do not select that task; instead, sele
 ### 5. Update Task Status to in_progress
 
 ```bash
-agkan task update <id> --status in_progress
+agkan task update <id> status in_progress
 ```
 
 ### 6. Implementation and Completion
@@ -96,13 +96,7 @@ permission denied, etc.), do NOT update the task status to done. Leave the task 
 `in_progress` and record the error in the task body:
 ```bash
 agkan task get <id> --json
-# Write body to tmp file and update using --file to preserve newlines
-cat > /tmp/agkan_body_$$.md << 'BODY'
-<existing body>
-
-Error: <error description>
-BODY
-agkan task update <id> --file /tmp/agkan_body_$$.md
+agkan task update <id> body "<existing body>\n\nError: <error description>"
 ```
 Only update to done if implementation and all commits/pushes succeeded.
 """
@@ -120,11 +114,20 @@ agkan task get <id> --json
 If the status is still `in_progress`, determine whether the sub-agent encountered a critical error (git push failure, commit failure, permission error). Check the task body for any recorded error messages.
 
 - **If a critical error occurred**: Do NOT update to `done`. Leave the task as `in_progress` so the issue can be resolved manually.
-- **If no critical error occurred** and implementation succeeded but the sub-agent forgot to update the status, update it manually:
+- **If only task management operations were performed** (comment additions, body updates, discussion — no actual commits): Do NOT update to `done`. Leave the task as `in_progress`.
+- **If implementation succeeded** (at least one `git commit` was made and pushed) but the sub-agent forgot to update the status, verify with `git log --oneline -1` and update manually only if a commit exists:
 
 ```bash
-agkan task update <id> --status done
+# Verify a commit was actually made before marking done
+git log --oneline -1
+# Only if a commit is confirmed:
+agkan task update <id> status done
 ```
+
+**The following do NOT qualify as implementation success:**
+- `agkan task comment add` (comment additions only)
+- `agkan task update --body` / `--file` (body/metadata updates only)
+- Discussion or planning without code commits
 
 ### 8. Re-fetch Task List and Continue or End Session
 
