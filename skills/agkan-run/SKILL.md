@@ -244,6 +244,7 @@ Only execute this step if implementation succeeded — specifically, if ALL of t
 - Actual code/file changes were committed (not just task management operations)
 - `git push` completed without errors
 - PR was created or already exists
+- No pending user confirmations or interruptions remain
 
 **The following do NOT count as implementation:**
 - `agkan task comment add` (comment additions only)
@@ -269,9 +270,19 @@ agkan task update <id> body "<existing body>\n\nError: <error description>"
 # Do NOT run: agkan task update <id> status review
 ```
 
+**If user confirmation was required / execution was interrupted mid-task** (e.g., permission denied for a file edit, user asked a clarifying question, tool use was blocked, or the skill presented choices to the user), do NOT update the status to `review`. Leave the task as `in_progress`:
+
+```bash
+# When interrupted awaiting user input: do NOT advance to review
+# The task remains in_progress until fully implemented after confirmation
+# Do NOT run: agkan task update <id> status review
+```
+
+`review` status means implementation is **fully complete** — a PR has been successfully created and is awaiting human review. It does **not** mean "paused waiting for user input".
+
 **If only task management operations were performed** (comments, body updates, no commits), do NOT update the status to review. Leave the task as `in_progress`.
 
-**If implementation succeeded** (commits were made and pushed, PR created), update to review:
+**If implementation succeeded** (commits were made and pushed, PR created, no pending confirmations), update to review:
 
 ```bash
 agkan task update <id> status review
@@ -418,3 +429,4 @@ See the canonical definition in `agkan/SKILL.md` (Tag Priority section).
 - If no tasks exist, end the session
 - Do not mark task as done before PR merge (mark as done after PR review and merge)
 - **Never stop mid-workflow due to interruptions** — handle them and resume
+- **`review` status is exclusively for tasks where implementation is fully complete and a PR is awaiting human review** — never set `review` when waiting for user input or when execution was interrupted mid-task
