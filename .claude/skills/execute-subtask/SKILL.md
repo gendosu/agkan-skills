@@ -71,6 +71,16 @@ agkan task update <id> body "<existing body>\n\nPR: <PR URL>"
 
 ### 7. Update Task to Review
 
+Only execute this step if implementation succeeded — specifically, if git push (Step 4) and PR creation (Step 5) both completed without critical errors.
+
+**If a critical error occurred** (e.g., git push failed, PR creation failed, permission denied), do NOT update the status to review. Leave the task as `in_progress`.
+
+**If user confirmation was required / execution was interrupted mid-task** (e.g., permission denied for a file edit, user asked a clarifying question, tool use was blocked), do NOT update the status to `review`. Leave the task as `in_progress`.
+
+`review` status means implementation is **fully complete** — a PR has been successfully created and is awaiting human review. It does **not** mean "paused waiting for user input".
+
+**If implementation succeeded**, update to review:
+
 ```bash
 agkan task update <id> status review
 ```
@@ -80,4 +90,6 @@ agkan task update <id> status review
 ## Important Notes
 
 - Do not mark task as done before PR is merged (mark as done after PR review and merge)
+- **Step 7 (status → review) must only be executed when implementation succeeded** — do not update to review if a critical error occurred or if user confirmation is pending
+- **`review` status is exclusively for tasks where implementation is fully complete and a PR is awaiting human review**
 - This skill is used after task selection (task selection is done with `execute-task` skill)
