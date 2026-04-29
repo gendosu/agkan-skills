@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.3] - 2026-04-29
+
+### Changed
+
+- **agkan**: Add `task copy` command documentation with usage examples and options
+
 ## [0.13.2] - 2026-04-29
 
 ### Fixed
