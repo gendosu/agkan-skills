@@ -209,7 +209,29 @@ git push -u origin <branch-name>
 > **Note**: Do not use `git add -A` or `git add .`. Files containing `.env`,
 > `credentials.*`, or secrets may be committed unintentionally.
 
+**After push, verify it succeeded before proceeding to Step 6:**
+
+```bash
+git ls-remote --heads origin <branch-name>
+```
+
+If push failed (empty output or non-zero exit code), record the error in the task
+body and do NOT proceed to PR creation. Leave the task as `in_progress`.
+
+**Recovery: If interrupted during Steps 4–7**
+
+If an error, permission denial, or user interruption occurs during implementation
+(Step 4), commit/push (Step 5), or PR creation (Step 6):
+1. Do NOT update the task status to `review`
+2. Record what happened in the task body
+3. Leave the task as `in_progress` — complete the remaining steps before re-evaluating
+
 ### 6. Create PR
+
+> **MANDATORY**: PR creation after a successful push is required and MUST NOT be
+> skipped. This step must complete before advancing to Steps 7 and 8. Skipping PR
+> creation for any reason other than an existing `PR:` label (Case A below) is
+> forbidden — including when approaching context limits.
 
 If a `PR:` label was found in the task body (Step 2, Case A), skip PR creation —
 the existing PR will be updated automatically when commits are pushed to the branch.
@@ -244,7 +266,11 @@ Only execute this step if implementation succeeded — specifically, if ALL of t
 - Actual code/file changes were committed (not just task management operations)
 - `git push` completed without errors
 - PR was created or already exists
-- No pending user confirmations or interruptions remain
+
+> **Scope note**: The interruption guard below applies **only to this status
+> transition decision** — not to Steps 4–7. If a confirmation or interruption
+> occurred during implementation and has since been resolved, complete Steps 5–6
+> before evaluating the guard below.
 
 **The following do NOT count as implementation:**
 - `agkan task comment add` (comment additions only)
@@ -270,11 +296,11 @@ agkan task update <id> body "<existing body>\n\nError: <error description>"
 # Do NOT run: agkan task update <id> status review
 ```
 
-**If user confirmation was required / execution was interrupted mid-task** (e.g., permission denied for a file edit, user asked a clarifying question, tool use was blocked, or the skill presented choices to the user), do NOT update the status to `review`. Leave the task as `in_progress`:
+**If an unresolved interruption remains at this point** (e.g., push or PR creation in Steps 5–6 could not complete, a tool use is still blocked, or the skill is still awaiting user clarification), do NOT update the status to `review`. Leave the task as `in_progress`:
 
 ```bash
-# When interrupted awaiting user input: do NOT advance to review
-# The task remains in_progress until fully implemented after confirmation
+# When an unresolved interruption prevents completion: do NOT advance to review
+# Resolve the interruption, complete Steps 5–6, then re-evaluate
 # Do NOT run: agkan task update <id> status review
 ```
 
@@ -282,7 +308,7 @@ agkan task update <id> body "<existing body>\n\nError: <error description>"
 
 **If only task management operations were performed** (comments, body updates, no commits), do NOT update the status to review. Leave the task as `in_progress`.
 
-**If implementation succeeded** (commits were made and pushed, PR created, no pending confirmations), update to review:
+**If implementation succeeded** (commits were made and pushed, PR created, no unresolved interruptions), update to review:
 
 ```bash
 agkan task update <id> status review
