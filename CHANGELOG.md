@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.4] - 2026-05-02
+
+### Fixed
+
+- **agkan-run**, **agkan-subtask**: Narrow guard condition and enforce PR creation to prevent invalid status transitions
+
 ## [0.13.3] - 2026-04-29
 
 ### Changed
