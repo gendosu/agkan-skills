@@ -111,10 +111,17 @@ After the sub-agent completes, check whether the task has been moved out of `in_
 agkan task get <id> --json
 ```
 
+> **Scope note**: The interruption guard below applies **only to this status
+> transition decision** — not to the sub-agent's implementation steps. If the
+> sub-agent was interrupted during implementation and the interruption has since
+> been resolved, ensure the sub-agent completes its implementation steps (commit,
+> push) before evaluating the guard below.
+
 If the status is still `in_progress`, determine whether the sub-agent encountered a critical error (git push failure, commit failure, permission error). Check the task body for any recorded error messages.
 
 - **If a critical error occurred**: Do NOT update to `done`. Leave the task as `in_progress` so the issue can be resolved manually.
 - **If only task management operations were performed** (comment additions, body updates, discussion — no actual commits): Do NOT update to `done`. Leave the task as `in_progress`.
+- **If the task body contains an error about no commit being made** (silent failure surfaced by the sub-agent): Do NOT update to `done`. Leave the task as `in_progress`.
 - **If implementation succeeded** (at least one `git commit` was made and pushed) but the sub-agent forgot to update the status, verify with `git log --oneline -1` and update manually only if a commit exists:
 
 ```bash
