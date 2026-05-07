@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.5] - 2026-05-07
+
+### Fixed
+
+- **agkan-subtask-direct**: Add MANDATORY commit guard and recovery to prevent skipping commits
+
 ## [0.13.4] - 2026-05-02
 
 ### Fixed
