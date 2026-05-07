@@ -54,6 +54,8 @@ Fix any errors before proceeding.
 
 ### 5. Commit
 
+> **MANDATORY**: Committing and pushing the implementation is required and MUST NOT be skipped. This step must complete before advancing to Steps 6 and 7. Skipping commit for any reason — including when approaching context limits or after running tests/lint — is forbidden.
+
 Stage files by specifying them explicitly. Do not use `git add -A` as it risks including unintended files such as `.env` or credentials.
 
 ```bash
@@ -64,6 +66,21 @@ git push -u origin <branch-name-or-current>
 ```
 
 > **Note**: Do not use `git add -A` or `git add .`. Files containing `.env`, `credentials.*`, or secrets may be committed unintentionally.
+
+**After push, verify it succeeded before proceeding to Step 6:**
+
+```bash
+git ls-remote --heads origin <branch-name-or-current>
+```
+
+If push failed (empty output or non-zero exit code), record the error in the task body and do NOT proceed to Step 6. Leave the task as `in_progress`.
+
+**Recovery: If interrupted during Steps 3–5**
+
+If an error, permission denial, or user interruption occurs during implementation (Step 3), lint check (Step 4), or commit/push (Step 5):
+1. Do NOT update the task status to `done`
+2. Record what happened in the task body
+3. Leave the task as `in_progress` — complete the remaining steps before re-evaluating
 
 ### 6. Self-Review
 
@@ -91,6 +108,11 @@ If the code reviewer identifies critical issues, fix them and commit the fixes b
 
 Only execute this step if implementation succeeded — specifically, if ALL of the following conditions are met:
 
+> **Scope note**: The interruption guard below applies **only to this status
+> transition decision** — not to Steps 3–5. If a confirmation or interruption
+> occurred during implementation and has since been resolved, complete Steps 3–5
+> before evaluating the guard below.
+
 **Implementation succeeded** means ALL of the following:
 - At least one `git commit` was executed in this session (verify with `git log --oneline -1`)
 - Actual code/file changes were committed (not just task management operations)
@@ -107,14 +129,33 @@ Only execute this step if implementation succeeded — specifically, if ALL of t
 git log --oneline -1
 ```
 
-If no commits were made in this session (output is empty or only shows pre-existing commits), do NOT update the status to done. Leave the task as `in_progress`.
+If no commits were made in this session (output is empty or only shows pre-existing commits), do NOT update the status to done. **Surface the failure** by appending an error line to the task body, then leave the task as `in_progress`:
+
+```bash
+# Surface silent failure: no commit was made
+agkan task get <id> --json
+# Write body to tmp file and update using --file to preserve newlines
+cat > /tmp/agkan_body_$$.md << 'BODY'
+<existing body>
+
+Error: Skill reached end without a commit. Implementation was not completed — files may remain uncommitted in the working tree. Manual intervention required.
+BODY
+agkan task update <id> --file /tmp/agkan_body_$$.md
+# Do NOT run: agkan task update <id> status done
+```
 
 **If a critical error occurred** (e.g., git push failed, permission denied, commit failed), do NOT update the status to done. Leave the task as `in_progress` and record the error details in the task body:
 
 ```bash
 # On error: record what went wrong in the task body (optional but recommended)
 agkan task get <id> --json
-agkan task update <id> body "<existing body>\n\nError: <error description>"
+# Write body to tmp file and update using --file to preserve newlines
+cat > /tmp/agkan_body_$$.md << 'BODY'
+<existing body>
+
+Error: <error description>
+BODY
+agkan task update <id> --file /tmp/agkan_body_$$.md
 # Do NOT run: agkan task update <id> status done
 ```
 
