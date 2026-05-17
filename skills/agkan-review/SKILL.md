@@ -13,6 +13,38 @@ Workflow to retrieve tasks with Review status in agkan, check the merge/close st
 
 ## Workflow
 
+### Primary: Run the bundled script
+
+Run the bundled `review.sh` script to process all review tasks in one command:
+
+```bash
+bash "$(dirname "$(agkan skill path agkan-review 2>/dev/null || echo "$BASE_DIR")")/review.sh"
+```
+
+The base directory for this skill is provided at session start. Use it to resolve the script path:
+
+```bash
+bash "$BASE_DIR/review.sh"
+```
+
+Where `$BASE_DIR` is the base directory shown at the top of the skill (e.g. `/home/gen/.claude/skills/agkan-review`).
+
+The script:
+1. Fetches all tasks with `--status review`
+2. Extracts the PR URL from each task body (`PR: <URL>`) or metadata (`pr` key)
+3. Calls `gh pr view <URL> --json state,mergedAt` for each PR
+4. Updates task status to `done` (MERGED) or `closed` (CLOSED without merge), skips OPEN
+5. Adds a comment recording the reason and timestamp
+6. Prints a summary: `done: X件, closed: X件, スキップ(OPEN): X件, PR未設定: X件`
+
+To register the script in `.claude/settings.json` to eliminate per-command permission prompts, add the script path to `allowedTools` or the relevant bash allowlist.
+
+---
+
+## Fallback: Manual step-by-step workflow
+
+Use the manual steps below if the script is unavailable or you need to process tasks individually.
+
 ### 1. Retrieve Review tasks
 
 ```bash
@@ -61,21 +93,7 @@ gh pr view <PR URL> --json state,mergedAt
 | `CLOSED` (mergedAt is null) | `closed` | `agkan task update <id> status closed` | Increment `closed_count` |
 | `OPEN` | No change | Skip (still under review) | Increment `skipped_open_count` |
 
-### 6. Display summary after all tasks are processed
-
-After processing all tasks, display a summary of the results:
-
-```
-done: <done_count>件, closed: <closed_count>件, スキップ(OPEN): <skipped_open_count>件, PR未設定: <no_pr_count>件
-```
-
-Example output:
-
-```
-done: 2件, closed: 0件, スキップ(OPEN): 0件, PR未設定: 6件
-```
-
-### 5. Add comment recording the reason for status change
+### 6. Add comment recording the reason for status change
 
 After updating status to `done` or `closed`, record the merge date/time and reason:
 
@@ -90,14 +108,10 @@ Comment format by status:
 | `done` | `Merged at <mergedAt>. PR was merged and task is complete.` |
 | `closed` | `PR was closed without merging. Task moved to closed.` |
 
-Example commands:
+### 7. Display summary after all tasks are processed
 
-```bash
-# When merged
-agkan task comment add <id> "Merged at 2026-03-22T10:00:00Z. PR was merged and task is complete."
-
-# When closed without merge
-agkan task comment add <id> "PR was closed without merging. Task moved to closed."
+```
+done: <done_count>件, closed: <closed_count>件, スキップ(OPEN): <skipped_open_count>件, PR未設定: <no_pr_count>件
 ```
 
 ---
