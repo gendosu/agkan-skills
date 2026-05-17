@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.1] - 2026-05-18
+
+### Fixed
+
+- **agkan-review**: Fix jq error by using `.tasks[]` instead of `.[]`
+
 ## [0.15.0] - 2026-05-17
 
 ### Added
