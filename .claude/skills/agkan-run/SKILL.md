@@ -77,20 +77,17 @@ If there are incomplete tasks in `blockedBy`, do not select that task. Instead, 
 agkan task update <id> status in_progress
 ```
 
-### 5a. Inspect task body for existing Branch/PR
+### 5a. Inspect task for existing Branch/PR
 
-Before launching the sub-agent, retrieve the full task body and parse it for `Branch:` and `PR:` labels (see `agkan/SKILL.md` — Body Conventions):
+Before launching the sub-agent, retrieve the task to get the branch and check the body for a `PR:` label:
 
 ```bash
 agkan task get <id> --json
 ```
 
-Extract any values matching these patterns from the task body:
-
-```
-Branch: <branch-name>
-PR: <URL>
-```
+Extract:
+- **Branch**: read from `.task.branch` (first-class column; `null` if not set)
+- **PR**: parse the task body for a `PR: <URL>` label
 
 Pass these values to the sub-agent prompt (Step 6) so it can resume work on the existing branch/PR instead of creating new ones.
 
@@ -135,10 +132,9 @@ agkan task update <id> status in_progress
 
 ### 2. Check for Existing Branch/PR
 
-Before creating a new branch, inspect the task body for existing branch and PR
-associations. Parse the "Existing Branch/PR" values provided above.
+The "Existing Branch/PR" values above come from the task record. Use them as follows:
 
-**Case A — Branch label found (not "none"):**
+**Case A — Branch is not "none":**
 
 Check out the existing branch:
 
@@ -162,13 +158,16 @@ ERROR: Branch '<existing-branch-name>' has conflicts with '$DEFAULT_BRANCH'.
 Please resolve the conflicts manually before resuming this task.
 ```
 
-If no conflicts are detected, continue from Step 4 (skip Step 3, as the branch name
-is already recorded).
+If no conflicts are detected, continue from Step 4 (skip Step 3, as the branch is
+already recorded in the task).
 
-**Case B — No branch label found (value is "none"):**
+**Case B — Branch is "none" (null in the task record):**
 
-Create a new branch. Branch name is generated from task ID and title
-(example: `feat/42-add-login-page`).
+Generate a branch name from the task ID and title. Use the following naming convention:
+
+- If the task has a `bug` or `security` tag → prefix `fix/`
+- Otherwise → prefix `feat/`
+- Format: `<prefix>/<id>-<title-slug>` (e.g., `feat/42-add-login-page`)
 
 ```bash
 DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
@@ -181,13 +180,11 @@ Then continue to Step 3.
 ### 3. Write Branch Name to Task
 
 ```bash
-# First, retrieve the existing body
-agkan task get <id> --json
-# Then update by concatenating existing body with branch name
-agkan task update <id> body "<existing body>\n\nBranch: <branch-name>"
-# Also store as metadata so the board detail panel can display it
-agkan task meta set <id> branch <branch-name>
+agkan task update <id> --branch <branch-name>
 ```
+
+This stores the branch as a first-class column on the task record so subsequent skill
+executions can resume work on the correct branch.
 
 ### 4. Implementation
 

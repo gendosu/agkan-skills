@@ -33,6 +33,7 @@ agkan task add "Title" --file ./spec.md  # Read body from file
 agkan task add "Title" --blocked-by 1,2  # Set tasks that block this task
 agkan task add "Title" --blocks 3,4      # Set tasks that this task blocks
 agkan task add "Title" --assignees "alice,bob"  # Set task assignees (comma-separated)
+agkan task add "Title" --branch feature/my-branch  # Assign a branch to this task
 
 # List tasks
 agkan task list                    # All tasks
@@ -67,6 +68,7 @@ agkan task update <id> --author "agent"
 agkan task update <id> --assignees "alice,bob"
 agkan task update <id> --file ./spec.md  # Read body from file
 agkan task update <id> --status done --title "Updated Title"  # Multiple options
+agkan task update <id> --branch feature/my-branch  # Set the branch column
 
 # Count
 agkan task count
@@ -288,7 +290,8 @@ agkan task list --status ready --json | jq '.tasks[].id'
     "status": "backlog | ready | in_progress | review | done | closed",
     "parent_id": "number | null",
     "created_at": "2026-01-01T00:00:00.000Z",
-    "updated_at": "2026-01-01T00:00:00.000Z"
+    "updated_at": "2026-01-01T00:00:00.000Z",
+    "branch": "string | null"
   },
   "parent": "object | null",
   "children": [],
@@ -448,24 +451,32 @@ agkan task list --tree
 
 ## Body Conventions
 
-Skills that create branches and PRs write structured labels into the task body. These labels are used by subsequent skill executions to resume work on the correct branch and PR instead of starting fresh.
+### PR Label
 
-### Format
+Skills that create PRs write a structured label into the task body. This label is used by subsequent skill executions to resume work on the existing PR instead of opening a new one.
+
+#### Format
 
 ```
-Branch: <branch-name>
 PR: <URL>
 ```
 
-### Rules
+#### Rules
 
-- **Branch label** is written by `agkan-subtask` after the branch is created (Step 3).
 - **PR label** is written by `agkan-subtask` after the PR is opened (Step 7).
-- Both labels are appended to the existing task body, separated by a blank line.
-- Skills that start work on a task **must** parse these labels from the task body before creating a new branch or PR.
-  - If a `Branch:` label is present → check out the existing branch and continue work on it.
-  - If a `PR:` label is present → push to that branch to update the existing PR instead of opening a new one.
-  - If neither label is present → proceed with the default flow (create a new branch, open a new PR).
+- The label is appended to the existing task body, separated by a blank line.
+- Skills that start work on a task **must** parse this label from the task body before creating a new PR.
+  - If a `PR:` label is present → push to the branch to update the existing PR instead of opening a new one.
+  - If no `PR:` label is present → open a new PR.
+
+### Branch Field
+
+The `branch` column is a first-class field on the task record — it is not stored in the task body.
+
+- **Set**: `agkan task add --branch <name>` or `agkan task update <id> --branch <name>`
+- **Read**: `agkan task get <id> --json` → `.task.branch`
+- **Note**: `agkan task list --json` does **not** include the `branch` field. Use `agkan task get <id> --json` when branch information is needed.
+- When `branch` is `null`, subtask skills (`agkan-subtask`, `agkan-subtask-direct`) auto-generate a branch name from the task ID and title, create the branch, and persist the name back via `agkan task update <id> --branch <name>`.
 
 ---
 
