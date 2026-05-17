@@ -7,7 +7,7 @@ skipped_open_count=0
 no_pr_count=0
 
 tasks=$(agkan task list --status review --json)
-task_ids=$(echo "$tasks" | jq -r '.[].id')
+task_ids=$(echo "$tasks" | jq -r '.tasks[].id')
 
 if [ -z "$task_ids" ]; then
   echo "No review tasks found."
@@ -15,7 +15,7 @@ if [ -z "$task_ids" ]; then
 fi
 
 for id in $task_ids; do
-  task=$(echo "$tasks" | jq -r ".[] | select(.id == $id)")
+  task=$(echo "$tasks" | jq -r ".tasks[] | select(.id == $id)")
   title=$(echo "$task" | jq -r '.title')
 
   # Extract PR URL from body
