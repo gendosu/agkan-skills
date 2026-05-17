@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-05-17
+
+### Changed
+
+- **agkan**, **agkan-add**, **agkan-run**, **agkan-subtask**, **agkan-subtask-direct**: Adopt agkan's first-class `branch` column for storing branch names — `task add/update --branch`, `.task.branch` reads, and removal of body/metadata branch storage
+
 ## [0.13.5] - 2026-05-07
 
 ### Fixed
