@@ -20,19 +20,44 @@ A workflow to directly implement a selected task without creating a branch or PR
 agkan task update <id> status in_progress
 ```
 
-### 2. Check for Pre-assigned Branch
+### 2. Check for Existing Branch
 
-Before implementing, check if a branch has been pre-assigned via task metadata:
+Read the branch from the task's first-class `branch` column:
 
 ```bash
-BRANCH=$(agkan task meta get <id> branch 2>/dev/null)
-if [ -n "$BRANCH" ]; then
-  git fetch origin
-  git checkout "$BRANCH"
-fi
+BRANCH=$(agkan task get <id> --json | jq -r '.task.branch // empty')
 ```
 
-If `$BRANCH` is set, all subsequent commits and pushes must target that branch.
+**Case A — Branch is non-null:**
+
+Check out the existing branch:
+
+```bash
+git fetch origin
+git checkout "$BRANCH"
+```
+
+All subsequent commits and pushes must target this branch.
+
+**Case B — Branch is null:**
+
+Generate a branch name from the task ID and title. Use the following naming convention:
+
+- If the task has a `bug` or `security` tag → prefix `fix/`
+- Otherwise → prefix `feat/`
+- Format: `<prefix>/<id>-<title-slug>` (e.g., `feat/42-add-login-page`)
+
+```bash
+DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
+git fetch origin
+git checkout -b <branch-name> origin/$DEFAULT_BRANCH
+```
+
+Persist the generated branch name to the task:
+
+```bash
+agkan task update <id> --branch <branch-name>
+```
 
 ### 3. Implementation
 
@@ -171,7 +196,7 @@ agkan task update <id> status done
 
 ## Important Notes
 
-- Do not create a branch (work directly on the current branch)
+- Branch creation: check out an existing branch if `.task.branch` is non-null; otherwise auto-generate a name and create the branch, then persist it via `agkan task update <id> --branch <name>`
 - Do not create a PR
 - **Only update to done if implementation succeeded** — if a critical error occurred, keep the task as `in_progress`
 - **Only update to done if at least one `git commit` was made** — task management operations alone (comments, body updates) do NOT qualify as implementation

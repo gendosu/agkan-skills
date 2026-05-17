@@ -24,36 +24,26 @@ agkan task update <id> status in_progress
 
 ### 2. Check for Existing Branch/PR
 
-Before creating a new branch, check for an existing branch in two places:
-
-1. **Task metadata** (primary source):
+Read the branch from the task's first-class `branch` column:
 
 ```bash
-BRANCH=$(agkan task meta get <id> branch 2>/dev/null)
+TASK_JSON=$(agkan task get <id> --json)
+BRANCH=$(echo "$TASK_JSON" | jq -r '.task.branch // empty')
 ```
 
-2. **Task body** (fallback — only if metadata is empty):
-
-```bash
-agkan task get <id> --json
-```
-
-Parse the task body for the following labels:
+Also parse the task body for a `PR:` label:
 
 ```
-Branch: <branch-name>
 PR: <URL>
 ```
 
-If `$BRANCH` from metadata is empty, parse the body for `Branch: <branch-name>` and use that value.
-
-**Case A — Branch found (via metadata or body label):**
+**Case A — Branch is non-null:**
 
 Check out the existing branch:
 
 ```bash
 git fetch origin
-git checkout <existing-branch-name>
+git checkout "$BRANCH"
 ```
 
 Then check for conflicts with the default branch:
@@ -70,11 +60,15 @@ ERROR: Branch '<existing-branch-name>' has conflicts with '$DEFAULT_BRANCH'.
 Please resolve the conflicts manually before resuming this task.
 ```
 
-If no conflicts are detected, continue from Step 4 (skip Step 3, as the branch name is already recorded).
+If no conflicts are detected, continue from Step 4 (skip Step 3, as the branch is already recorded in the task).
 
-**Case B — No branch label found:**
+**Case B — Branch is null:**
 
-Create a new branch. Branch name is generated from task ID and title (example: `feat/42-add-login-page`).
+Generate a branch name from the task ID and title. Use the following naming convention:
+
+- If the task has a `bug` or `security` tag → prefix `fix/`
+- Otherwise → prefix `feat/`
+- Format: `<prefix>/<id>-<title-slug>` (e.g., `feat/42-add-login-page`)
 
 ```bash
 DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
@@ -87,13 +81,10 @@ Then continue to Step 3.
 ### 3. Write Branch Name to Task
 
 ```bash
-# First, retrieve the existing body
-agkan task get <id> --json
-# Then update by concatenating existing body with branch name
-agkan task update <id> body "<existing body>\n\nBranch: <branch-name>"
-# Also store as metadata so the board detail panel can display it
-agkan task meta set <id> branch <branch-name>
+agkan task update <id> --branch <branch-name>
 ```
+
+This stores the branch as a first-class column on the task record so subsequent skill executions can resume work on the correct branch.
 
 ### 4. Implementation
 
