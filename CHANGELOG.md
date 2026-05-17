@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-05-17
+
+### Added
+
+- **agkan-review**: Bundle workflow into `review.sh` script for allowlist registration to reduce permission prompts
+
 ## [0.14.0] - 2026-05-17
 
 ### Changed
