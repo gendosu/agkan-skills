@@ -146,7 +146,9 @@ agkan task list --status ready --json
 
 If there is no instruction to end from the user and ready tasks exist (including newly added ones), select the next task and repeat from step 3 of the same workflow.
 
-If no ready tasks remain, end the session.
+If no ready tasks remain, invoke `/exit` to terminate the Claude Code session automatically, unless:
+- A task is still `in_progress` (error state)
+- The user has said "stop but keep the session open"
 
 ---
 
@@ -175,6 +177,6 @@ See the canonical definition in `agkan/SKILL.md` (Tag Priority section).
 ## Important Notes
 
 - Always select only one task (do not work on multiple tasks simultaneously)
-- If no tasks exist, end the session
+- If no tasks exist, invoke `/exit` to terminate the Claude Code session automatically (unless a task is still `in_progress` or the user has said "keep the session open")
 - Do not create branches or PRs (commit directly to the current branch)
 - Task status update to done and static analysis checks are handled inside the sub-agent (agkan-subtask-direct), not in the main thread

@@ -382,7 +382,9 @@ agkan task list --status ready --json
 
 If there are no termination instructions from the user and ready tasks exist (including newly added ones), select the next task and repeat from step 3 of the workflow.
 
-If no ready tasks remain, end the session.
+If no ready tasks remain, invoke `/exit` to terminate the Claude Code session automatically, unless:
+- A task is still `in_progress` (error state)
+- The user has said "stop but keep the session open"
 
 ---
 
@@ -393,7 +395,7 @@ START
   ↓
 git pull (default branch) & get ready tasks
   ↓
-No tasks? → END SESSION
+No tasks? → /exit (END SESSION)
   ↓
 Select highest priority task (skip will-do-later)
   ↓
@@ -412,7 +414,7 @@ Re-fetch task list  ←───────────────────
   ↓                                              │
 Ready tasks exist AND no stop instruction? ─Yes─┘
   ↓ No
-END SESSION
+/exit (END SESSION)
 ```
 
 **Red flags — you are breaking the loop:**
@@ -449,7 +451,7 @@ See the canonical definition in `agkan/SKILL.md` (Tag Priority section).
 ## Notes
 
 - Always select only 1 task (do not start multiple tasks simultaneously)
-- If no tasks exist, end the session
+- If no tasks exist, invoke `/exit` to terminate the Claude Code session automatically (unless a task is still `in_progress` or the user has said "keep the session open")
 - Do not mark task as done before PR merge (mark as done after PR review and merge)
 - **Never stop mid-workflow due to interruptions** — handle them and resume
 - **`review` status is exclusively for tasks where implementation is fully complete and a PR is awaiting human review** — never set `review` when waiting for user input or when execution was interrupted mid-task
