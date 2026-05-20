@@ -112,7 +112,7 @@ git ls-remote --heads origin <branch-name>
 
 If push failed (empty output or non-zero exit code), record the error in the task body and do NOT proceed to PR creation. Leave the task as `in_progress`.
 
-**Recovery: If interrupted during Steps 4–8**
+**Recovery: If interrupted during Steps 4–7**
 
 If an error, permission denial, or user interruption occurs during implementation (Step 4), commit/push (Step 5), or PR creation (Step 6):
 1. Do NOT update the task status to `review`
@@ -228,11 +228,11 @@ agkan task update <id> body "<existing body>\n\nError: <error description>"
 # Do NOT run: agkan task update <id> status review
 ```
 
-**If an unresolved interruption remains at this point** (e.g., push or PR creation in Steps 5–6 could not complete, a tool use is still blocked, or the skill is still awaiting user clarification), do NOT update the status to `review`. Leave the task as `in_progress`:
+**If an unresolved interruption remains at this point** (e.g., push or PR creation in Steps 5–7 could not complete, a tool use is still blocked, or the skill is still awaiting user clarification), do NOT update the status to `review`. Leave the task as `in_progress`:
 
 ```bash
 # When an unresolved interruption prevents completion: do NOT advance to review
-# Resolve the interruption, complete Steps 5–6, then re-evaluate
+# Resolve the interruption, complete Steps 5–7, then re-evaluate
 # Do NOT run: agkan task update <id> status review
 ```
 
