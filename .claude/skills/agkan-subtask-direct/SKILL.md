@@ -79,7 +79,7 @@ Fix any errors before proceeding.
 
 ### 5. Commit
 
-> **MANDATORY**: Committing and pushing the implementation is required and MUST NOT be skipped. This step must complete before advancing to Steps 6 and 7. Skipping commit for any reason — including when approaching context limits or after running tests/lint — is forbidden.
+> **MANDATORY**: Committing and pushing the implementation is required and MUST NOT be skipped. This step must complete before advancing to Steps 7 and 8. Skipping commit for any reason — including when approaching context limits or after running tests/lint — is forbidden.
 
 Stage files by specifying them explicitly. Do not use `git add -A` as it risks including unintended files such as `.env` or credentials.
 
@@ -92,13 +92,13 @@ git push -u origin <branch-name-or-current>
 
 > **Note**: Do not use `git add -A` or `git add .`. Files containing `.env`, `credentials.*`, or secrets may be committed unintentionally.
 
-**After push, verify it succeeded before proceeding to Step 6:**
+**After push, verify it succeeded before proceeding to Step 7:**
 
 ```bash
 git ls-remote --heads origin <branch-name-or-current>
 ```
 
-If push failed (empty output or non-zero exit code), record the error in the task body and do NOT proceed to Step 6. Leave the task as `in_progress`.
+If push failed (empty output or non-zero exit code), record the error in the task body and do NOT proceed to Step 7. Leave the task as `in_progress`.
 
 **Recovery: If interrupted during Steps 3–5**
 
@@ -107,7 +107,35 @@ If an error, permission denial, or user interruption occurs during implementatio
 2. Record what happened in the task body
 3. Leave the task as `in_progress` — complete the remaining steps before re-evaluating
 
-### 6. Self-Review
+### 6. Update Checkboxes
+
+If the task body contains `- [ ]` checklist items, update items completed during this implementation.
+
+1. Retrieve the current body:
+
+```bash
+TASK_JSON=$(agkan task get <id> --json)
+CURRENT_BODY=$(echo "$TASK_JSON" | jq -r '.task.body // empty')
+```
+
+2. Check whether the body contains unchecked items. If none found, **skip this step**:
+
+```bash
+echo "$CURRENT_BODY" | grep -q -- '- \[ \]' || echo "No unchecked items — skipping"
+```
+
+3. For each item completed in this implementation, replace its `- [ ]` with `- [x]`. Write the updated body to a temp file and apply:
+
+```bash
+cat > /tmp/agkan_checkbox_$$.md << 'BODY'
+<updated body with completed items marked as - [x]>
+BODY
+agkan task update <id> --file /tmp/agkan_checkbox_$$.md
+```
+
+> Only mark items that were actually completed in this session. Leave pending items as `- [ ]`.
+
+### 7. Self-Review
 
 Before updating the task status, perform a self-review of the implementation using the `superpowers:code-reviewer` sub-agent:
 
@@ -129,13 +157,13 @@ Review the git changes (run `git diff HEAD~1 HEAD` to see them) against the orig
 
 If the code reviewer identifies critical issues, fix them and commit the fixes before proceeding.
 
-### 7. Update task to done
+### 8. Update task to done
 
 Only execute this step if implementation succeeded — specifically, if ALL of the following conditions are met:
 
 > **Scope note**: The interruption guard below applies **only to this status
-> transition decision** — not to Steps 3–5. If a confirmation or interruption
-> occurred during implementation and has since been resolved, complete Steps 3–5
+> transition decision** — not to Steps 3–6. If a confirmation or interruption
+> occurred during implementation and has since been resolved, complete Steps 3–6
 > before evaluating the guard below.
 
 **Implementation succeeded** means ALL of the following:
