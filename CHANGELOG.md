@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-05-25
+
+### Added
+
+- **agkan-subtask**, **agkan-subtask-direct**: Add checkbox update step to mark task as in_progress on the kanban board
+
+### Fixed
+
+- **agkan-subtask**: Correct step range references after checkbox step insertion
+
 ## [0.15.1] - 2026-05-18
 
 ### Fixed
