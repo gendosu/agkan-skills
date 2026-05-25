@@ -122,7 +122,7 @@ If an error, permission denial, or user interruption occurs during implementatio
 ### 6. Create PR
 
 > **MANDATORY**: PR creation after a successful push is required and MUST NOT be
-> skipped. This step must complete before advancing to Steps 7 and 8. Skipping PR
+> skipped. This step must complete before advancing to Steps 7 and 9. Skipping PR
 > creation for any reason other than an existing `PR:` label (Case A below) is
 > forbidden — including when approaching context limits.
 
@@ -149,7 +149,35 @@ agkan task update <id> body "<existing body>\n\nPR: <PR URL>"
 agkan task meta set <id> pr <PR URL>
 ```
 
-### 8. Self-Review
+### 8. Update Checkboxes
+
+If the task body contains `- [ ]` checklist items, update items completed during this implementation.
+
+1. Retrieve the current body:
+
+```bash
+TASK_JSON=$(agkan task get <id> --json)
+CURRENT_BODY=$(echo "$TASK_JSON" | jq -r '.task.body // empty')
+```
+
+2. Check whether the body contains unchecked items. If none found, **skip this step**:
+
+```bash
+echo "$CURRENT_BODY" | grep -q -- '- \[ \]' || echo "No unchecked items — skipping"
+```
+
+3. For each item completed in this implementation, replace its `- [ ]` with `- [x]`. Write the updated body to a temp file and apply:
+
+```bash
+cat > /tmp/agkan_checkbox_$$.md << 'BODY'
+<updated body with completed items marked as - [x]>
+BODY
+agkan task update <id> --file /tmp/agkan_checkbox_$$.md
+```
+
+> Only mark items that were actually completed in this session. Leave pending items as `- [ ]`.
+
+### 9. Self-Review
 
 Before updating the task status, perform a self-review of the implementation using the `superpowers:code-reviewer` sub-agent:
 
@@ -171,7 +199,7 @@ Review the git changes (run `git diff origin/<default-branch>...HEAD` to see the
 
 If the code reviewer identifies critical issues, fix them, commit and push the fixes, before proceeding.
 
-### 9. Update Task to Review
+### 10. Update Task to Review
 
 Only execute this step if implementation succeeded — specifically, if ALL of the following conditions are met:
 
@@ -182,8 +210,8 @@ Only execute this step if implementation succeeded — specifically, if ALL of t
 - PR was created or already exists
 
 > **Scope note**: The interruption guard below applies **only to this status
-> transition decision** — not to Steps 4–7. If a confirmation or interruption
-> occurred during implementation and has since been resolved, complete Steps 5–6
+> transition decision** — not to Steps 4–8. If a confirmation or interruption
+> occurred during implementation and has since been resolved, complete Steps 5–7
 > before evaluating the guard below.
 
 **The following do NOT count as implementation:**
@@ -200,11 +228,11 @@ agkan task update <id> body "<existing body>\n\nError: <error description>"
 # Do NOT run: agkan task update <id> status review
 ```
 
-**If an unresolved interruption remains at this point** (e.g., push or PR creation in Steps 5–6 could not complete, a tool use is still blocked, or the skill is still awaiting user clarification), do NOT update the status to `review`. Leave the task as `in_progress`:
+**If an unresolved interruption remains at this point** (e.g., push or PR creation in Steps 5–7 could not complete, a tool use is still blocked, or the skill is still awaiting user clarification), do NOT update the status to `review`. Leave the task as `in_progress`:
 
 ```bash
 # When an unresolved interruption prevents completion: do NOT advance to review
-# Resolve the interruption, complete Steps 5–6, then re-evaluate
+# Resolve the interruption, complete Steps 5–7, then re-evaluate
 # Do NOT run: agkan task update <id> status review
 ```
 
@@ -229,8 +257,8 @@ Verify that the status is `review`. If it is still `in_progress`, retry the upda
 ## Important Notes
 
 - Do not mark task as done before PR is merged (mark as done after PR review and merge)
-- **Step 9 (status → review) must only be executed when implementation succeeded** — do not update to review if a critical error occurred
-- **Step 9 (status → review) requires at least one `git commit` to have been made** — task management operations alone (comments, body updates) do NOT qualify as implementation
+- **Step 10 (status → review) must only be executed when implementation succeeded** — do not update to review if a critical error occurred
+- **Step 10 (status → review) requires at least one `git commit` to have been made** — task management operations alone (comments, body updates) do NOT qualify as implementation
 - If a critical error occurs (git push failure, PR creation failure, permission error), keep the task as `in_progress` and record the error
 - **If user confirmation was required or execution was interrupted mid-task**, keep the task as `in_progress` — do NOT advance to `review`
 - `review` status is exclusively for tasks where implementation is fully complete and a PR is awaiting human review
