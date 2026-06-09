@@ -86,7 +86,7 @@ Stage files by specifying them explicitly. Do not use `git add -A` as it risks i
 ```bash
 git add <file1> <file2> ...
 git commit -m "<commit message>"
-# If a branch was checked out from metadata, push to it; otherwise push to current branch
+# If a branch was checked out from the task's branch column, push to it; otherwise push to current branch
 git push -u origin <branch-name-or-current>
 ```
 
