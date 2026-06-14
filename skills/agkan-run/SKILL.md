@@ -107,6 +107,10 @@ Do not use `Skill("agkan-subtask")`; instead, embed the workflow steps directly 
 > **Why embed steps instead of referencing a file path?**
 > Sub-agents spawned via the Task tool start with a fresh context. When installed as a plugin, the skill files may reside at a path unknown to the sub-agent (e.g., under a plugin cache directory), so instructing the sub-agent to read a relative or installation-specific path is unreliable. Embedding the workflow steps directly in the prompt makes the instructions path-independent.
 
+Before calling Task(), substitute the placeholders with the values fetched in Step 0:
+- Replace `<RUN_MODEL>` with the value of `$RUN_MODEL`
+- Replace `<RUN_EFFORT>` with the value of `$RUN_EFFORT`
+
 ```
 Task(
   subagent_type="general-purpose",
