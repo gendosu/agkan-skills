@@ -15,6 +15,14 @@ Standard workflow to pick the highest priority ready task from agkan, implement 
 
 ## Workflow
 
+### 0. Fetch Config
+
+```bash
+CONFIG=$(agkan config get --json)
+RUN_MODEL=$(echo "$CONFIG" | jq -r '.config.models.run.model // "sonnet"')
+RUN_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.run.effort // "medium"')
+```
+
 ### 1. Update branch to latest
 
 Before switching to the default branch, check for uncommitted changes:
@@ -102,6 +110,7 @@ Do not use `Skill("agkan-subtask")`; instead, embed the workflow steps directly 
 ```
 Task(
   subagent_type="general-purpose",
+  model="<RUN_MODEL>",
   description="Implement task #<id>",
   prompt="""
 Please implement the following task.
@@ -327,6 +336,10 @@ command.
 - **Step 8 (status → review) requires at least one `git commit` to have been made** — task management operations alone (comments, body updates) do NOT qualify as implementation
 - If a critical error occurs (git push failure, PR creation failure, permission error), keep the task as `in_progress` and record the error
 - If only task management operations were performed (no commits), keep the task as `in_progress`
+
+## Effort
+
+Thoroughness hint: <RUN_EFFORT>
 """
 )
 ```
