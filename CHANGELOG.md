@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-06-15
+
+### Added
+
+- **agkan-planning**, **agkan-run**, **agkan-run-direct**: Add config-driven model and effort selection via `agkan config get`
+
+### Fixed
+
+- **agkan-planning**, **agkan-run**, **agkan-run-direct**: Clarify placeholder substitution for `RUN_MODEL` and `RUN_EFFORT`
+- **agkan-planning**, **agkan-run**, **agkan-run-direct**: Fallback to empty JSON when `agkan config get` fails
+
 ## [0.16.1] - 2026-06-09
 
 ### Fixed
