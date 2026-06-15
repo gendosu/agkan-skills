@@ -15,6 +15,14 @@ Standard workflow to pick the highest priority ready task from agkan, implement 
 
 ## Workflow
 
+### 0. Fetch Config
+
+```bash
+CONFIG=$(agkan config get --json 2>/dev/null || echo '{}')
+RUN_MODEL=$(echo "$CONFIG" | jq -r '.config.models.run.model // "sonnet"')
+RUN_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.run.effort // "medium"')
+```
+
 ### 1. Update branch to latest
 
 Before switching to the default branch, check for uncommitted changes:
@@ -99,9 +107,14 @@ Do not use `Skill("agkan-subtask")`; instead, embed the workflow steps directly 
 > **Why embed steps instead of referencing a file path?**
 > Sub-agents spawned via the Task tool start with a fresh context. When installed as a plugin, the skill files may reside at a path unknown to the sub-agent (e.g., under a plugin cache directory), so instructing the sub-agent to read a relative or installation-specific path is unreliable. Embedding the workflow steps directly in the prompt makes the instructions path-independent.
 
+Before calling Task(), substitute the placeholders with the values fetched in Step 0:
+- Replace `<RUN_MODEL>` with the value of `$RUN_MODEL`
+- Replace `<RUN_EFFORT>` with the value of `$RUN_EFFORT`
+
 ```
 Task(
   subagent_type="general-purpose",
+  model="<RUN_MODEL>",
   description="Implement task #<id>",
   prompt="""
 Please implement the following task.
@@ -327,6 +340,10 @@ command.
 - **Step 8 (status → review) requires at least one `git commit` to have been made** — task management operations alone (comments, body updates) do NOT qualify as implementation
 - If a critical error occurs (git push failure, PR creation failure, permission error), keep the task as `in_progress` and record the error
 - If only task management operations were performed (no commits), keep the task as `in_progress`
+
+## Effort
+
+Thoroughness hint: <RUN_EFFORT>
 """
 )
 ```

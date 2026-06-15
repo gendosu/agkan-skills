@@ -13,6 +13,18 @@ A workflow to select the highest priority ready task from agkan, implement it di
 
 ## Workflow
 
+### 0. Fetch Config
+
+Retrieve the agkan configuration and extract model/effort settings for the sub-agent:
+
+```bash
+CONFIG=$(agkan config get --json 2>/dev/null || echo '{}')
+RUN_MODEL=$(echo "$CONFIG" | jq -r '.config.models.run.model // "sonnet"')
+RUN_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.run.effort // "medium"')
+```
+
+These values are passed to the sub-agent in Step 6.
+
 ### 1. Update Branch
 
 This skill is designed to commit directly to the current branch (default branch or topic branch).
@@ -76,6 +88,7 @@ Use the **Task tool (general-purpose sub-agent)** to implement.
 ```
 Task(
   subagent_type="general-purpose",
+  model="<RUN_MODEL>",
   description="Implement task #<id>",
   prompt="""
 Please implement the following task.
@@ -99,6 +112,12 @@ agkan task get <id> --json
 agkan task update <id> body "<existing body>\n\nError: <error description>"
 ```
 Only update to done if implementation and all commits/pushes succeeded.
+
+## Effort
+Thoroughness level for this session: <RUN_EFFORT>
+- low: Implement quickly with minimal exploration; prefer direct solutions
+- medium: Balance thoroughness with speed; standard implementation quality
+- high: Be thorough; explore edge cases, add tests, review carefully
 """
 )
 ```

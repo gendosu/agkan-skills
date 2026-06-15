@@ -13,6 +13,14 @@ A planning workflow that uses agkan to review backlog tasks and make decisions a
 
 ## Workflow
 
+### 0. Fetch Config
+
+```bash
+CONFIG=$(agkan config get --json 2>/dev/null || echo '{}')
+PLANNING_MODEL=$(echo "$CONFIG" | jq -r '.config.models.planning.model // "sonnet"')
+PLANNING_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.planning.effort // "medium"')
+```
+
 ### 1. Retrieve Backlog Tasks
 
 ```bash
@@ -30,6 +38,7 @@ Do not use `Skill("agkan-planning-subtask")`. Instead, instruct the sub-agent to
 ```
 Task(
   subagent_type="general-purpose",
+  model="<PLANNING_MODEL>",
   description="Review task #<id>",
   prompt="""
 Please review the following backlog task.
@@ -45,6 +54,12 @@ Read .claude/skills/agkan-planning-subtask/SKILL.md and follow its procedures to
 ## Important Constraint
 Your role is ONLY to review the task and update its status in agkan (e.g., move to ready, decompose, or tag for deferral).
 Do NOT implement the task. Do NOT edit any source code or codebase files.
+
+## Effort / Thoroughness
+Effort level: <PLANNING_EFFORT>
+- low: Quick assessment. Focus on obvious gaps or blockers. Minimal research.
+- medium: Standard review. Check requirements clarity, decomposition needs, and implementation readiness.
+- high: Thorough review. Deep analysis of dependencies, edge cases, and potential risks. Research codebase as needed.
 """
 )
 ```
