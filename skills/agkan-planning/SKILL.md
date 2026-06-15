@@ -16,7 +16,7 @@ A planning workflow that uses agkan to review backlog tasks and make decisions a
 ### 0. Fetch Config
 
 ```bash
-CONFIG=$(agkan config get --json)
+CONFIG=$(agkan config get --json 2>/dev/null || echo '{}')
 PLANNING_MODEL=$(echo "$CONFIG" | jq -r '.config.models.planning.model // "sonnet"')
 PLANNING_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.planning.effort // "medium"')
 ```

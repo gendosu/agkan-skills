@@ -18,7 +18,7 @@ Standard workflow to pick the highest priority ready task from agkan, implement 
 ### 0. Fetch Config
 
 ```bash
-CONFIG=$(agkan config get --json)
+CONFIG=$(agkan config get --json 2>/dev/null || echo '{}')
 RUN_MODEL=$(echo "$CONFIG" | jq -r '.config.models.run.model // "sonnet"')
 RUN_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.run.effort // "medium"')
 ```

@@ -18,7 +18,7 @@ A workflow to select the highest priority ready task from agkan, implement it di
 Retrieve the agkan configuration and extract model/effort settings for the sub-agent:
 
 ```bash
-CONFIG=$(agkan config get --json)
+CONFIG=$(agkan config get --json 2>/dev/null || echo '{}')
 RUN_MODEL=$(echo "$CONFIG" | jq -r '.config.models.run.model // "sonnet"')
 RUN_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.run.effort // "medium"')
 ```
