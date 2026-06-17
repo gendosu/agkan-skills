@@ -34,6 +34,7 @@ agkan task add "Title" --blocked-by 1,2  # Set tasks that block this task
 agkan task add "Title" --blocks 3,4      # Set tasks that this task blocks
 agkan task add "Title" --assignees "alice,bob"  # Set task assignees (comma-separated)
 agkan task add "Title" --branch feature/my-branch  # Assign a branch to this task
+agkan task add "Title" --priority high            # Set task priority (critical/high/medium/low)
 
 # List tasks
 agkan task list                    # All tasks
@@ -69,6 +70,8 @@ agkan task update <id> --assignees "alice,bob"
 agkan task update <id> --file ./spec.md  # Read body from file
 agkan task update <id> --status done --title "Updated Title"  # Multiple options
 agkan task update <id> --branch feature/my-branch  # Set the branch column
+agkan task update <id> --priority high            # Update task priority
+agkan task update <id> --priority ""              # Clear task priority
 
 # Count
 agkan task count
@@ -195,12 +198,17 @@ agkan task meta list <task-id>
 agkan task meta delete <task-id> <key>
 ```
 
-#### Priority (priority)
+#### Priority
 
-Task priority is managed with the `priority` key:
+Task priority is managed with the native `--priority` flag:
 
 ```bash
-agkan task meta set <task-id> priority <value>
+# Set priority when creating a task
+agkan task add "Title" --priority high
+
+# Update priority on an existing task
+agkan task update <id> --priority high
+agkan task update <id> --priority ""  # Clear priority
 ```
 
 | Value | Meaning |
