@@ -20,7 +20,7 @@ for id in $task_ids; do
 
   # Extract PR URL from body
   body=$(echo "$task" | jq -r '.body // ""')
-  pr_url=$(echo "$body" | grep -oP '(?<=PR: )https://\S+' || true)
+  pr_url=$(echo "$body" | sed -n 's/.*PR: \(https:\/\/[^[:space:]]*\).*/\1/p' | head -1 || true)
 
   # Fallback to metadata
   if [ -z "$pr_url" ]; then
