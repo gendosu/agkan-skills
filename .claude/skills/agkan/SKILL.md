@@ -22,6 +22,18 @@ description: Use when managing tasks with the agkan CLI tool - creating, listing
 agkan agent-guide
 ```
 
+### Context
+
+```bash
+# Output context for AI agents (used in Claude Code SessionStart hook)
+agkan context
+
+# Output in JSON format (for SessionStart hook integration)
+agkan context --hook
+```
+
+> **Note:** `agkan agent-guide --hook` is **deprecated**. Use `agkan context --hook` instead.
+
 ### Task Operations
 
 ```bash
