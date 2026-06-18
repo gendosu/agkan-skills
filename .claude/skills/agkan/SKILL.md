@@ -497,3 +497,17 @@ path: ./.agkan/data.db
 ```
 
 Or use environment variable: `AGENT_KANBAN_DB_PATH=/custom/path/data.db`
+
+### Config Commands
+
+```bash
+# Get all resolved config values from .agkan.yml
+agkan config get
+
+# Get a specific config value (dot notation)
+agkan config get board.port
+agkan config get models.planning.model
+
+# Output in JSON format
+agkan config get --json
+```
