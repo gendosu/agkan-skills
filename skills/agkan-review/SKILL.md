@@ -153,3 +153,22 @@ Display summary: done: X件, closed: X件, スキップ(OPEN): X件, PR未設定
 - If PR URL is not found in either location, prompt for manual verification (skip task)
 - `done` means successful completion, `closed` means suspended or withdrawn
 - The `gh` command is required and will not work in environments where it is unavailable
+
+---
+
+## Troubleshooting
+
+### `grep: invalid option -- P` on macOS
+
+BSD grep (shipped with macOS) does not support the `-P` (Perl-compatible regex) flag. If you see this error, you are likely running an older version of `review.sh` that used `grep -oP`.
+
+**Symptom:** PR URLs are not extracted from task bodies, and the script silently falls back to metadata lookup (which may also be empty), resulting in `PR未設定` for tasks that do have a `PR: <URL>` line.
+
+**Fix:** The current `review.sh` uses `sed` instead of `grep -oP`:
+
+```bash
+# Compatible with macOS (BSD) and Linux (GNU)
+pr_url=$(echo "$body" | sed -n 's/.*PR: \(https:\/\/[^[:space:]]*\).*/\1/p' | head -1 || true)
+```
+
+If you are still seeing the error after updating, confirm you are running the latest version of the skill.
