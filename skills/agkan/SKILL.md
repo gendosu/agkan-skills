@@ -49,6 +49,7 @@ agkan task list --assignees "alice,bob"  # Filter by assignees (comma-separated)
 agkan task list --all              # Include all statuses (including done and closed)
 agkan task list --priority high,critical  # Filter by priority
 agkan task list --sort priority           # Sort by priority
+agkan task list --archived         # Include archived tasks in the results
 
 # Get details
 agkan task get <id>
@@ -90,13 +91,29 @@ agkan task copy <id> --json            # Output in JSON format
 # Delete task
 agkan task delete <id>
 
-# Purge old done/closed tasks
+# Archive done/closed tasks (hide but recoverable via unarchive)
+agkan task archive                            # Archive done/closed tasks older than 3 days ago (default)
+agkan task archive --before 2026-01-01        # Archive tasks last updated before the given date (ISO 8601)
+agkan task archive --status done              # Target specific statuses (default: done,closed)
+agkan task archive --dry-run                  # Preview tasks that would be archived without archiving
+agkan task archive --json                     # Output in JSON format
+
+# Unarchive a specific task (restore from archived state)
+agkan task unarchive <id>                     # Unarchive a task by ID
+agkan task unarchive <id> --dry-run           # Preview without unarchiving
+agkan task unarchive <id> --json              # Output in JSON format
+
+# Purge old done/closed tasks (permanent deletion, irreversible)
 agkan task purge                        # Delete done/closed tasks older than 3 days ago (default)
 agkan task purge --before 2026-01-01    # Purge tasks last updated before the given date (ISO 8601)
 agkan task purge --status done          # Target specific statuses (default: done,closed)
 agkan task purge --dry-run              # Preview tasks that would be purged without deleting
 agkan task purge --json                 # Output in JSON format
 ```
+
+> **archive vs purge**
+> - `archive`: Sets the `is_archived` flag to hide tasks from default views. Recoverable with `unarchive`.
+> - `purge`: Permanently deletes tasks. Irreversible.
 
 ### Blocking Relationships
 
