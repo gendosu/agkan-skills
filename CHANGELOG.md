@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.3] - 2026-06-30
+
+### Fixed
+
+- **agkan-planning-subtask**: Move ready status update after self-review to ensure correct order
+
 ## [0.17.2] - 2026-06-18
 
 ### Documentation
