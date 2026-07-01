@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.4] - 2026-07-01
+
+### Fixed
+
+- **agkan-review**: Use `--json` for `meta get` to fix PR URL fallback parsing
+
 ## [0.17.3] - 2026-06-30
 
 ### Fixed
