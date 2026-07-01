@@ -24,7 +24,7 @@ for id in $task_ids; do
 
   # Fallback to metadata
   if [ -z "$pr_url" ]; then
-    pr_url=$(agkan task meta get "$id" pr 2>/dev/null || true)
+    pr_url=$(agkan task meta get "$id" pr --json 2>/dev/null | jq -r '.data.value // empty' 2>/dev/null || true)
   fi
 
   if [ -z "$pr_url" ]; then
