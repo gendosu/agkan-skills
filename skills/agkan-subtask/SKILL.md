@@ -187,11 +187,11 @@ agkan task update <id> --file /tmp/agkan_checkbox_$$.md
 
 ### 9. Self-Review
 
-Before updating the task status, perform a self-review of the implementation using the `superpowers:code-reviewer` sub-agent. Substitute `<REVIEW_MODEL>` and `<REVIEW_EFFORT>` with the values fetched in Step 0:
+Before updating the task status, perform a self-review of the implementation using a general-purpose sub-agent. Substitute `<REVIEW_MODEL>` and `<REVIEW_EFFORT>` with the values fetched in Step 0:
 
 ```
 Agent(
-  subagent_type="superpowers:code-reviewer",
+  subagent_type="general-purpose",
   model="<REVIEW_MODEL>",
   description="Self-review task #<id> implementation",
   prompt="""Review the implementation of the following task.
