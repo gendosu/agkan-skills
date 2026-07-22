@@ -14,6 +14,14 @@ A sub-workflow that reviews a single Backlog task in agkan, makes decisions on d
 
 ## Workflow
 
+### 0. Fetch Config
+
+```bash
+CONFIG=$(agkan config get --json 2>/dev/null || echo '{}')
+PLANNING_MODEL=$(echo "$CONFIG" | jq -r '.config.models.planning.model // "sonnet"')
+PLANNING_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.planning.effort // "medium"')
+```
+
 ### 1. Content Review, Supplementation, and Task List Creation
 
 - If task content is unclear, investigate and confirm details by examining the code
@@ -36,7 +44,29 @@ EOF
 
 - If the task contains multiple pieces of work, organize the content and append it to the description in task list format:
 
-When creating a task list, it is advisable to use the Explore subagent (Agent tool with subagent_type="Explore") to examine the code, understand the task content, and then use Plan mode to create the task list if investigation is needed.
+When creating a task list, it is advisable to use the Explore subagent to examine the code and understand the task content, and then use Plan mode to create the task list if investigation is needed. Apply the config values fetched in Step 0 to the Explore call:
+
+```
+Agent(
+  subagent_type="Explore",
+  model="<PLANNING_MODEL>",
+  description="Investigate task #<id>",
+  prompt="""
+Investigate the codebase to understand the following task before creating the task list.
+
+## Task Information
+- ID: <id>
+- Title: <title>
+- Body: <body>
+
+## Search Breadth
+Effort level: <PLANNING_EFFORT>
+- low: quick — a single targeted lookup
+- medium: medium — moderate exploration
+- high: very thorough — search across multiple locations and naming conventions
+"""
+)
+```
 
 ```- Task content summary
 - [ ] Work item 1
