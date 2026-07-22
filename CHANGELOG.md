@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-07-22
+
+### Added
+
+- **agkan-icebox**: Apply config-driven model and effort to sub agent invocation
+- **agkan-subtask**: Apply config-driven model and effort to self-review sub agent
+- **agkan-planning-subtask**: Apply config-driven model and effort to Explore sub agent
+
 ### Changed
 
 - **agkan-subtask**, **agkan-subtask-direct**: Remove dependency on the `superpowers` plugin — self-review now uses a `general-purpose` sub-agent instead of `superpowers:code-reviewer`
