@@ -23,6 +23,14 @@ A workflow to review `icebox` tasks and decide whether to promote each one to `b
 
 ## Workflow
 
+### 0. Fetch Config
+
+```bash
+CONFIG=$(agkan config get --json 2>/dev/null || echo '{}')
+ICEBOX_MODEL=$(echo "$CONFIG" | jq -r '.config.models.icebox.model // "sonnet"')
+ICEBOX_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.icebox.effort // "medium"')
+```
+
 ### 1. Retrieve Icebox Tasks
 
 ```bash
@@ -37,6 +45,7 @@ Do not use `Skill("agkan-icebox-subtask")`. Instead, invoke it by having the sub
 ```
 Task(
   subagent_type="general-purpose",
+  model="<ICEBOX_MODEL>",
   description="Review icebox task #<id>",
   prompt="""
 Please review the following icebox task.
@@ -48,6 +57,12 @@ Please review the following icebox task.
 
 ## Procedure
 Read .claude/skills/agkan-icebox-subtask/SKILL.md and follow its procedures to review.
+
+## Effort / Thoroughness
+Effort level: <ICEBOX_EFFORT>
+- low: Quick assessment. Focus on obvious gaps or blockers. Minimal research.
+- medium: Standard review. Check requirements clarity and promote/close decision.
+- high: Thorough review. Deep analysis of relevance, dependencies, and edge cases. Research codebase as needed.
 """
 )
 ```

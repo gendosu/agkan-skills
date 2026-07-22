@@ -14,6 +14,14 @@ A sub-workflow that reviews a single Backlog task in agkan, makes decisions on d
 
 ## Workflow
 
+### 0. Fetch Config
+
+```bash
+CONFIG=$(agkan config get --json 2>/dev/null || echo '{}')
+PLANNING_MODEL=$(echo "$CONFIG" | jq -r '.config.models.planning.model // "sonnet"')
+PLANNING_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.planning.effort // "medium"')
+```
+
 ### 1. Content Review, Supplementation, and Task List Creation
 
 - If task content is unclear, investigate and confirm details by examining the code
@@ -36,7 +44,29 @@ EOF
 
 - If the task contains multiple pieces of work, organize the content and append it to the description in task list format:
 
-When creating a task list, it is advisable to use the Explore subagent (Agent tool with subagent_type="Explore") to examine the code, understand the task content, and then use Plan mode to create the task list if investigation is needed.
+When creating a task list, it is advisable to use the Explore subagent to examine the code and understand the task content, and then use Plan mode to create the task list if investigation is needed. Apply the config values fetched in Step 0 to the Explore call:
+
+```
+Agent(
+  subagent_type="Explore",
+  model="<PLANNING_MODEL>",
+  description="Investigate task #<id>",
+  prompt="""
+Investigate the codebase to understand the following task before creating the task list.
+
+## Task Information
+- ID: <id>
+- Title: <title>
+- Body: <body>
+
+## Search Breadth
+Effort level: <PLANNING_EFFORT>
+- low: quick — a single targeted lookup
+- medium: medium — moderate exploration
+- high: very thorough — search across multiple locations and naming conventions
+"""
+)
+```
 
 ```- Task content summary
 - [ ] Work item 1
@@ -100,23 +130,48 @@ agkan task add "<sub-task name>" "<details>" --parent <original-id>
 agkan task update <id> --status closed
 ```
 
-### 4. Ready Status Movement Decision
+### 4. Ready/Deferral Decision (Decision Only — Do NOT Execute Yet)
 
-Move to Ready if **all** of the following conditions are met:
+**Decide** the outcome for this task. Do NOT run any `agkan task update` command yet.
 
+**Ready** if all of the following conditions are met:
 - Scope that can be implemented as a single PR
 - Implementation approach is clear
 - No unresolved questions that require user input
 
 Blockers do **not** prevent moving to Ready. If planning is complete and the task would be executable once blockers are resolved, move it to Ready. The blocking relationships registered in Step 2 already capture the dependency — when the blocker task is done, this task can be picked up immediately.
 
-Check blocking relationships (already done in Step 2, but verify if needed):
+**Deferral** if any of the following apply:
+- Low impact on current priorities
+- Resources or information are insufficient
+- The task itself is not yet well-defined enough to implement
 
-```bash
-agkan task block list <id> --json
-```
+Record your decision (Ready or Deferral) and the reasoning. Proceed to Step 5.
 
-When moving a task to Ready, also set the priority at this point:
+---
+
+### 5. Self-Review
+
+Before executing any status change, verify all previous steps are complete:
+
+- [ ] Step 1: Task body is updated with content review and task list
+- [ ] Step 2: Blocking relationships are registered (or confirmed none exist)
+- [ ] Step 3: Decomposition decision is made (split or keep as-is)
+- [ ] Step 4: Decision is recorded (Ready or Deferral) with reasoning
+- [ ] No unresolved questions remain
+- [ ] Task scope matches 1 PR = 1 feature standard
+
+If any item is unchecked, return to that step and complete it before proceeding.
+
+---
+
+### 6. Execute Status Change
+
+Only after all self-review items are checked, execute the status change.
+
+**If Ready:**
+
+Determine priority and run:
 
 ```bash
 agkan task update <id> --status ready --priority <value>
@@ -133,9 +188,7 @@ Priority determination criteria:
 | `medium` | Normal feature additions, improvements (default) |
 | `low` | Nice-to-have, work on if time permits |
 
-### 5. Deferral Decision
-
-For tasks that are "something to do later but not now," attach the `will-do-later` tag and keep it in Backlog:
+**If Deferral:**
 
 ```bash
 # Create the tag if it does not exist
@@ -143,11 +196,6 @@ agkan tag add "will-do-later"
 # Attach the tag to the task
 agkan tag attach <task-id> <tag-id-or-name>
 ```
-
-Deferral criteria:
-- Low impact on current priorities
-- Resources or information are insufficient
-- The task itself is not yet well-defined enough to implement
 
 ---
 
