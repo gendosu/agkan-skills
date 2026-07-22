@@ -14,6 +14,14 @@ A workflow to directly implement a selected task without creating a branch or PR
 
 ## Workflow
 
+### 0. Fetch Config
+
+```bash
+CONFIG=$(agkan config get --json 2>/dev/null || echo '{}')
+REVIEW_MODEL=$(echo "$CONFIG" | jq -r '.config.models.run.model // "opus"')
+REVIEW_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.run.effort // "medium"')
+```
+
 ### 1. Update Task to In Progress
 
 ```bash
@@ -137,11 +145,12 @@ agkan task update <id> --file /tmp/agkan_checkbox_$$.md
 
 ### 7. Self-Review
 
-Before updating the task status, perform a self-review of the implementation using the `superpowers:code-reviewer` sub-agent:
+Before updating the task status, perform a self-review of the implementation using the `superpowers:code-reviewer` sub-agent. Substitute `<REVIEW_MODEL>` and `<REVIEW_EFFORT>` with the values fetched in Step 0:
 
 ```
 Agent(
   subagent_type="superpowers:code-reviewer",
+  model="<REVIEW_MODEL>",
   description="Self-review task #<id> implementation",
   prompt="""Review the implementation of the following task.
 
@@ -151,6 +160,12 @@ Task body:
 <body>
 
 Review the git changes (run `git diff HEAD~1 HEAD` to see them) against the original plan and coding standards. Check for correctness, security issues, and code quality. Report critical issues that must be fixed before completing the task.
+
+## Effort / Thoroughness
+Thoroughness/effort level: <REVIEW_EFFORT>
+- low: Quick pass. Focus on obvious correctness and security issues.
+- medium: Standard review. Check correctness, security, and code quality.
+- high: Deep review. Additionally examine edge cases, test coverage, and architectural fit.
 """
 )
 ```
