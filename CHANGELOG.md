@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **agkan-subtask**, **agkan-subtask-direct**: Remove dependency on the `superpowers` plugin — self-review now uses a `general-purpose` sub-agent instead of `superpowers:code-reviewer`
+
 ## [0.17.4] - 2026-07-01
 
 ### Fixed
