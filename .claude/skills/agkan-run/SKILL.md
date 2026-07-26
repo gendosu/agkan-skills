@@ -412,10 +412,11 @@ stop. If a diagnostic appears or the user asks a question after the sub-agent
 completes, handle it and then resume from Step 8 (re-fetch the task list) rather than
 ending the session.
 
-> **モデル差:** Fable 5 = 長時間セッションの末尾で、意図表明のみでツール呼び出しをせず終わる
-> 早期停止の既知挙動があるため、このリマインダ（Step 8 に戻って再フェッチする）は残す。
-> Opus 5 はこの種のリマインダは不要（完遂傾向が強く早期停止は稀）。
-> 詳細・出典は `.claude/rules/model-guidance.md` の「早期停止」を参照。
+> **Model differences:** Fable 5 = has a known early-stopping behavior at the end of long
+> sessions, ending with a stated intent but no tool call, so this reminder (go back to Step 8
+> and re-fetch) is kept. Opus 5 does not need this kind of reminder (strong completion tendency,
+> early stopping is rare). See "Early stopping" in `.claude/rules/model-guidance.md` for details
+> and sources.
 
 ---
 
