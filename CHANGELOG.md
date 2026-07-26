@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.18.1] - 2026-07-26
+
+### Fixed
+
+- **agkan-run**, **agkan-run-direct**, **dashboard**: Read task priority from the native `priority` field instead of `metadata` — priority ordering was never actually working
+- **agkan**: Correct JSON schema docs in SKILL.md to match agkan 3.19.0's actual response fields
+- Drop dead `.claude/rules/model-guidance.md` citations from shipped skills — the plugin only distributes `./skills/`, so those pointers were dead links for plugin consumers
+
+### Changed
+
+- **agkan-run**, **agkan-run-direct**, **agkan-subtask**, **agkan-subtask-direct**: Remove overtrigger-prone MANDATORY/CRITICAL/forbidden phrasing, add xhigh/max effort tiers, raise default effort to high, dedupe repeated text, and split the previously-conflated `models.run.*` / `models.review.*` config keys so each skill reads the key that matches its actual usage
+- **agkan-planning**, **agkan-planning-subtask**, **agkan-icebox**: Scope-based Explore-subagent delegation guidance instead of an unconditional recommendation, xhigh/max effort tiers, and softened MANDATORY/STRICT phrasing
+
+### Documentation
+
+- Add `.claude/rules/model-guidance.md` as a single source of truth for Fable 5 / Opus 5 / Sonnet 5 behavioral differences
+- Translate `model-guidance.md` and remaining Japanese skill content to English
+
 ## [0.18.0] - 2026-07-22
 
 ### Added
