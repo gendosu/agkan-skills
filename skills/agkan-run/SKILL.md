@@ -415,8 +415,7 @@ ending the session.
 > **Model differences:** Fable 5 = has a known early-stopping behavior at the end of long
 > sessions, ending with a stated intent but no tool call, so this reminder (go back to Step 8
 > and re-fetch) is kept. Opus 5 does not need this kind of reminder (strong completion tendency,
-> early stopping is rare). See "Early stopping" in `.claude/rules/model-guidance.md` for details
-> and sources.
+> early stopping is rare).
 
 ---
 

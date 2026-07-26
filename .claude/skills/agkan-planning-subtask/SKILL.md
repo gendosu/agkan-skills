@@ -46,7 +46,7 @@ EOF
 
 When creating a task list, decide whether to investigate directly or delegate to the Explore subagent based on scope: for a single targeted lookup (e.g. finding one file or symbol), search directly; only delegate to the Explore subagent when the investigation spans multiple files, unfamiliar naming conventions, or broad codebase areas. Use Plan mode to create the task list once investigation is complete. Apply the config values fetched in Step 0 to the Explore call:
 
-> **Model differences:** Opus 5 = tends to over-delegate to subagents (the opposite of Opus 4.8), so handle simple investigation directly and reserve Explore delegation for broad, multi-file investigation only. Fable 5 = benefits from eager delegation, so when in doubt, delegate to Explore. See "Subagent delegation" in `.claude/rules/model-guidance.md` for details and sources.
+> **Model differences:** Opus 5 = tends to over-delegate to subagents (the opposite of Opus 4.8), so handle simple investigation directly and reserve Explore delegation for broad, multi-file investigation only. Fable 5 = benefits from eager delegation, so when in doubt, delegate to Explore.
 
 ```
 Agent(

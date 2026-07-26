@@ -189,8 +189,7 @@ agkan task update <id> --file /tmp/agkan_checkbox_$$.md
 
 > **Model differences:** Opus 5 / Sonnet 5 = self-verification is the default behavior, so this
 > step can be skipped (explicit instructions invite over-verification). Fable 5 = run this step
-> using an independent-context verification subagent (more effective than self-critique). See
-> "Self-verification" in `.claude/rules/model-guidance.md` for details and sources.
+> using an independent-context verification subagent (more effective than self-critique).
 
 Before updating the task status, perform a self-review of the implementation using a general-purpose sub-agent. Substitute `<REVIEW_MODEL>` and `<REVIEW_EFFORT>` with the values fetched in Step 0:
 
