@@ -60,4 +60,4 @@ for id in $task_ids; do
 done
 
 echo ""
-echo "done: ${done_count}件, closed: ${closed_count}件, スキップ(OPEN): ${skipped_open_count}件, PR未設定: ${no_pr_count}件"
+echo "done: ${done_count}, closed: ${closed_count}, skipped (OPEN): ${skipped_open_count}, no PR: ${no_pr_count}"

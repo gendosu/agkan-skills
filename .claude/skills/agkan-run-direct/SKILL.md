@@ -20,7 +20,7 @@ Retrieve the agkan configuration and extract model/effort settings for the sub-a
 ```bash
 CONFIG=$(agkan config get --json 2>/dev/null || echo '{}')
 RUN_MODEL=$(echo "$CONFIG" | jq -r '.config.models.run.model // "sonnet"')
-RUN_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.run.effort // "medium"')
+RUN_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.run.effort // "high"')
 ```
 
 These values are passed to the sub-agent in Step 6.
@@ -54,7 +54,7 @@ Evaluate tasks using the following criteria in descending order and select the t
 **Skip tasks with `will-do-later` tag:**
 Tasks with the `will-do-later` tag are intentionally deferred tasks. Skip them **unless** they are in `ready` status — a task promoted to `ready` is executable regardless of the tag.
 
-**Priority (read from `metadata` field in the list JSON response):**
+**Priority (read from the `priority` field in the list JSON response):**
 ```
 Critical > High > Medium > Low
 ```
@@ -118,6 +118,8 @@ Thoroughness level for this session: <RUN_EFFORT>
 - low: Implement quickly with minimal exploration; prefer direct solutions
 - medium: Balance thoroughness with speed; standard implementation quality
 - high: Be thorough; explore edge cases, add tests, review carefully
+- xhigh: Recommended default for coding/agentic work; maximize correctness and edge-case coverage
+- max: Reserve for the highest-stakes or most complex tasks
 """
 )
 ```

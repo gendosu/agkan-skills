@@ -9,7 +9,7 @@ description: Use when starting a development session to pick the highest priorit
 
 Standard workflow to pick the highest priority ready task from agkan, implement it, create a pull request, and complete it.
 
-**CRITICAL: This is a loop. After each task completes (including handling any interruptions), ALWAYS re-fetch the task list and continue unless explicitly told to stop.**
+This is a loop: after each task completes (including handling any interruptions), re-fetch the task list and continue unless explicitly told to stop.
 
 ---
 
@@ -20,7 +20,7 @@ Standard workflow to pick the highest priority ready task from agkan, implement 
 ```bash
 CONFIG=$(agkan config get --json 2>/dev/null || echo '{}')
 RUN_MODEL=$(echo "$CONFIG" | jq -r '.config.models.run.model // "sonnet"')
-RUN_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.run.effort // "medium"')
+RUN_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.run.effort // "high"')
 ```
 
 ### 1. Update branch to latest
@@ -58,7 +58,7 @@ Evaluate tasks in descending order using the following criteria and select the t
 **Skip tasks with `will-do-later` tag:**
 Tasks with the `will-do-later` tag are intentionally postponed tasks. Skip them **unless** they are in `ready` status — a task promoted to `ready` is executable regardless of the tag.
 
-**Priority (read from `metadata` field in the list JSON response):**
+**Priority (read from the `priority` field in the list JSON response):**
 ```
 Critical > High > Medium > Low
 ```
@@ -238,10 +238,10 @@ If an error, permission denial, or user interruption occurs during implementatio
 
 ### 6. Create PR
 
-> **MANDATORY**: PR creation after a successful push is required and MUST NOT be
-> skipped. This step must complete before advancing to Steps 7 and 8. Skipping PR
-> creation for any reason other than an existing `PR:` label (Case A below) is
-> forbidden — including when approaching context limits.
+> PR creation after a successful push is required and must not be skipped. This
+> step must complete before advancing to Steps 7 and 8. Skip PR creation only when
+> an existing `PR:` label was found (Case A below) — do not skip it for any other
+> reason, including approaching context limits.
 
 If a `PR:` label was found in the task body (Step 2, Case A), skip PR creation —
 the existing PR will be updated automatically when commits are pushed to the branch.
@@ -336,14 +336,15 @@ command.
 ## Important Notes
 
 - Do not mark task as done before PR is merged (mark as done after PR review and merge)
-- **Step 8 (status → review) must only be executed when implementation succeeded** — do not update to review if a critical error occurred
-- **Step 8 (status → review) requires at least one `git commit` to have been made** — task management operations alone (comments, body updates) do NOT qualify as implementation
-- If a critical error occurs (git push failure, PR creation failure, permission error), keep the task as `in_progress` and record the error
-- If only task management operations were performed (no commits), keep the task as `in_progress`
+- The condition for moving a task to `review` (commit made, no critical error, no unresolved interruption) is defined in full in Step 8 above — see that step for the exact rule; it is not repeated here
 
 ## Effort
-
-Thoroughness hint: <RUN_EFFORT>
+Thoroughness level for this session: <RUN_EFFORT>
+- low: Implement quickly with minimal exploration; prefer direct solutions
+- medium: Balance thoroughness with speed; standard implementation quality
+- high: Be thorough; explore edge cases, add tests, review carefully
+- xhigh: Recommended default for coding/agentic work; maximize correctness and edge-case coverage
+- max: Reserve for the highest-stakes or most complex tasks
 """
 )
 ```
@@ -405,39 +406,16 @@ If no ready tasks remain, end the session.
 
 ## Loop Structure
 
-```
-START
-  ↓
-git pull (default branch) & get ready tasks
-  ↓
-No tasks? → END SESSION
-  ↓
-Select highest priority task (skip will-do-later)
-  ↓
-Check blockers → blocked? → select different task
-  ↓
-Update status: in_progress
-  ↓
-Launch sub-agent to implement & create PR
-  ↓
-Sub-agent done?
-  ↓
-Interruption occurred? (diagnostic, user question)
-  Yes → Handle it → RETURN HERE
-  No  ↓
-Re-fetch task list  ←──────────────────────────┐
-  ↓                                              │
-Ready tasks exist AND no stop instruction? ─Yes─┘
-  ↓ No
-END SESSION
-```
+The workflow above (Steps 0–8) is a loop: fetch tasks → select → implement → verify →
+handle interruptions → re-fetch → repeat until no ready tasks remain or the user says
+stop. If a diagnostic appears or the user asks a question after the sub-agent
+completes, handle it and then resume from Step 8 (re-fetch the task list) rather than
+ending the session.
 
-**Red flags — you are breaking the loop:**
-- Sub-agent completed, you fixed a diagnostic, then stopped
-- Sub-agent completed, user asked a question, you answered, then stopped
-- You forgot to re-fetch the task list after any action
-
-**All of these mean: Go back to step 7. Re-fetch the task list.**
+> **Model differences:** Fable 5 = has a known early-stopping behavior at the end of long
+> sessions, ending with a stated intent but no tool call, so this reminder (go back to Step 8
+> and re-fetch) is kept. Opus 5 does not need this kind of reminder (strong completion tendency,
+> early stopping is rare).
 
 ---
 
@@ -468,5 +446,4 @@ See the canonical definition in `agkan/SKILL.md` (Tag Priority section).
 - Always select only 1 task (do not start multiple tasks simultaneously)
 - If no tasks exist, end the session
 - Do not mark task as done before PR merge (mark as done after PR review and merge)
-- **Never stop mid-workflow due to interruptions** — handle them and resume
-- **`review` status is exclusively for tasks where implementation is fully complete and a PR is awaiting human review** — never set `review` when waiting for user input or when execution was interrupted mid-task
+- See Step 8 (`review` status transition) and Loop Structure (handling interruptions) above for the exact rules — not repeated here

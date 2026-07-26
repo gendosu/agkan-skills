@@ -35,7 +35,7 @@ The script:
 3. Calls `gh pr view <URL> --json state,mergedAt` for each PR
 4. Updates task status to `done` (MERGED) or `closed` (CLOSED without merge), skips OPEN
 5. Adds a comment recording the reason and timestamp
-6. Prints a summary: `done: X件, closed: X件, スキップ(OPEN): X件, PR未設定: X件`
+6. Prints a summary: `done: X, closed: X, skipped (OPEN): X, no PR: X`
 
 To register the script in `.claude/settings.json` to eliminate per-command permission prompts, add the script path to `allowedTools` or the relevant bash allowlist.
 
@@ -111,7 +111,7 @@ Comment format by status:
 ### 7. Display summary after all tasks are processed
 
 ```
-done: <done_count>件, closed: <closed_count>件, スキップ(OPEN): <skipped_open_count>件, PR未設定: <no_pr_count>件
+done: <done_count>, closed: <closed_count>, skipped (OPEN): <skipped_open_count>, no PR: <no_pr_count>
 ```
 
 ---
@@ -141,7 +141,7 @@ What is the PR state?
     ↓
 Move to next task (repeat until all tasks are processed)
     ↓
-Display summary: done: X件, closed: X件, スキップ(OPEN): X件, PR未設定: X件
+Display summary: done: X, closed: X, skipped (OPEN): X, no PR: X
 ```
 
 ---

@@ -71,11 +71,11 @@ Write the body to a temporary file first, then pass it with `--file`. NEVER use 
 ```bash
 # Step 1: Write body to a temp file (use Write tool)
 # /tmp/task_body.md:
-# 1行目
-# 2行目
+# Line 1
+# Line 2
 #
-# ## 詳細
-# 内容はここに
+# ## Details
+# Content goes here
 
 # Step 2: Create task with --file
 agkan task add "<title>" --file /tmp/task_body.md
