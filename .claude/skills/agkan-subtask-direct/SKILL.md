@@ -18,8 +18,8 @@ A workflow to directly implement a selected task without creating a branch or PR
 
 ```bash
 CONFIG=$(agkan config get --json 2>/dev/null || echo '{}')
-REVIEW_MODEL=$(echo "$CONFIG" | jq -r '.config.models.run.model // "opus"')
-REVIEW_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.run.effort // "medium"')
+REVIEW_MODEL=$(echo "$CONFIG" | jq -r '.config.models.review.model // "opus"')
+REVIEW_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.review.effort // "high"')
 ```
 
 ### 1. Update Task to In Progress
@@ -87,7 +87,9 @@ Fix any errors before proceeding.
 
 ### 5. Commit
 
-> **MANDATORY**: Committing and pushing the implementation is required and MUST NOT be skipped. This step must complete before advancing to Steps 7 and 8. Skipping commit for any reason — including when approaching context limits or after running tests/lint — is forbidden.
+> Committing and pushing the implementation is required and must not be skipped.
+> This step must complete before advancing to Steps 7 and 8. Do not skip the commit
+> for any reason, including approaching context limits or after running tests/lint.
 
 Stage files by specifying them explicitly. Do not use `git add -A` as it risks including unintended files such as `.env` or credentials.
 
@@ -145,6 +147,11 @@ agkan task update <id> --file /tmp/agkan_checkbox_$$.md
 
 ### 7. Self-Review
 
+> **モデル差:** Opus 5 / Sonnet 5 = 自己検証は既定動作のため、このステップを省略してよい
+> （明示指示は過剰検証を招く）。Fable 5 = 独立コンテキストの検証サブエージェントを使うこの
+> ステップを実行する(自己批判より有効)。詳細・出典は `.claude/rules/model-guidance.md`
+> の「自己検証」を参照。
+
 Before updating the task status, perform a self-review of the implementation using a general-purpose sub-agent. Substitute `<REVIEW_MODEL>` and `<REVIEW_EFFORT>` with the values fetched in Step 0:
 
 ```
@@ -159,13 +166,19 @@ Task #<id>: <title>
 Task body:
 <body>
 
-Review the git changes (run `git diff HEAD~1 HEAD` to see them) against the original plan and coding standards. Check for correctness, security issues, and code quality. Report critical issues that must be fixed before completing the task.
+Review the git changes (run `git diff HEAD~1 HEAD` to see them) against the original plan and coding standards. Check for correctness, security issues, and code quality.
+
+Report all issues found, each annotated with a severity (critical/major/minor) and a
+confidence level. Do not filter by severity in this report — filtering, if needed, is
+the responsibility of the caller reading this review, not this step.
 
 ## Effort / Thoroughness
 Thoroughness/effort level: <REVIEW_EFFORT>
 - low: Quick pass. Focus on obvious correctness and security issues.
 - medium: Standard review. Check correctness, security, and code quality.
 - high: Deep review. Additionally examine edge cases, test coverage, and architectural fit.
+- xhigh: Recommended default for coding/agentic work; maximize correctness and edge-case coverage.
+- max: Reserve for the highest-stakes or most complex tasks.
 """
 )
 ```
@@ -241,8 +254,5 @@ agkan task update <id> status done
 
 - Branch creation: check out an existing branch if `.task.branch` is non-null; otherwise auto-generate a name and create the branch, then persist it via `agkan task update <id> --branch <name>`
 - Do not create a PR
-- **Only update to done if implementation succeeded** — if a critical error occurred, keep the task as `in_progress`
-- **Only update to done if at least one `git commit` was made** — task management operations alone (comments, body updates) do NOT qualify as implementation
-- If a critical error occurs (git push failure, commit failure, permission error), keep the task as `in_progress` and record the error
-- If only task management operations were performed (no commits), keep the task as `in_progress`
+- The condition for moving a task to `done` (commit made, no critical error) is defined in full in Step 8 above — see that step for the exact rule; it is not repeated here
 - This skill is used after task selection (task selection is done with the `agkan-run-direct` skill)

@@ -20,8 +20,8 @@ Workflow to implement a selected task on a new branch, create a PR, and move to 
 
 ```bash
 CONFIG=$(agkan config get --json 2>/dev/null || echo '{}')
-REVIEW_MODEL=$(echo "$CONFIG" | jq -r '.config.models.run.model // "opus"')
-REVIEW_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.run.effort // "medium"')
+REVIEW_MODEL=$(echo "$CONFIG" | jq -r '.config.models.review.model // "opus"')
+REVIEW_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.review.effort // "high"')
 ```
 
 ### 1. Update Task to In Progress
@@ -129,10 +129,10 @@ If an error, permission denial, or user interruption occurs during implementatio
 
 ### 6. Create PR
 
-> **MANDATORY**: PR creation after a successful push is required and MUST NOT be
-> skipped. This step must complete before advancing to Steps 7 and 9. Skipping PR
-> creation for any reason other than an existing `PR:` label (Case A below) is
-> forbidden — including when approaching context limits.
+> PR creation after a successful push is required and must not be skipped. This
+> step must complete before advancing to Steps 7 and 9. Skip PR creation only when
+> an existing `PR:` label was found (Case A below) — do not skip it for any other
+> reason, including approaching context limits.
 
 If a `PR:` label was found in the task body (Step 2, Case A), skip PR creation — the existing PR will be updated automatically when commits are pushed to the branch.
 
@@ -187,6 +187,11 @@ agkan task update <id> --file /tmp/agkan_checkbox_$$.md
 
 ### 9. Self-Review
 
+> **モデル差:** Opus 5 / Sonnet 5 = 自己検証は既定動作のため、このステップを省略してよい
+> （明示指示は過剰検証を招く）。Fable 5 = 独立コンテキストの検証サブエージェントを使うこの
+> ステップを実行する（自己批判より有効）。詳細・出典は `.claude/rules/model-guidance.md`
+> の「自己検証」を参照。
+
 Before updating the task status, perform a self-review of the implementation using a general-purpose sub-agent. Substitute `<REVIEW_MODEL>` and `<REVIEW_EFFORT>` with the values fetched in Step 0:
 
 ```
@@ -201,13 +206,19 @@ Task #<id>: <title>
 Task body:
 <body>
 
-Review the git changes (run `git diff origin/<default-branch>...HEAD` to see them) against the original plan and coding standards. Check for correctness, security issues, and code quality. Report critical issues that must be fixed before completing the task.
+Review the git changes (run `git diff origin/<default-branch>...HEAD` to see them) against the original plan and coding standards. Check for correctness, security issues, and code quality.
+
+Report all issues found, each annotated with a severity (critical/major/minor) and a
+confidence level. Do not filter by severity in this report — filtering, if needed, is
+the responsibility of the caller reading this review, not this step.
 
 ## Effort / Thoroughness
 Thoroughness/effort level: <REVIEW_EFFORT>
 - low: Quick pass. Focus on obvious correctness and security issues.
 - medium: Standard review. Check correctness, security, and code quality.
 - high: Deep review. Additionally examine edge cases, test coverage, and architectural fit.
+- xhigh: Recommended default for coding/agentic work; maximize correctness and edge-case coverage.
+- max: Reserve for the highest-stakes or most complex tasks.
 """
 )
 ```
@@ -272,9 +283,5 @@ Verify that the status is `review`. If it is still `in_progress`, retry the upda
 ## Important Notes
 
 - Do not mark task as done before PR is merged (mark as done after PR review and merge)
-- **Step 10 (status → review) must only be executed when implementation succeeded** — do not update to review if a critical error occurred
-- **Step 10 (status → review) requires at least one `git commit` to have been made** — task management operations alone (comments, body updates) do NOT qualify as implementation
-- If a critical error occurs (git push failure, PR creation failure, permission error), keep the task as `in_progress` and record the error
-- **If user confirmation was required or execution was interrupted mid-task**, keep the task as `in_progress` — do NOT advance to `review`
-- `review` status is exclusively for tasks where implementation is fully complete and a PR is awaiting human review
+- The condition for moving a task to `review` (commit made, no critical error, no unresolved interruption) is defined in full in Step 10 above — see that step for the exact rule; it is not repeated here
 - This skill is used after task selection (task selection is done with `agkan-run` skill)
