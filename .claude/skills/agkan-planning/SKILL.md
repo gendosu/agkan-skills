@@ -18,7 +18,7 @@ A planning workflow that uses agkan to review backlog tasks and make decisions a
 ```bash
 CONFIG=$(agkan config get --json 2>/dev/null || echo '{}')
 PLANNING_MODEL=$(echo "$CONFIG" | jq -r '.config.models.planning.model // "sonnet"')
-PLANNING_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.planning.effort // "medium"')
+PLANNING_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.planning.effort // "high"')
 ```
 
 ### 1. Retrieve Backlog Tasks
@@ -60,6 +60,8 @@ Effort level: <PLANNING_EFFORT>
 - low: Quick assessment. Focus on obvious gaps or blockers. Minimal research.
 - medium: Standard review. Check requirements clarity, decomposition needs, and implementation readiness.
 - high: Thorough review. Deep analysis of dependencies, edge cases, and potential risks. Research codebase as needed.
+- xhigh: Recommended default for planning/agentic work; maximize coverage of dependencies and edge cases.
+- max: Reserve for the highest-stakes or most complex tasks.
 """
 )
 ```

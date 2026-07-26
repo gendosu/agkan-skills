@@ -19,7 +19,7 @@ A sub-workflow that reviews a single Backlog task in agkan, makes decisions on d
 ```bash
 CONFIG=$(agkan config get --json 2>/dev/null || echo '{}')
 PLANNING_MODEL=$(echo "$CONFIG" | jq -r '.config.models.planning.model // "sonnet"')
-PLANNING_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.planning.effort // "medium"')
+PLANNING_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.planning.effort // "high"')
 ```
 
 ### 1. Content Review, Supplementation, and Task List Creation
@@ -44,7 +44,9 @@ EOF
 
 - If the task contains multiple pieces of work, organize the content and append it to the description in task list format:
 
-When creating a task list, it is advisable to use the Explore subagent to examine the code and understand the task content, and then use Plan mode to create the task list if investigation is needed. Apply the config values fetched in Step 0 to the Explore call:
+When creating a task list, decide whether to investigate directly or delegate to the Explore subagent based on scope: for a single targeted lookup (e.g. finding one file or symbol), search directly; only delegate to the Explore subagent when the investigation spans multiple files, unfamiliar naming conventions, or broad codebase areas. Use Plan mode to create the task list once investigation is complete. Apply the config values fetched in Step 0 to the Explore call:
+
+> **モデル差:** Opus 5 = Opus 4.8 とは逆に過剰にサブエージェントへ委譲する傾向があるため、単純な調査は直接行い、Explore への委譲は広範な多ファイル調査のみに限定する。Fable 5 = 積極的な委譲が有効なため、判断に迷う場合は Explore へ委譲してよい。詳細・出典は `.claude/rules/model-guidance.md` の「サブエージェント委譲」を参照。
 
 ```
 Agent(
@@ -60,10 +62,12 @@ Investigate the codebase to understand the following task before creating the ta
 - Body: <body>
 
 ## Search Breadth
-Effort level: <PLANNING_EFFORT>
+Effort level: <PLANNING_EFFORT> (maps to the Explore agent's search breadth, not implementation thoroughness)
 - low: quick — a single targeted lookup
 - medium: medium — moderate exploration
 - high: very thorough — search across multiple locations and naming conventions
+- xhigh: very thorough, recommended default — search across multiple locations, naming conventions, and related files
+- max: exhaustive — reserve for the highest-stakes or most complex investigations
 """
 )
 ```
@@ -74,7 +78,7 @@ Effort level: <PLANNING_EFFORT>
 - [ ] Work item 3
 ```
 
-**MANDATORY: After completing content review and creating the task list, you MUST write the planning results back to the task body. This step is REQUIRED and must NOT be skipped under any circumstances.**
+After completing content review and creating the task list, write the planning results back to the task body. This step is required and must not be skipped.
 
 ```bash
 # REQUIRED: Write planning results to task body
@@ -222,12 +226,12 @@ agkan tag attach <task-id> <tag-id-or-name>
 
 ---
 
-## STRICT PROHIBITION
+## Scope Boundary
 
-**Do NOT implement tasks.** This skill's sole responsibility is to review tasks and update their status in agkan. The following actions are strictly forbidden:
+This skill does not implement tasks. Its sole responsibility is to review tasks and update their status in agkan. Do not do any of the following:
 
-- Editing source code files
-- Creating or modifying any files in the codebase (other than agkan task updates via CLI)
-- Implementing features, fixes, or any code changes described in the task
+- Edit source code files
+- Create or modify any files in the codebase (other than agkan task updates via CLI)
+- Implement features, fixes, or any code changes described in the task
 
 If a task is ready for implementation, move it to Ready status and stop. Implementation is handled by a separate workflow (`agkan-run`).

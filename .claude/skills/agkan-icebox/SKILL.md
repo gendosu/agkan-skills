@@ -28,7 +28,7 @@ A workflow to review `icebox` tasks and decide whether to promote each one to `b
 ```bash
 CONFIG=$(agkan config get --json 2>/dev/null || echo '{}')
 ICEBOX_MODEL=$(echo "$CONFIG" | jq -r '.config.models.icebox.model // "sonnet"')
-ICEBOX_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.icebox.effort // "medium"')
+ICEBOX_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.icebox.effort // "high"')
 ```
 
 ### 1. Retrieve Icebox Tasks
@@ -63,6 +63,8 @@ Effort level: <ICEBOX_EFFORT>
 - low: Quick assessment. Focus on obvious gaps or blockers. Minimal research.
 - medium: Standard review. Check requirements clarity and promote/close decision.
 - high: Thorough review. Deep analysis of relevance, dependencies, and edge cases. Research codebase as needed.
+- xhigh: Recommended default for planning/agentic work; maximize coverage of dependencies and edge cases.
+- max: Reserve for the highest-stakes or most complex tasks.
 """
 )
 ```
