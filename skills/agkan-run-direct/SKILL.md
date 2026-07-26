@@ -54,7 +54,7 @@ Evaluate tasks using the following criteria in descending order and select the t
 **Skip tasks with `will-do-later` tag:**
 Tasks with the `will-do-later` tag are intentionally deferred tasks. Skip them **unless** they are in `ready` status — a task promoted to `ready` is executable regardless of the tag.
 
-**Priority (read from `metadata` field in the list JSON response):**
+**Priority (read from the `priority` field in the list JSON response):**
 ```
 Critical > High > Medium > Low
 ```

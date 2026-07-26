@@ -303,16 +303,19 @@ agkan task list --status ready --json | jq '.tasks[].id'
       "body": "Body | null",
       "author": "string | null",
       "status": "icebox | backlog | ready | in_progress | review | done | closed",
+      "priority": "critical | high | medium | low | null",
       "parent_id": "number | null",
       "created_at": "2026-01-01T00:00:00.000Z",
       "updated_at": "2026-01-01T00:00:00.000Z",
       "parent": "object | null",
       "tags": [{ "id": 1, "name": "bug" }],
-      "metadata": [{ "key": "priority", "value": "high" }]
+      "metadata": []
     }
   ]
 }
 ```
+
+> **Note:** `priority` is a first-class column, not `metadata`. `metadata` holds arbitrary key/value pairs unrelated to priority (e.g. `pr`).
 
 #### `agkan task get <id> --json`
 
@@ -324,8 +327,11 @@ agkan task list --status ready --json | jq '.tasks[].id'
     "title": "Task Title",
     "body": "Body | null",
     "author": "string | null",
+    "assignees": "string | null",
     "status": "backlog | ready | in_progress | review | done | closed",
+    "priority": "critical | high | medium | low | null",
     "parent_id": "number | null",
+    "is_archived": "boolean",
     "created_at": "2026-01-01T00:00:00.000Z",
     "updated_at": "2026-01-01T00:00:00.000Z",
     "branch": "string | null"
@@ -370,6 +376,7 @@ agkan task list --status ready --json | jq '.tasks[].id'
       "body": "Body | null",
       "author": "string | null",
       "status": "ready",
+      "priority": "critical | high | medium | low | null",
       "parent_id": "number | null",
       "created_at": "2026-01-01T00:00:00.000Z",
       "updated_at": "2026-01-01T00:00:00.000Z",
@@ -401,10 +408,12 @@ agkan task list --status ready --json | jq '.tasks[].id'
 {
   "success": true,
   "data": [
-    { "key": "priority", "value": "high" }
+    { "key": "pr", "value": "https://github.com/org/repo/pull/1" }
   ]
 }
 ```
+
+> **Note:** `priority` is a first-class task field (see `task list` / `task get` schemas above), not stored via `task meta`. The example above uses `pr` to avoid implying otherwise.
 
 #### `agkan tag list --json`
 

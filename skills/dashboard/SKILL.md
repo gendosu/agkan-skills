@@ -38,7 +38,7 @@ Display a summary table of all statuses:
 agkan task list --status in_progress --json
 ```
 
-Display each in-progress task with its ID, title, and priority (from metadata).
+Display each in-progress task with its ID, title, and `priority` field.
 
 ### 3. Show high-priority ready tasks
 
@@ -46,7 +46,11 @@ Display each in-progress task with its ID, title, and priority (from metadata).
 agkan task list --status ready --json
 ```
 
-Filter and display tasks where `metadata` contains `priority: critical` or `priority: high`.
+Filter and display tasks where the `priority` field is `critical` or `high`, e.g.:
+
+```bash
+agkan task list --status ready --json | jq '.tasks[] | select(.priority=="critical" or .priority=="high")'
+```
 
 Display each task with its ID, title, and priority value.
 
@@ -89,7 +93,7 @@ Example output:
 
 ## Notes
 
-- Priority is stored as task metadata with key `priority`
+- Priority is a first-class `priority` field on the task record
 - Priority values: `critical` > `high` > `medium` > `low`
 - If there are no in-progress tasks or no high-priority ready tasks, display a message indicating none exist
 - This skill is read-only and does not modify any tasks
