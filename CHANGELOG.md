@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **agkan-run**, **agkan-subtask**: Create the PR as a draft when implementation is still remaining at PR-creation time, and mark it ready for review (`gh pr ready`) when the task advances to `review`; a task left `in_progress` keeps its draft PR
+
 ## [0.18.1] - 2026-07-26
 
 ### Fixed

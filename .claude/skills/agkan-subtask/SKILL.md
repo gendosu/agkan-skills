@@ -136,11 +136,21 @@ If an error, permission denial, or user interruption occurs during implementatio
 
 If a `PR:` label was found in the task body (Step 2, Case A), skip PR creation — the existing PR will be updated automatically when commits are pushed to the branch.
 
-Otherwise, create a new PR:
+Otherwise, create a new PR. Choose draft or normal based on whether implementation is still remaining at this point:
 
-```bash
-gh pr create --title "<title>" --body "<body>"
-```
+- **Implementation remaining** — part of the task's work is not yet implemented (e.g., unchecked `- [ ]` items you have not implemented yet, or you are pushing an intermediate state and will continue implementing afterward) → create a **draft** PR:
+
+  ```bash
+  gh pr create --draft --title "<title>" --body "<body>"
+  ```
+
+- **Implementation complete** — all of the task's work is implemented and pushed → create a normal PR:
+
+  ```bash
+  gh pr create --title "<title>" --body "<body>"
+  ```
+
+A draft PR stays a draft while the task remains `in_progress`. It is converted back to a normal PR in Step 10 when the task advances to `review`.
 
 ### 7. Add PR Information to Task
 
@@ -263,7 +273,19 @@ agkan task update <id> body "<existing body>\n\nError: <error description>"
 
 `review` status means implementation is **fully complete** — a PR has been successfully created and is awaiting human review. It does **not** mean "paused waiting for user input".
 
-**If implementation succeeded**, update to review:
+Whenever the task is left as `in_progress` for any of the reasons above, leave the PR as a draft — do not run `gh pr ready`.
+
+**If implementation succeeded**, first convert a draft PR back to a normal PR, then update to review.
+
+`review` means the PR is awaiting human review, so it must not remain a draft. If the PR is a draft (opened as a draft in Step 6, or in an earlier session via Case A), mark it ready for review. `<PR URL>` is the URL from Step 6 or from the existing `PR:` label:
+
+```bash
+if [ "$(gh pr view <PR URL> --json isDraft -q .isDraft)" = "true" ]; then
+  gh pr ready <PR URL>
+fi
+```
+
+Then update the status:
 
 ```bash
 agkan task update <id> status review

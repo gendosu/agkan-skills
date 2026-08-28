@@ -514,6 +514,7 @@ PR: <URL>
 - Skills that start work on a task **must** parse this label from the task body before creating a new PR.
   - If a `PR:` label is present → push to the branch to update the existing PR instead of opening a new one.
   - If no `PR:` label is present → open a new PR.
+- A PR opened while implementation is still remaining is created as a draft (`gh pr create --draft`). It stays a draft while the task is `in_progress`; the skill marks it ready for review (`gh pr ready`) when the task advances to `review`.
 
 ### Branch Field
 
