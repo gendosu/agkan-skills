@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-09-06
+
 ### Added
 
 - Package the repository as an agy (Antigravity CLI) plugin: `plugin.json` and `hooks.json` at the repository root so `agy plugin install <clone dir>` registers all skills in one step
