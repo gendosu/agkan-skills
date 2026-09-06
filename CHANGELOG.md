@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Package the repository as an agy (Antigravity CLI) plugin: `plugin.json` and `hooks.json` at the repository root so `agy plugin install <clone dir>` registers all skills in one step
-- **agkan-env-guard**: `PreToolUse` hook (`hooks/env-guard.mjs`) that denies `run_command` calls dumping the whole environment (`env`, `printenv`, `env | grep`, `export -p`, `declare -x`/`-p`, bare `set`, `/proc/*/environ`, `node -e` with whole `process.env`) while allowing per-variable access such as `printenv NAME`; covered by `hooks/env-guard.test.mjs` (`node --test`)
+- **agkan-env-guard**: `PreToolUse` hook (`hooks/env-guard.mjs`) that denies `run_command` calls dumping the whole environment (`env`, `printenv`, `env | grep`, `export -p`, `declare -x`/`-p`, bare `set`, `/proc/*/environ`, `node -e` with whole `process.env`) while allowing per-variable access such as `printenv NAME`; non-matching commands are answered with `decision: "ask"` (agy treats a bare `{}` as a deny); covered by `hooks/env-guard.test.mjs` (`node --test`)
 
 ### Changed
 

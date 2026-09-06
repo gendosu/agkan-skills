@@ -242,7 +242,7 @@ agy plugin install ./agkan-skills
 
 #### 環境変数ガード（`agkan-env-guard`）
 
-プラグインには `PreToolUse` フック（`hooks/env-guard.mjs`）が同梱されており、環境変数一式をモデルに送ってしまう `run_command`（`env`、`printenv`、`env | grep`、`export -p`、`declare -x`、引数なしの `set`、`/proc/*/environ` の読み出し、`process.env` を丸ごと出力する `node -e` など）を deny します。`printenv NAME`、`echo $NAME`、`env FOO=1 cmd`、`#!/usr/bin/env node` のような個別参照・通常利用は許可されます。deny 時にはエージェントへ「必要な変数は `printenv NAME` で個別に参照すること」という理由が返るため、作業は止まらずに続行できます。ガードはプラグインを入れた agy セッション全体で有効です（agkan board からの起動に限りません）。`PATH` 上に `node` が必要です。
+プラグインには `PreToolUse` フック（`hooks/env-guard.mjs`）が同梱されており、環境変数一式をモデルに送ってしまう `run_command`（`env`、`printenv`、`env | grep`、`export -p`、`declare -x`、引数なしの `set`、`/proc/*/environ` の読み出し、`process.env` を丸ごと出力する `node -e` など）を deny します。`printenv NAME`、`echo $NAME`、`env FOO=1 cmd`、`#!/usr/bin/env node` のような個別参照・通常利用は許可されます。deny 時にはエージェントへ「必要な変数は `printenv NAME` で個別に参照すること」という理由が返るため、作業は止まらずに続行できます。それ以外のコマンドには `{"decision": "ask"}` を返し、agy 通常の許可フロー（allow ルール・承認キャッシュ・`--dangerously-skip-permissions`）に委ねます（agy 1.1.27 は空の `{}` 応答を deny として扱うため、フックは `{}` を返しません）。ガードはプラグインを入れた agy セッション全体で有効です（agkan board からの起動に限りません）。`PATH` 上に `node` が必要です。
 
 ガードのテストは次で実行できます:
 
