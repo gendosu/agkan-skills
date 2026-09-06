@@ -45,6 +45,15 @@ const denied = [
   "node -e \"console.log(JSON.stringify(process.env))\"",
   "node -p process.env",
   "node --eval 'Object.entries(process.env).forEach(console.log)'",
+  "echo \"$(env)\"",
+  "X=\"$(env | head)\"; echo $X",
+  "echo \"`env`\"",
+  "eval env",
+  "eval \"env | grep A\"",
+  "env # list everything",
+  "echo | xargs env",
+  "python3 -c 'import os; print(os.environ)'",
+  "python -c \"import os, json; print(json.dumps(dict(os.environ)))\"",
 ];
 
 const allowed = [
@@ -77,6 +86,12 @@ const allowed = [
   "cat /proc/cpuinfo",
   "sh -c 'printenv HOME'",
   "npm test",
+  "echo \"$(printenv HOME)\"",
+  "eval \"printenv HOME\"",
+  "ls # env",
+  "python3 -c 'import os; print(os.environ.get(\"HOME\"))'",
+  "python3 -c 'import os; print(os.environ[\"HOME\"])'",
+  "python3 script.py",
 ];
 
 for (const cmd of denied) {

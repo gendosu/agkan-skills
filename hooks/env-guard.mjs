@@ -12,15 +12,23 @@ export const DENY_REASON =
 export const PASS_DECISION = Object.freeze({ decision: "ask" });
 
 const SHELLS = new Set(["sh", "bash", "zsh", "dash", "ksh"]);
-const COMMAND_PREFIXES = new Set(["sudo", "command", "builtin", "exec", "time", "nice", "nohup"]);
+const COMMAND_PREFIXES = new Set(["sudo", "command", "builtin", "exec", "time", "nice", "nohup", "xargs"]);
 const ENV_OPTIONS_WITH_ARG = new Set(["-u", "--unset", "-C", "--chdir", "-S", "--split-string"]);
 const PROC_ENVIRON = /\/proc\/[^/\s]+\/environ/;
-// process.env not followed by a property access / index → the whole object is being used
+// process.env / os.environ not followed by a property access / index → the whole mapping is being used
 const WHOLE_PROCESS_ENV = /process\.env(?![.\[\w])/;
+const WHOLE_OS_ENVIRON = /os\.environ(?![.\[\w])/;
+// $(...) and `...` bodies run as commands even inside double quotes
+const COMMAND_SUBSTITUTION = /\$\(([^()]*)\)|`([^`]*)`/g;
 
 export function evaluateCommand(commandLine) {
   if (typeof commandLine !== "string") return PASS_DECISION;
-  return splitSegments(commandLine).some(segmentDumpsEnv) ? { decision: "deny", reason: DENY_REASON } : PASS_DECISION;
+  return dumpsEnv(commandLine) ? { decision: "deny", reason: DENY_REASON } : PASS_DECISION;
+}
+
+function dumpsEnv(commandLine) {
+  const substitutions = [...commandLine.matchAll(COMMAND_SUBSTITUTION)].map((m) => m[1] ?? m[2]);
+  return substitutions.some(dumpsEnv) || splitSegments(commandLine).some(segmentDumpsEnv);
 }
 
 function segmentDumpsEnv(segment) {
@@ -50,10 +58,15 @@ function segmentDumpsEnv(segment) {
     case "node":
     case "nodejs":
       return nodeEvalDumpsEnv(args);
+    case "python":
+    case "python3":
+      return args.includes("-c") && WHOLE_OS_ENVIRON.test(args.join(" "));
+    case "eval":
+      return dumpsEnv(args.join(" "));
     default:
       if (SHELLS.has(cmd)) {
         const c = args.indexOf("-c");
-        return c !== -1 && c + 1 < args.length && evaluateCommand(args[c + 1]).decision === "deny";
+        return c !== -1 && c + 1 < args.length && dumpsEnv(args[c + 1]);
       }
       return false;
   }
@@ -138,7 +151,7 @@ function splitSegments(line) {
   return segments;
 }
 
-// Whitespace tokenizer that keeps quoted strings together and drops the quotes.
+// Whitespace tokenizer that keeps quoted strings together, drops the quotes, and stops at a `#` comment.
 function tokenize(segment) {
   const tokens = [];
   let cur = "";
@@ -176,6 +189,7 @@ function tokenize(segment) {
       inToken = false;
       continue;
     }
+    if (ch === "#" && !inToken) return tokens;
     cur += ch;
     inToken = true;
   }
