@@ -1,11 +1,15 @@
 // agy PreToolUse hook: deny shell commands that dump the whole environment.
 // stdin:  {"toolCall":{"name":"run_command","args":{"CommandLine":"..."}}, ...}
-// stdout: {"decision":"deny","reason":"..."} or {} (no opinion; agy applies its normal permission flow)
+// stdout: {"decision":"deny","reason":"..."} or {"decision":"ask"} (defer to agy's normal permission flow).
+// agy 1.1.27 treats a response without `decision` (e.g. `{}`) as a deny with an empty reason,
+// so the pass-through case must be explicit. "ask" respects allow rules and cached approvals;
+// "allow" would bypass the user's permission prompts for every command.
 
 import { basename } from "node:path";
 
 export const DENY_REASON =
   "環境変数の一覧表示は禁止。必要な変数は `printenv NAME` で個別に参照すること";
+export const PASS_DECISION = Object.freeze({ decision: "ask" });
 
 const SHELLS = new Set(["sh", "bash", "zsh", "dash", "ksh"]);
 const COMMAND_PREFIXES = new Set(["sudo", "command", "builtin", "exec", "time", "nice", "nohup"]);
@@ -15,8 +19,8 @@ const PROC_ENVIRON = /\/proc\/[^/\s]+\/environ/;
 const WHOLE_PROCESS_ENV = /process\.env(?![.\[\w])/;
 
 export function evaluateCommand(commandLine) {
-  if (typeof commandLine !== "string") return {};
-  return splitSegments(commandLine).some(segmentDumpsEnv) ? { decision: "deny", reason: DENY_REASON } : {};
+  if (typeof commandLine !== "string") return PASS_DECISION;
+  return splitSegments(commandLine).some(segmentDumpsEnv) ? { decision: "deny", reason: DENY_REASON } : PASS_DECISION;
 }
 
 function segmentDumpsEnv(segment) {
@@ -180,14 +184,14 @@ function tokenize(segment) {
 }
 
 async function main() {
-  let decision = {};
+  let decision = PASS_DECISION;
   try {
     let input = "";
     for await (const chunk of process.stdin) input += chunk;
     const payload = JSON.parse(input);
     decision = evaluateCommand(payload?.toolCall?.args?.CommandLine);
   } catch {
-    decision = {};
+    decision = PASS_DECISION;
   }
   process.stdout.write(JSON.stringify(decision));
 }

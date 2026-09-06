@@ -4,7 +4,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
-import { evaluateCommand, DENY_REASON } from "./env-guard.mjs";
+import { evaluateCommand, DENY_REASON, PASS_DECISION } from "./env-guard.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const script = join(here, "env-guard.mjs");
@@ -86,8 +86,8 @@ for (const cmd of denied) {
 }
 
 for (const cmd of allowed) {
-  test(`allows: ${JSON.stringify(cmd)}`, () => {
-    assert.deepEqual(evaluateCommand(cmd), {});
+  test(`passes through: ${JSON.stringify(cmd)}`, () => {
+    assert.deepEqual(evaluateCommand(cmd), PASS_DECISION);
   });
 }
 
@@ -103,20 +103,26 @@ test("cli: denies env from PreToolUse payload", () => {
   assert.deepEqual(JSON.parse(out.stdout), { decision: "deny", reason: DENY_REASON });
 });
 
-test("cli: returns {} for an ordinary command", () => {
+// agy 1.1.27 treats a response without `decision` (e.g. `{}`) as a deny with an empty reason,
+// so anything we do not block must explicitly defer to the normal permission flow with "ask".
+test("pass-through decision is ask, never allow", () => {
+  assert.deepEqual(PASS_DECISION, { decision: "ask" });
+});
+
+test("cli: passes through an ordinary command", () => {
   const out = runHook(JSON.stringify({ toolCall: { name: "run_command", args: { CommandLine: "ls" } } }));
   assert.equal(out.status, 0);
-  assert.deepEqual(JSON.parse(out.stdout), {});
+  assert.deepEqual(JSON.parse(out.stdout), PASS_DECISION);
 });
 
-test("cli: returns {} on malformed stdin", () => {
+test("cli: passes through on malformed stdin", () => {
   const out = runHook("not json");
   assert.equal(out.status, 0);
-  assert.deepEqual(JSON.parse(out.stdout), {});
+  assert.deepEqual(JSON.parse(out.stdout), PASS_DECISION);
 });
 
-test("cli: returns {} when CommandLine is missing", () => {
+test("cli: passes through when CommandLine is missing", () => {
   const out = runHook(JSON.stringify({ toolCall: { name: "run_command", args: {} } }));
   assert.equal(out.status, 0);
-  assert.deepEqual(JSON.parse(out.stdout), {});
+  assert.deepEqual(JSON.parse(out.stdout), PASS_DECISION);
 });
