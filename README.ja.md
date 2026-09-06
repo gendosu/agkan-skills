@@ -229,6 +229,27 @@ agkan-skills プラグインをインストールします:
 /plugin install agkan-skills
 ```
 
+### agy（Antigravity CLI）向けインストール
+
+このリポジトリは agy（Antigravity CLI）プラグインとしても利用できます。クローンしたディレクトリをそのままインストールします:
+
+```bash
+git clone https://github.com/gendosu/agkan-skills.git
+agy plugin install ./agkan-skills
+```
+
+これで全スキルと `agkan-env-guard` フックが一度に登録されます。以前 `~/.agents/skills/agkan*` に手動コピーしたスキルがある場合は、プラグインと二重登録になるため削除してください。
+
+#### 環境変数ガード（`agkan-env-guard`）
+
+プラグインには `PreToolUse` フック（`hooks/env-guard.mjs`）が同梱されており、環境変数一式をモデルに送ってしまう `run_command`（`env`、`printenv`、`env | grep`、`export -p`、`declare -x`、引数なしの `set`、`/proc/*/environ` の読み出し、`process.env` を丸ごと出力する `node -e` など）を deny します。`printenv NAME`、`echo $NAME`、`env FOO=1 cmd`、`#!/usr/bin/env node` のような個別参照・通常利用は許可されます。deny 時にはエージェントへ「必要な変数は `printenv NAME` で個別に参照すること」という理由が返るため、作業は止まらずに続行できます。ガードはプラグインを入れた agy セッション全体で有効です（agkan board からの起動に限りません）。`PATH` 上に `node` が必要です。
+
+ガードのテストは次で実行できます:
+
+```bash
+node --test hooks/env-guard.test.mjs
+```
+
 ## 使用方法
 
 ### 基本的なタスク管理
@@ -321,7 +342,12 @@ export AGENT_KANBAN_DB_PATH=/custom/path/data.db
 ```
 agkan-skills/
 ├── .claude-plugin/
-│   └── plugin.json           # プラグイン設定
+│   └── plugin.json           # Claude Code プラグイン設定
+├── plugin.json               # agy プラグインマニフェスト
+├── hooks.json                # agy ライフサイクルフック（agkan-env-guard）
+├── hooks/
+│   ├── env-guard.mjs         # 環境変数一覧表示を deny する PreToolUse フック
+│   └── env-guard.test.mjs    # フックのテスト（node --test）
 ├── skills/
 │   ├── agkan/
 │   │   └── SKILL.md          # コアタスク管理スキル

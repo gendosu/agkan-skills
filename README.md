@@ -229,6 +229,27 @@ Alternatively, if the marketplace is already added:
 /plugin install agkan-skills
 ```
 
+### Install for agy (Antigravity CLI)
+
+This repository is also an agy (Antigravity CLI) plugin. Clone it and install the clone directory:
+
+```bash
+git clone https://github.com/gendosu/agkan-skills.git
+agy plugin install ./agkan-skills
+```
+
+This registers all skills and the `agkan-env-guard` hook in one step. If you previously copied skills by hand into `~/.agents/skills/agkan*`, delete those copies — otherwise they are registered twice alongside the plugin.
+
+#### Environment guard (`agkan-env-guard`)
+
+The plugin ships a `PreToolUse` hook (`hooks/env-guard.mjs`) that denies `run_command` calls which would print the whole environment to the model, such as `env`, `printenv`, `env | grep`, `export -p`, `declare -x`, bare `set`, reads of `/proc/*/environ`, and `node -e` scripts that dump `process.env`. Per-variable access such as `printenv NAME`, `echo $NAME`, `env FOO=1 cmd`, and `#!/usr/bin/env node` is allowed. When a command is denied, the reason returned to the agent tells it to read individual variables with `printenv NAME` instead. The guard is active in every agy session that has the plugin installed, not only sessions started from the agkan board. Requires `node` on `PATH`.
+
+Run the guard's tests with:
+
+```bash
+node --test hooks/env-guard.test.mjs
+```
+
 ## Usage
 
 ### Basic Task Management
@@ -321,7 +342,12 @@ export AGENT_KANBAN_DB_PATH=/custom/path/data.db
 ```
 agkan-skills/
 ├── .claude-plugin/
-│   └── plugin.json           # Plugin configuration
+│   └── plugin.json           # Claude Code plugin configuration
+├── plugin.json               # agy plugin manifest
+├── hooks.json                # agy lifecycle hooks (agkan-env-guard)
+├── hooks/
+│   ├── env-guard.mjs         # PreToolUse hook denying environment dumps
+│   └── env-guard.test.mjs    # Hook tests (node --test)
 ├── skills/
 │   ├── agkan/
 │   │   └── SKILL.md          # Core task management skill
