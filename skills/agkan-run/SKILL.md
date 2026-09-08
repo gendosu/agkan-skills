@@ -23,6 +23,8 @@ RUN_MODEL=$(echo "$CONFIG" | jq -r '.config.models.run.model // "sonnet"')
 RUN_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.run.effort // "high"')
 ```
 
+These are the session defaults. A task's own run model / run effort (`model_run` / `effort_run`, set per task) override them in Step 5b.
+
 ### 1. Update branch to latest
 
 Before switching to the default branch, check for uncommitted changes:
@@ -58,6 +60,8 @@ Evaluate tasks in descending order using the following criteria and select the t
 **Skip tasks with `will-do-later` tag:**
 Tasks with the `will-do-later` tag are intentionally postponed tasks. Skip them **unless** they are in `ready` status — a task promoted to `ready` is executable regardless of the tag.
 
+Also skip any task whose ID was recorded as skipped in Step 5b earlier in this session (its run model cannot be launched from this skill).
+
 **Priority (read from the `priority` field in the list JSON response):**
 ```
 Critical > High > Medium > Low
@@ -85,19 +89,41 @@ If there are incomplete tasks in `blockedBy`, do not select that task. Instead, 
 agkan task update <id> status in_progress
 ```
 
-### 5a. Inspect task for existing Branch/PR
+### 5a. Inspect task for existing Branch/PR and run model/effort
 
-Before launching the sub-agent, retrieve the task to get the branch and check the body for a `PR:` label:
+Before launching the sub-agent, retrieve the task to get the branch, the task-level run model/effort, and check the body for a `PR:` label:
 
 ```bash
-agkan task get <id> --json
+TASK=$(agkan task get <id> --json)
 ```
 
 Extract:
 - **Branch**: read from `.task.branch` (first-class column; `null` if not set)
 - **PR**: parse the task body for a `PR: <URL>` label
+- **Run model**: read from `.task.model_run` (first-class column; `null` if not set)
+- **Run effort**: read from `.task.effort_run` (first-class column; `null` if not set)
 
-Pass these values to the sub-agent prompt (Step 6) so it can resume work on the existing branch/PR instead of creating new ones.
+`model_run` / `effort_run` are the task's "Run model" / "Run effort" (set with `agkan task update <id> --model-run <model> --effort-run <level>` or from the board's detail panel). They are not in `metadata`, and `agkan task list --json` does not include them — only `agkan task get --json` does.
+
+Pass the Branch/PR values to the sub-agent prompt (Step 6) so it can resume work on the existing branch/PR instead of creating new ones. Carry the run model/effort into Step 5b.
+
+### 5b. Resolve the model and effort for this task
+
+A task's own run model / run effort take precedence over the session defaults from Step 0. This is the same precedence `agkan board` applies when it runs a task.
+
+```bash
+TASK_MODEL=$(echo "$TASK" | jq -r '.task.model_run // empty')
+TASK_EFFORT=$(echo "$TASK" | jq -r '.task.effort_run // empty')
+RUN_MODEL_FOR_TASK=${TASK_MODEL:-$RUN_MODEL}
+RUN_EFFORT_FOR_TASK=${TASK_EFFORT:-$RUN_EFFORT}
+```
+
+The sub-agent is launched with the Task tool, whose `model` parameter accepts only the Claude aliases `fable`, `opus`, `sonnet`, and `haiku`. When `model_run` is set to anything else (for example a codex or agy model from the model catalog, such as `gpt-5.6-sol` or `gemini-3.8-flash`), this skill cannot run the task with the model it was configured for. Do not substitute another model. Instead:
+
+1. Report it to the user: `Task #<id>: run model "<model_run>" cannot be launched by the Task tool; run this task from agkan board.`
+2. Revert the task: `agkan task update <id> status ready`
+3. Record the task ID as skipped for the rest of this session (see Step 3)
+4. Go to Step 8
 
 ### 6. Implement, create PR, complete
 
@@ -107,9 +133,9 @@ Do not use `Skill("agkan-subtask")`; instead, embed the workflow steps directly 
 > **Why embed steps instead of referencing a file path?**
 > Sub-agents spawned via the Task tool start with a fresh context. When installed as a plugin, the skill files may reside at a path unknown to the sub-agent (e.g., under a plugin cache directory), so instructing the sub-agent to read a relative or installation-specific path is unreliable. Embedding the workflow steps directly in the prompt makes the instructions path-independent.
 
-Before calling Task(), substitute the placeholders with the values fetched in Step 0:
-- Replace `<RUN_MODEL>` with the value of `$RUN_MODEL`
-- Replace `<RUN_EFFORT>` with the value of `$RUN_EFFORT`
+Before calling Task(), substitute the placeholders with the values resolved in Step 5b (task-level override, falling back to the Step 0 session defaults):
+- Replace `<RUN_MODEL>` with the value of `$RUN_MODEL_FOR_TASK`
+- Replace `<RUN_EFFORT>` with the value of `$RUN_EFFORT_FOR_TASK`
 
 ```
 Task(
