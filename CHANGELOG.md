@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.19.1] - 2026-09-08
+
 ### Fixed
 
 - **agkan-run**: Launch the implementation sub-agent with the task's own run model / run effort (`model_run` / `effort_run` from `agkan task get --json`) instead of only the `models.run.*` session defaults; a task whose run model is not a Claude alias the Task tool accepts (codex / agy catalog models) is reverted to `ready` and skipped with a message to run it from agkan board
