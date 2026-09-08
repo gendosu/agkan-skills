@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.19.2] - 2026-09-08
+
+### Fixed
+
+- **agkan**: Correct SKILL.md CLI reference against agkan 3.22.0 — fix documented commands that error or do not exist (`task find --status todo,...`, `agkan skill path agkan-review`), correct `task get --json` / `task list --json` schemas, document task-level model/effort fields, list all `.agkan.yml` keys, and add options shipped since the docs were written (`--tag`, `--model-planning`/`--model-run`/`--effort-planning`/`--effort-run`, `--dry-run`, `comment update`)
+
 ## [0.19.1] - 2026-09-08
 
 ### Fixed
