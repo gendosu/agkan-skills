@@ -83,6 +83,7 @@ agkan task update <id> --assignees "alice,bob"
 agkan task update <id> --file ./spec.md  # Read body from file
 agkan task update <id> --status done --title "Updated Title"  # Multiple options
 agkan task update <id> --branch feature/my-branch  # Set the branch column
+agkan task update <id> --model-run sonnet --effort-run high  # Set the task's run model / effort (planning: --model-planning / --effort-planning)
 agkan task update <id> --priority high            # Update task priority
 agkan task update <id> --priority ""              # Clear task priority
 
@@ -334,7 +335,11 @@ agkan task list --status ready --json | jq '.tasks[].id'
     "is_archived": "boolean",
     "created_at": "2026-01-01T00:00:00.000Z",
     "updated_at": "2026-01-01T00:00:00.000Z",
-    "branch": "string | null"
+    "branch": "string | null",
+    "model_planning": "string | null",
+    "model_run": "string | null",
+    "effort_planning": "string | null",
+    "effort_run": "string | null"
   },
   "parent": "object | null",
   "children": [],
