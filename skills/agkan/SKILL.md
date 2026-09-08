@@ -47,6 +47,11 @@ agkan task add "Title" --blocks 3,4      # Set tasks that this task blocks
 agkan task add "Title" --assignees "alice,bob"  # Set task assignees (comma-separated)
 agkan task add "Title" --branch feature/my-branch  # Assign a branch to this task
 agkan task add "Title" --priority high            # Set task priority (critical/high/medium/low)
+agkan task add "Title" --tag frontend,3           # Attach tags at creation (comma-separated names or IDs)
+agkan task add "Title" --model-planning opus      # Model used for planning runs
+agkan task add "Title" --model-run sonnet         # Model used for implementation runs
+agkan task add "Title" --effort-planning high     # Reasoning effort for planning runs
+agkan task add "Title" --effort-run xhigh         # Reasoning effort for implementation runs
 
 # List tasks
 agkan task list                    # All tasks
@@ -55,7 +60,7 @@ agkan task list --tree             # Hierarchical view
 agkan task list --root-only        # Root tasks only
 agkan task list --tag 1,2          # Filter by tags
 agkan task list --dep-tree         # Dependency (blocking) tree view
-agkan task list --sort title       # Sort by field (id / title / status / created_at / updated_at), default: created_at
+agkan task list --sort title       # Sort by field (id / title / status / priority / created_at / updated_at), default: created_at
 agkan task list --order asc        # Sort order (asc / desc), default: desc
 agkan task list --assignees "alice,bob"  # Filter by assignees (comma-separated)
 agkan task list --all              # Include all statuses (including done and closed)
@@ -69,7 +74,7 @@ agkan task get <id>
 # Search
 agkan task find "keyword"
 agkan task find "keyword" --all  # Include done/closed
-agkan task find "keyword" --status todo,in_progress   # Filter by status
+agkan task find "keyword" --status ready,in_progress  # Filter by status (validated: icebox/backlog/ready/in_progress/review/done/closed)
 
 # Update (positional argument form - backward compatible)
 agkan task update <id> status in_progress
@@ -86,6 +91,11 @@ agkan task update <id> --branch feature/my-branch  # Set the branch column
 agkan task update <id> --model-run sonnet --effort-run high  # Set the task's run model / effort (planning: --model-planning / --effort-planning)
 agkan task update <id> --priority high            # Update task priority
 agkan task update <id> --priority ""              # Clear task priority
+agkan task update <id> --model-planning opus      # Set the planning model
+agkan task update <id> --model-run sonnet         # Set the implementation model
+agkan task update <id> --effort-planning high     # Set the planning reasoning effort
+agkan task update <id> --effort-run xhigh         # Set the implementation reasoning effort
+agkan task update <id> --model-run ""             # Pass an empty string to clear the value
 
 # Count
 agkan task count
@@ -103,6 +113,7 @@ agkan task copy <id> --json            # Output in JSON format
 
 # Delete task
 agkan task delete <id>
+agkan task delete <id> --dry-run              # Preview the impact of deletion without deleting
 
 # Archive done/closed tasks (hide but recoverable via unarchive)
 agkan task archive                            # Archive done/closed tasks older than 3 days ago (default)
@@ -123,6 +134,17 @@ agkan task purge --status done          # Target specific statuses (default: don
 agkan task purge --dry-run              # Preview tasks that would be purged without deleting
 agkan task purge --json                 # Output in JSON format
 ```
+
+> **`-p` is the short form of `--priority`, not `--parent`.**
+> Specify a parent with the long form `--parent <id>` only.
+
+> **Model / effort values**
+> - Models: `fable`, `opus`, `sonnet`, `haiku`, `gpt-6-astra`, `gpt-5.6-sol`, `gpt-5.6-terra`,
+>   `gpt-5.6-luna`, `gemini-3.8-flash`, `gemini-3.7-flash`, `claude-sonnet-4-6`,
+>   `claude-opus-4-6-thinking`, `gpt-oss-120b-medium`
+> - Efforts: `low`, `medium`, `high`, `xhigh`, `max`
+> - The accepted set comes from the `modelCatalog` config key. Run `agkan task add --help`
+>   to see the list this installation actually accepts.
 
 > **archive vs purge**
 > - `archive`: Sets the `is_archived` flag to hide tasks from default views. Recoverable with `unarchive`.
@@ -147,6 +169,9 @@ agkan task comment add <task-id> <content> --author "agent"
 # List all comments for a task
 agkan task comment list <task-id>
 
+# Update a comment by ID
+agkan task comment update <comment-id> <content>
+
 # Delete a comment by ID
 agkan task comment delete <comment-id>
 ```
@@ -158,6 +183,7 @@ agkan task comment delete <comment-id>
 agkan tag add "frontend"
 agkan tag list
 agkan tag delete <tag-id-or-name>
+agkan tag delete <tag-id-or-name> --dry-run  # Preview the impact of deletion without deleting
 agkan tag rename <id-or-name> <new-name>
 
 # Tag tasks
@@ -294,9 +320,13 @@ agkan task list --status ready --json | jq '.tasks[].id'
   "filters": {
     "status": "ready | null",
     "author": "string | null",
+    "assignees": "string | null",
     "tagIds": [1, 2],
-    "rootOnly": false
+    "rootOnly": false,
+    "priority": "critical | high | medium | low | null"
   },
+  "sort": "id | title | status | priority | created_at | updated_at | null",
+  "order": "asc | desc | null",
   "tasks": [
     {
       "id": 1,
@@ -329,24 +359,25 @@ agkan task list --status ready --json | jq '.tasks[].id'
     "body": "Body | null",
     "author": "string | null",
     "assignees": "string | null",
-    "status": "backlog | ready | in_progress | review | done | closed",
+    "status": "icebox | backlog | ready | in_progress | review | done | closed",
     "priority": "critical | high | medium | low | null",
     "parent_id": "number | null",
     "is_archived": "boolean",
-    "created_at": "2026-01-01T00:00:00.000Z",
-    "updated_at": "2026-01-01T00:00:00.000Z",
     "branch": "string | null",
     "model_planning": "string | null",
     "model_run": "string | null",
     "effort_planning": "string | null",
-    "effort_run": "string | null"
+    "effort_run": "string | null",
+    "created_at": "2026-01-01T00:00:00.000Z",
+    "updated_at": "2026-01-01T00:00:00.000Z"
   },
   "parent": "object | null",
   "children": [],
   "blockedBy": [{ "id": 2, "title": "..." }],
   "blocking": [{ "id": 3, "title": "..." }],
   "tags": [{ "id": 1, "name": "bug" }],
-  "attachments": []
+  "comments": [],
+  "metadata": []
 }
 ```
 
@@ -534,13 +565,38 @@ The `branch` column is a first-class field on the task record — it is not stor
 
 ## Configuration
 
-Place `.agkan.yml` in the project root to customize the DB path:
+Place `.agkan.yml` in the project root. Every key agkan reads:
 
 ```yaml
-path: ./.agkan/data.db
+agent: claude                   # AI coding agent to run: claude | codex | agy (default: claude)
+path: ./.agkan/data.db          # SQLite DB path
+board:
+  port: 3000                    # Board server port
+  title: My Project             # Board page title
+models:
+  planning:                     # Applies to the agent selected by `agent`
+    model: opus
+    effort: high
+  run:
+    model: sonnet
+    effort: xhigh
+  claude:                       # Per-agent settings: `claude` | `codex` | `agy`,
+    planning:                   # each holding its own `planning` / `run`
+      model: opus
+      effort: high
+    run:
+      model: sonnet
+      effort: xhigh
+modelCatalog:                   # Replaces the built-in (cli, model, efforts) catalog wholesale
+  - cli: claude
+    model: opus
+    efforts: [low, medium, high, xhigh, max]
+permissionMode: auto            # Passed through to the agent CLI.
+                                # `skipPermissions` maps to --dangerously-skip-permissions.
 ```
 
-Or use environment variable: `AGENT_KANBAN_DB_PATH=/custom/path/data.db`
+Every key is optional. The DB path can also be set with the environment variable
+`AGENT_KANBAN_DB_PATH=/custom/path/data.db`.
 
 ### Config Commands
 

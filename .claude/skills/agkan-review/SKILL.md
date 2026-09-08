@@ -15,12 +15,7 @@ Workflow to retrieve tasks with Review status in agkan, check the merge/close st
 
 ### Primary: Run the bundled script
 
-Run the bundled `review.sh` script to process all review tasks in one command:
-
-```bash
-bash "$(dirname "$(agkan skill path agkan-review 2>/dev/null || echo "$BASE_DIR")")/review.sh"
-```
-
+Run the bundled `review.sh` script to process all review tasks in one command.
 The base directory for this skill is provided at session start. Use it to resolve the script path:
 
 ```bash
