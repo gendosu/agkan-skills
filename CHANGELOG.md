@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.19.3] - 2026-09-17
+
+### Fixed
+
+- **agkan-run / agkan-subtask**: Clarify that the end-of-task flow stops at `review` and never waits for the PR to merge or marks the task `done` — the previous wording ("do not mark task as done before PR is merged") could be read as "wait for the merge in this session, then mark done"; the `review` → `done` transition is `agkan-review`'s job in a separate session
+
 ## [0.19.2] - 2026-09-08
 
 ### Fixed
