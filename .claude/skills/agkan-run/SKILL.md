@@ -381,9 +381,16 @@ agkan task get <id> --json
 Verify that the status is `review`. If it is still `in_progress`, retry the update
 command.
 
+### 9. End of task
+
+Once the task is at `review`, report the result (task ID, PR URL, status `review`) and END.
+Do NOT wait for the PR to be merged. Do NOT move the task to `done`. Do NOT ask whether
+to wait or whether to mark it done. The `review` → `done` (or `close`) transition is
+handled by the `agkan-review` skill in a separate session after the PR is merged/closed.
+
 ## Important Notes
 
-- Do not mark task as done before PR is merged (mark as done after PR review and merge)
+- This skill ends at `review`. Never mark the task `done` here and never wait for the merge; `agkan-review` moves the task to `done` after the PR is merged.
 - The condition for moving a task to `review` (commit made, no critical error, no unresolved interruption) is defined in full in Step 8 above — see that step for the exact rule; it is not repeated here
 
 ## Effort
@@ -493,5 +500,5 @@ See the canonical definition in `agkan/SKILL.md` (Tag Priority section).
 
 - Always select only 1 task (do not start multiple tasks simultaneously)
 - If no tasks exist, end the session
-- Do not mark task as done before PR merge (mark as done after PR review and merge)
+- Each subtask ends at `review`. Never mark a task `done` here and never wait for the merge; `agkan-review` moves the task to `done` after the PR is merged.
 - See Step 8 (`review` status transition) and Loop Structure (handling interruptions) above for the exact rules — not repeated here
