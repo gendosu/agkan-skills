@@ -16,13 +16,13 @@ Workflow to retrieve tasks with Review status in agkan, check the merge/close st
 ### Primary: Run the bundled script
 
 Run the bundled `review.sh` script to process all review tasks in one command.
-The base directory for this skill is provided at session start. Use it to resolve the script path:
+Resolve this skill's directory from its loaded SKILL.md path or the environment's skill catalog. Set `BASE_DIR` to that directory and use it to resolve the script path:
 
 ```bash
 bash "$BASE_DIR/review.sh"
 ```
 
-Where `$BASE_DIR` is the base directory shown at the top of the skill (e.g. `/home/gen/.claude/skills/agkan-review`).
+`BASE_DIR` is the directory containing this skill's SKILL.md and review.sh, regardless of the agent or installation location.
 
 The script:
 1. Fetches all tasks with `--status review`
@@ -32,7 +32,7 @@ The script:
 5. Adds a comment recording the reason and timestamp
 6. Prints a summary: `done: X, closed: X, skipped (OPEN): X, no PR: X`
 
-To register the script in `.claude/settings.json` to eliminate per-command permission prompts, add the script path to `allowedTools` or the relevant bash allowlist.
+If repeated execution needs an allowlist, use the executing environment's supported permission settings for this script, following its approval rules.
 
 ---
 

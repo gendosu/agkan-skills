@@ -11,6 +11,23 @@ A workflow to select the highest priority ready task from agkan, implement it di
 
 ---
 
+## Agent Compatibility
+
+Use the executing environment's available tools; these procedures apply across agents.
+`Delegate(...)` below is pseudocode, not a tool name: map it to the available
+sub-agent tool and supported arguments, using the indicated role and prompt. Wait
+for completion before continuing. If delegation is unavailable or disallowed,
+execute the same procedure in the current agent, preserving its scope and status checks.
+An empty model means inherit the current model (omit the model override). Honor an
+explicit model only when the environment supports it; never silently substitute a
+different model. Check this before changing task status; if unsupported, report the
+limitation and stop unless a later step defines a skip/recovery procedure.
+Pass effort through a supported setting, or retain it as prompt-level thoroughness
+guidance without claiming the runtime effort was changed.
+Resolve referenced skills from the environment's skill catalog or this installation's
+sibling directories. Pass a resolved accessible path or embed their instructions in
+the sub-agent prompt; do not assume a `.claude/skills` installation.
+
 ## Workflow
 
 ### 0. Fetch Config
@@ -19,7 +36,7 @@ Retrieve the agkan configuration and extract model/effort settings for the sub-a
 
 ```bash
 CONFIG=$(agkan config get --json 2>/dev/null || echo '{}')
-RUN_MODEL=$(echo "$CONFIG" | jq -r '.config.models.run.model // "sonnet"')
+RUN_MODEL=$(echo "$CONFIG" | jq -r '.config.models.run.model // empty')
 RUN_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.run.effort // "high"')
 ```
 
@@ -83,17 +100,17 @@ agkan task update <id> status in_progress
 
 ### 6. Implementation and Completion
 
-Use the **Task tool (general-purpose sub-agent)** to implement.
+Use the **available sub-agent tool (general-purpose role)** to implement.
 
 ```
-Task(
-  subagent_type="general-purpose",
+Delegate(
+  role="general-purpose",
   model="<RUN_MODEL>",
   description="Implement task #<id>",
   prompt="""
 Please implement the following task.
 
-Invoke the key-guidelines skill using the Skill tool: Skill("key-guidelines")
+Load and follow the key-guidelines skill through the environment’s skill mechanism or its resolved SKILL.md path.
 
 ## Task Information
 - ID: <id>
@@ -101,7 +118,7 @@ Invoke the key-guidelines skill using the Skill tool: Skill("key-guidelines")
 - Body: <body>
 
 ## Procedure
-Invoke the agkan-subtask-direct skill using the Skill tool: Skill("agkan-subtask-direct")
+Load and follow the agkan-subtask-direct skill through the environment’s skill mechanism or its resolved SKILL.md path.
 
 ## Error Handling
 If a critical error occurs during implementation (git push failure, commit failure,
@@ -198,4 +215,4 @@ See the canonical definition in `agkan/SKILL.md` (Tag Priority section).
 - Always select only one task (do not work on multiple tasks simultaneously)
 - If no tasks exist, end the session
 - Do not create branches or PRs (commit directly to the current branch)
-- Task status update to done and static analysis checks are handled inside the sub-agent (agkan-subtask-direct), not in the main thread
+- Static analysis checks and the task status update to `done` follow the agkan-subtask-direct procedure, including its completion and error checks. The sub-agent performs these steps when delegated; if delegation is unavailable or disallowed, the current agent performs the same steps directly.

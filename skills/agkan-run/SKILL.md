@@ -13,13 +13,30 @@ This is a loop: after each task completes (including handling any interruptions)
 
 ---
 
+## Agent Compatibility
+
+Use the executing environment's available tools; these procedures apply across agents.
+`Delegate(...)` below is pseudocode, not a tool name: map it to the available
+sub-agent tool and supported arguments, using the indicated role and prompt. Wait
+for completion before continuing. If delegation is unavailable or disallowed,
+execute the same procedure in the current agent, preserving its scope and status checks.
+An empty model means inherit the current model (omit the model override). Honor an
+explicit model only when the environment supports it; never silently substitute a
+different model. Check this before changing task status; if unsupported, report the
+limitation and stop unless a later step defines a skip/recovery procedure.
+Pass effort through a supported setting, or retain it as prompt-level thoroughness
+guidance without claiming the runtime effort was changed.
+Resolve referenced skills from the environment's skill catalog or this installation's
+sibling directories. Pass a resolved accessible path or embed their instructions in
+the sub-agent prompt; do not assume a `.claude/skills` installation.
+
 ## Workflow
 
 ### 0. Fetch Config
 
 ```bash
 CONFIG=$(agkan config get --json 2>/dev/null || echo '{}')
-RUN_MODEL=$(echo "$CONFIG" | jq -r '.config.models.run.model // "sonnet"')
+RUN_MODEL=$(echo "$CONFIG" | jq -r '.config.models.run.model // empty')
 RUN_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.run.effort // "high"')
 ```
 
@@ -118,34 +135,34 @@ RUN_MODEL_FOR_TASK=${TASK_MODEL:-$RUN_MODEL}
 RUN_EFFORT_FOR_TASK=${TASK_EFFORT:-$RUN_EFFORT}
 ```
 
-The sub-agent is launched with the Task tool, whose `model` parameter accepts only the Claude aliases `fable`, `opus`, `sonnet`, and `haiku`. When `model_run` is set to anything else (for example a codex or agy model from the model catalog, such as `gpt-5.6-sol` or `gemini-3.8-flash`), this skill cannot run the task with the model it was configured for. Do not substitute another model. Instead:
+Check whether the current environment can execute `RUN_MODEL_FOR_TASK` using its available delegation tools (or the current agent when delegation is unavailable). An empty value inherits the current model. If an explicit model cannot be honored, do not substitute another model. Instead:
 
-1. Report it to the user: `Task #<id>: run model "<model_run>" cannot be launched by the Task tool; run this task from agkan board.`
+1. Report it to the user: `Task #<id>: run model "<RUN_MODEL_FOR_TASK>" cannot be launched in this environment; use a compatible agent or agkan board.`
 2. Revert the task: `agkan task update <id> status ready`
 3. Record the task ID as skipped for the rest of this session (see Step 3)
 4. Go to Step 8
 
 ### 6. Implement, create PR, complete
 
-**Use the Task tool (general-purpose sub-agent)** to implement.
-Do not use `Skill("agkan-subtask")`; instead, embed the workflow steps directly in the sub-agent prompt.
+Use the available sub-agent tool with a general-purpose role to implement, following Agent Compatibility above.
+Embed the workflow steps directly in the sub-agent prompt; loading a skill in the parent alone does not provide it to the sub-agent.
 
 > **Why embed steps instead of referencing a file path?**
-> Sub-agents spawned via the Task tool start with a fresh context. When installed as a plugin, the skill files may reside at a path unknown to the sub-agent (e.g., under a plugin cache directory), so instructing the sub-agent to read a relative or installation-specific path is unreliable. Embedding the workflow steps directly in the prompt makes the instructions path-independent.
+> Sub-agents may start with a fresh context. When installed as a plugin, the skill files may reside at a path unknown to the sub-agent (e.g., under a plugin cache directory), so instructing the sub-agent to read a relative or installation-specific path is unreliable. Embedding the workflow steps directly in the prompt makes the instructions path-independent.
 
-Before calling Task(), substitute the placeholders with the values resolved in Step 5b (task-level override, falling back to the Step 0 session defaults):
+Before delegating, substitute the placeholders with the values resolved in Step 5b (task-level override, falling back to the Step 0 session defaults):
 - Replace `<RUN_MODEL>` with the value of `$RUN_MODEL_FOR_TASK`
 - Replace `<RUN_EFFORT>` with the value of `$RUN_EFFORT_FOR_TASK`
 
 ```
-Task(
-  subagent_type="general-purpose",
+Delegate(
+  role="general-purpose",
   model="<RUN_MODEL>",
   description="Implement task #<id>",
   prompt="""
 Please implement the following task.
 
-Invoke the key-guidelines skill using the Skill tool: Skill("key-guidelines")
+Load and follow the key-guidelines skill through the environment’s skill mechanism or its resolved SKILL.md path.
 
 ## Task Information
 - ID: <id>
@@ -455,7 +472,7 @@ agkan task list --status ready --json
 
 If there are no termination instructions from the user and ready tasks exist (including newly added ones), select the next task and repeat from step 3 of the workflow.
 
-If no ready tasks remain, end the session.
+If no eligible ready tasks remain (including when all remaining tasks were skipped), report any skipped tasks and end the session.
 
 ---
 
@@ -467,10 +484,6 @@ stop. If a diagnostic appears or the user asks a question after the sub-agent
 completes, handle it and then resume from Step 8 (re-fetch the task list) rather than
 ending the session.
 
-> **Model differences:** Fable 5 = has a known early-stopping behavior at the end of long
-> sessions, ending with a stated intent but no tool call, so this reminder (go back to Step 8
-> and re-fetch) is kept. Opus 5 does not need this kind of reminder (strong completion tendency,
-> early stopping is rare).
 
 ---
 
