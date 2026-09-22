@@ -14,13 +14,30 @@ Workflow to implement a selected task on a new branch, create a PR, and move to 
 
 ---
 
+## Agent Compatibility
+
+Use the executing environment's available tools; these procedures apply across agents.
+`Delegate(...)` below is pseudocode, not a tool name: map it to the available
+sub-agent tool and supported arguments, using the indicated role and prompt. Wait
+for completion before continuing. If delegation is unavailable or disallowed,
+execute the same procedure in the current agent, preserving its scope and status checks.
+An empty model means inherit the current model (omit the model override). Honor an
+explicit model only when the environment supports it; never silently substitute a
+different model. Check this before changing task status; if unsupported, report the
+limitation and stop unless a later step defines a skip/recovery procedure.
+Pass effort through a supported setting, or retain it as prompt-level thoroughness
+guidance without claiming the runtime effort was changed.
+Resolve referenced skills from the environment's skill catalog or this installation's
+sibling directories. Pass a resolved accessible path or embed their instructions in
+the sub-agent prompt; do not assume a `.claude/skills` installation.
+
 ## Workflow
 
 ### 0. Fetch Config
 
 ```bash
 CONFIG=$(agkan config get --json 2>/dev/null || echo '{}')
-REVIEW_MODEL=$(echo "$CONFIG" | jq -r '.config.models.review.model // "opus"')
+REVIEW_MODEL=$(echo "$CONFIG" | jq -r '.config.models.review.model // empty')
 REVIEW_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.review.effort // "high"')
 ```
 
@@ -197,15 +214,14 @@ agkan task update <id> --file /tmp/agkan_checkbox_$$.md
 
 ### 9. Self-Review
 
-> **Model differences:** Opus 5 / Sonnet 5 = self-verification is the default behavior, so this
-> step can be skipped (explicit instructions invite over-verification). Fable 5 = run this step
-> using an independent-context verification subagent (more effective than self-critique).
+> Avoid duplicating a review already completed with equivalent scope. Otherwise, use
+> an independent review when available, or perform the same checks directly.
 
 Before updating the task status, perform a self-review of the implementation using a general-purpose sub-agent. Substitute `<REVIEW_MODEL>` and `<REVIEW_EFFORT>` with the values fetched in Step 0:
 
 ```
-Agent(
-  subagent_type="general-purpose",
+Delegate(
+  role="general-purpose",
   model="<REVIEW_MODEL>",
   description="Self-review task #<id> implementation",
   prompt="""Review the implementation of the following task.

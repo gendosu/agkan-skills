@@ -12,13 +12,30 @@ A sub-workflow that reviews a single Backlog task in agkan, makes decisions on d
 
 ---
 
+## Agent Compatibility
+
+Use the executing environment's available tools; these procedures apply across agents.
+`Delegate(...)` below is pseudocode, not a tool name: map it to the available
+sub-agent tool and supported arguments, using the indicated role and prompt. Wait
+for completion before continuing. If delegation is unavailable or disallowed,
+execute the same procedure in the current agent, preserving its scope and status checks.
+An empty model means inherit the current model (omit the model override). Honor an
+explicit model only when the environment supports it; never silently substitute a
+different model. Check this before changing task status; if unsupported, report the
+limitation and stop unless a later step defines a skip/recovery procedure.
+Pass effort through a supported setting, or retain it as prompt-level thoroughness
+guidance without claiming the runtime effort was changed.
+Resolve referenced skills from the environment's skill catalog or this installation's
+sibling directories. Pass a resolved accessible path or embed their instructions in
+the sub-agent prompt; do not assume a `.claude/skills` installation.
+
 ## Workflow
 
 ### 0. Fetch Config
 
 ```bash
 CONFIG=$(agkan config get --json 2>/dev/null || echo '{}')
-PLANNING_MODEL=$(echo "$CONFIG" | jq -r '.config.models.planning.model // "sonnet"')
+PLANNING_MODEL=$(echo "$CONFIG" | jq -r '.config.models.planning.model // empty')
 PLANNING_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.planning.effort // "high"')
 ```
 
@@ -26,7 +43,7 @@ PLANNING_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.planning.effort // "hig
 
 - If task content is unclear, investigate and confirm details by examining the code
 - **If questions arise that cannot be resolved through code investigation alone:**
-  - Use `AskUserQuestion` to ask the user before proceeding
+  - Use the environment's user-question tool, or ask directly in conversation, before proceeding
   - Do NOT move to Ready until the question is resolved
   - Record the question and the user's answer in the task body
 - Append the investigated content to the task description:
@@ -44,13 +61,12 @@ EOF
 
 - If the task contains multiple pieces of work, organize the content and append it to the description in task list format:
 
-When creating a task list, decide whether to investigate directly or delegate to the Explore subagent based on scope: for a single targeted lookup (e.g. finding one file or symbol), search directly; only delegate to the Explore subagent when the investigation spans multiple files, unfamiliar naming conventions, or broad codebase areas. Use Plan mode to create the task list once investigation is complete. Apply the config values fetched in Step 0 to the Explore call:
+When creating a task list, decide whether to investigate directly or delegate to a codebase-investigation sub-agent based on scope: for a single targeted lookup (e.g. finding one file or symbol), search directly; only delegate to a codebase-investigation sub-agent when the investigation spans multiple files, unfamiliar naming conventions, or broad codebase areas. Create the task list once investigation is complete, using a planning facility if available. Apply the config values fetched in Step 0 to the investigation:
 
-> **Model differences:** Opus 5 = tends to over-delegate to subagents (the opposite of Opus 4.8), so handle simple investigation directly and reserve Explore delegation for broad, multi-file investigation only. Fable 5 = benefits from eager delegation, so when in doubt, delegate to Explore.
 
 ```
-Agent(
-  subagent_type="Explore",
+Delegate(
+  role="codebase investigation",
   model="<PLANNING_MODEL>",
   description="Investigate task #<id>",
   prompt="""
@@ -62,7 +78,7 @@ Investigate the codebase to understand the following task before creating the ta
 - Body: <body>
 
 ## Search Breadth
-Effort level: <PLANNING_EFFORT> (maps to the Explore agent's search breadth, not implementation thoroughness)
+Effort level: <PLANNING_EFFORT> (maps to the investigation's search breadth, not implementation thoroughness)
 - low: quick — a single targeted lookup
 - medium: medium — moderate exploration
 - high: very thorough — search across multiple locations and naming conventions

@@ -11,13 +11,30 @@ A planning workflow that uses agkan to review backlog tasks and make decisions a
 
 ---
 
+## Agent Compatibility
+
+Use the executing environment's available tools; these procedures apply across agents.
+`Delegate(...)` below is pseudocode, not a tool name: map it to the available
+sub-agent tool and supported arguments, using the indicated role and prompt. Wait
+for completion before continuing. If delegation is unavailable or disallowed,
+execute the same procedure in the current agent, preserving its scope and status checks.
+An empty model means inherit the current model (omit the model override). Honor an
+explicit model only when the environment supports it; never silently substitute a
+different model. Check this before changing task status; if unsupported, report the
+limitation and stop unless a later step defines a skip/recovery procedure.
+Pass effort through a supported setting, or retain it as prompt-level thoroughness
+guidance without claiming the runtime effort was changed.
+Resolve referenced skills from the environment's skill catalog or this installation's
+sibling directories. Pass a resolved accessible path or embed their instructions in
+the sub-agent prompt; do not assume a `.claude/skills` installation.
+
 ## Workflow
 
 ### 0. Fetch Config
 
 ```bash
 CONFIG=$(agkan config get --json 2>/dev/null || echo '{}')
-PLANNING_MODEL=$(echo "$CONFIG" | jq -r '.config.models.planning.model // "sonnet"')
+PLANNING_MODEL=$(echo "$CONFIG" | jq -r '.config.models.planning.model // empty')
 PLANNING_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.planning.effort // "high"')
 ```
 
@@ -29,15 +46,14 @@ agkan task list --status backlog --json
 
 ### 2. Review Tasks One by One with Sub-agents
 
-For each task, use the **Task tool (general-purpose sub-agent)** to review.
-Do not use `Skill("agkan-planning-subtask")`. Instead, instruct the sub-agent to read the SKILL.md file directly.
-
-> **Why SKILL.md path instead of `Skill()`?**
-> Sub-agents spawned via the Task tool start with a fresh context. `Skill()` loads skill content into the current conversation, but a sub-agent needs its instructions embedded in its prompt. Providing the SKILL.md path directly in the prompt is the reliable way to pass workflow instructions to a sub-agent.
+For each task, use the **available sub-agent tool (general-purpose role)** to review.
+Resolve the agkan-planning-subtask skill before delegation and pass its accessible
+SKILL.md path (or embed its content) in the prompt. Loading a skill in the parent
+alone does not provide its instructions to a sub-agent.
 
 ```
-Task(
-  subagent_type="general-purpose",
+Delegate(
+  role="general-purpose",
   model="<PLANNING_MODEL>",
   description="Review task #<id>",
   prompt="""
@@ -49,7 +65,7 @@ Please review the following backlog task.
 - Body: <body>
 
 ## Procedure
-Read .claude/skills/agkan-planning-subtask/SKILL.md and follow its procedures to review.
+Read <resolved-path-to-agkan-planning-subtask-SKILL.md> and follow its procedures to review.
 
 ## Important Constraint
 Your role is ONLY to review the task and update its status in agkan (e.g., move to ready, decompose, or tag for deferral).
@@ -72,7 +88,7 @@ If a task ID is specified by the user, retrieve and review only that target task
 agkan task get <id> --json
 ```
 
-Then delegate only that single task to a sub-agent using the same Task call format above.
+Then delegate only that single task to a sub-agent using the same delegation procedure above.
 
 ### 3. Re-fetch Backlog Tasks and Continue or End Session
 
