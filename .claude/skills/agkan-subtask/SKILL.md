@@ -153,21 +153,13 @@ If an error, permission denial, or user interruption occurs during implementatio
 
 If a `PR:` label was found in the task body (Step 2, Case A), skip PR creation — the existing PR will be updated automatically when commits are pushed to the branch.
 
-Otherwise, create a new PR. Choose draft or normal based on whether implementation is still remaining at this point:
+Otherwise, create a new PR. Always create the initial PR as a **draft**, regardless of whether implementation is complete:
 
-- **Implementation remaining** — part of the task's work is not yet implemented (e.g., unchecked `- [ ]` items you have not implemented yet, or you are pushing an intermediate state and will continue implementing afterward) → create a **draft** PR:
+```bash
+gh pr create --draft --title "<title>" --body "<body>"
+```
 
-  ```bash
-  gh pr create --draft --title "<title>" --body "<body>"
-  ```
-
-- **Implementation complete** — all of the task's work is implemented and pushed → create a normal PR:
-
-  ```bash
-  gh pr create --title "<title>" --body "<body>"
-  ```
-
-A draft PR stays a draft while the task remains `in_progress`. It is converted back to a normal PR in Step 10 when the task advances to `review`.
+A draft PR stays a draft while the task remains `in_progress`. It is marked ready for review in Step 10 when the task advances to `review`.
 
 ### 7. Add PR Information to Task
 
