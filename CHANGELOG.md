@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.20.1] - 2026-10-08
+
+### Changed
+
+- **agkan-run / agkan-subtask**: 初回 PR を実装の残り状況に関わらず常に draft で作成するように変更。draft と通常 PR の判断基準が曖昧で draft 段階を飛ばせてしまっていたため、タスクが `review` に進む時点で ready for review に切り替える流れに統一 (#103)
+
 ## [0.20.0] - 2026-09-22
 
 ### Changed
