@@ -107,7 +107,7 @@ agkan task block list <id> --json | jq -r '.blockedBy[] | select(.status != "don
 
 2. If there are no unresolved blockers, the stack base is `$DEFAULT_BRANCH`. Go to "Create the branch".
 
-3. Every unresolved blocker must satisfy all of the following:
+3. The repository must delete head branches on merge (`gh repo view --json deleteBranchOnMerge -q .deleteBranchOnMerge` returns `true`). Without it, GitHub does not retarget a stacked PR to the default branch when the blocker's PR merges. Every unresolved blocker must also satisfy all of the following:
    - its status is `review`
    - it has a PR URL: the `PR: <URL>` label in its body, or else its `pr` metadata (`agkan task meta get <blocker-id> pr --json | jq -r '.data.value // empty'`)
    - `gh pr view <URL> --json state,headRefName,baseRefName` returns `state` = `OPEN`
@@ -188,8 +188,11 @@ If a `PR:` label was found in the task body (Step 2, Case A), skip PR creation â
 Otherwise, create a new PR. Always create the initial PR as a **draft**, regardless of whether implementation is complete:
 
 ```bash
-gh pr create --draft --title "<title>" --body "<body>"
+STACK_BASE=$(agkan task meta get <id> stack_base --json 2>/dev/null | jq -r '.data.value // empty')
+gh pr create --draft --base "${STACK_BASE:-$DEFAULT_BRANCH}" --title "<title>" --body "<body>"
 ```
+
+When `stack_base` is set, the PR is stacked on the blocker's PR. GitHub retargets it to the default branch when the blocker's PR merges. Do not register it as a GitHub native stack (`gh stack`): PRs in a native stack cannot be merged with `gh pr merge`, and the stack pins the bottom PR's base.
 
 A draft PR stays a draft while the task remains `in_progress`. It is marked ready for review in Step 10 when the task advances to `review`.
 
