@@ -71,17 +71,24 @@ git fetch origin
 git checkout "$BRANCH"
 ```
 
-Then check for conflicts with the default branch:
+Then check for conflicts with the base branch (the stack base while its PR is open, otherwise the default branch):
 
 ```bash
 DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
-git merge-base --is-ancestor origin/$DEFAULT_BRANCH HEAD
+STACK_BASE=$(agkan task meta get <id> stack_base --json 2>/dev/null | jq -r '.data.value // empty')
+# A stacked branch is checked against its stack base until that base's PR has merged.
+CHECK_BASE=$DEFAULT_BRANCH
+if [ -n "$STACK_BASE" ] && git ls-remote --exit-code --heads origin "$STACK_BASE" >/dev/null \
+  && [ "$(gh pr view "$STACK_BASE" --json state -q .state 2>/dev/null)" = "OPEN" ]; then
+  CHECK_BASE=$STACK_BASE
+fi
+git merge-base --is-ancestor origin/$CHECK_BASE HEAD
 ```
 
 If this check fails (exit code non-zero), the branch has diverged and there may be conflicts. Surface a clear error and stop:
 
 ```
-ERROR: Branch '<existing-branch-name>' has conflicts with '$DEFAULT_BRANCH'.
+ERROR: Branch '<existing-branch-name>' has conflicts with '$CHECK_BASE'.
 Please resolve the conflicts manually before resuming this task.
 ```
 
@@ -89,16 +96,41 @@ If no conflicts are detected, continue from Step 4 (skip Step 3, as the branch i
 
 **Case B — Branch is null:**
 
-Generate a branch name from the task ID and title. Use the following naming convention:
+First decide the branch to start from (the *stack base*).
+
+1. Collect the unresolved blockers — blockers whose status is not `done`:
+
+```bash
+DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
+agkan task block list <id> --json | jq -r '.blockedBy[] | select(.status != "done") | "\(.id) \(.status)"'
+```
+
+2. If there are no unresolved blockers, the stack base is `$DEFAULT_BRANCH`. Go to "Create the branch".
+
+3. The repository must delete head branches on merge (`gh repo view --json deleteBranchOnMerge -q .deleteBranchOnMerge` returns `true`). Without it, GitHub does not retarget a stacked PR to the default branch when the blocker's PR merges. Every unresolved blocker must also satisfy all of the following:
+   - its status is `review`
+   - it has a PR URL: the `PR: <URL>` label in its body, or else its `pr` metadata (`agkan task meta get <blocker-id> pr --json | jq -r '.data.value // empty'`)
+   - `gh pr view <URL> --json state,headRefName,baseRefName` returns `state` = `OPEN`
+
+4. The unresolved blockers' PRs must form one chain: every PR except the bottom one has a `baseRefName` equal to the `headRefName` of another PR in the set, and walking down from the top PR visits every PR in the set. The top PR is the one whose `headRefName` is not the `baseRefName` of any other PR in the set. The bottom PR's base may be any branch.
+
+5. If step 3 or step 4 fails, this is a stacking exception. Record in the task body which blocker failed which condition, leave the task as `in_progress`, do not create a branch, and stop. The task waits for a human.
+
+6. Otherwise the stack base is the top PR's `headRefName`. Record it:
+
+```bash
+agkan task meta set <id> stack_base <stack-base>
+```
+
+**Create the branch.** Generate a branch name from the task ID and title:
 
 - If the task has a `bug` or `security` tag → prefix `fix/`
 - Otherwise → prefix `feat/`
 - Format: `<prefix>/<id>-<title-slug>` (e.g., `feat/42-add-login-page`)
 
 ```bash
-DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
 git fetch origin
-git checkout -b <branch-name> origin/$DEFAULT_BRANCH
+git checkout -b <branch-name> origin/<stack-base>
 ```
 
 Then continue to Step 3.
@@ -156,8 +188,11 @@ If a `PR:` label was found in the task body (Step 2, Case A), skip PR creation �
 Otherwise, create a new PR. Always create the initial PR as a **draft**, regardless of whether implementation is complete:
 
 ```bash
-gh pr create --draft --title "<title>" --body "<body>"
+STACK_BASE=$(agkan task meta get <id> stack_base --json 2>/dev/null | jq -r '.data.value // empty')
+gh pr create --draft --base "${STACK_BASE:-$DEFAULT_BRANCH}" --title "<title>" --body "<body>"
 ```
+
+When `stack_base` is set, the PR is stacked on the blocker's PR. GitHub retargets it to the default branch when the blocker's PR merges. Do not register it as a GitHub native stack (`gh stack`): PRs in a native stack cannot be merged with `gh pr merge`, and the stack pins the bottom PR's base.
 
 A draft PR stays a draft while the task remains `in_progress`. It is marked ready for review in Step 10 when the task advances to `review`.
 
@@ -209,6 +244,8 @@ agkan task update <id> --file /tmp/agkan_checkbox_$$.md
 > Avoid duplicating a review already completed with equivalent scope. Otherwise, use
 > an independent review when available, or perform the same checks directly.
 
+Use the task's `stack_base` metadata as the diff base when it is set, so the blocker's changes are not reviewed again.
+
 Before updating the task status, perform a self-review of the implementation using a general-purpose sub-agent. Substitute `<REVIEW_MODEL>` and `<REVIEW_EFFORT>` with the values fetched in Step 0:
 
 ```
@@ -223,7 +260,7 @@ Task #<id>: <title>
 Task body:
 <body>
 
-Review the git changes (run `git diff origin/<default-branch>...HEAD` to see them) against the original plan and coding standards. Check for correctness, security issues, and code quality.
+Review the git changes (run `git diff origin/<stack-base-or-default-branch>...HEAD` to see them) against the original plan and coding standards. Check for correctness, security issues, and code quality.
 
 Report all issues found, each annotated with a severity (critical/major/minor) and a
 confidence level. Do not filter by severity in this report — filtering, if needed, is
