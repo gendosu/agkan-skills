@@ -27,8 +27,8 @@ bash "$BASE_DIR/review.sh"
 The script:
 1. Fetches all tasks with `--status review`
 2. Extracts the PR URL from each task body (`PR: <URL>`) or metadata (`pr` key)
-3. Calls `gh pr view <URL> --json state,mergedAt` for each PR
-4. Updates task status to `done` (MERGED) or `closed` (CLOSED without merge), skips OPEN
+3. Calls `gh pr view <URL> --json state,mergedAt,baseRefName,mergeCommit` for each PR
+4. Updates task status to `done` (MERGED into the default branch, or merged into a blocker's branch that has since reached the default branch) or `closed` (CLOSED without merge); skips OPEN PRs and PRs merged into a blocker's branch that is not yet in the default branch
 5. Adds a comment recording the reason and timestamp
 6. Prints a summary: `done: X, closed: X, skipped (OPEN): X, no PR: X`
 
@@ -72,19 +72,32 @@ If no URL is found in either the body or metadata, increment `no_pr_count`, skip
 ### 4. Check PR status on GitHub
 
 ```bash
-gh pr view <PR URL> --json state,mergedAt
+gh pr view <PR URL> --json state,mergedAt,baseRefName,mergeCommit
 ```
 
 | Field | Meaning |
 |-----------|------|
 | `state` | `OPEN` / `CLOSED` / `MERGED` |
 | `mergedAt` | Merge date/time (null if not merged) |
+| `baseRefName` | Branch the PR was merged into |
+| `mergeCommit.oid` | Merge commit SHA (null if not merged) |
+
+A stacked PR (one opened against a blocker's branch) can be merged before its blocker. It is then `MERGED` into the blocker's branch, not into the default branch. Treat a `MERGED` PR as complete only when its change is in the default branch:
+
+```bash
+DEFAULT_BRANCH=$(gh repo view --json defaultBranchRef -q .defaultBranchRef.name)
+# "behind" or "identical": the default branch already contains the merge commit
+gh api "repos/{owner}/{repo}/compare/$DEFAULT_BRANCH...<mergeCommit.oid>" -q .status
+```
+
+The PR is in the default branch when `baseRefName` equals `$DEFAULT_BRANCH`, or when the compare status is `behind` or `identical`.
 
 ### 5. Move status based on PR status
 
 | PR State | agkan Status | Command | Counter |
 |--------|----------------|---------|---------|
-| `MERGED` | `done` | `agkan task update <id> status done` | Increment `done_count` |
+| `MERGED`, in the default branch | `done` | `agkan task update <id> status done` | Increment `done_count` |
+| `MERGED`, not yet in the default branch | No change | Skip (waiting for the blocker's PR) | Increment `skipped_open_count` |
 | `CLOSED` (mergedAt is null) | `closed` | `agkan task update <id> status closed` | Increment `closed_count` |
 | `OPEN` | No change | Skip (still under review) | Increment `skipped_open_count` |
 
@@ -130,7 +143,9 @@ Does the body contain "PR: <URL>"?
 Check PR status
     ↓
 What is the PR state?
-   MERGED  → Move to done → Increment done_count → Add comment with mergedAt timestamp
+   MERGED  → In the default branch?
+               Yes → Move to done → Increment done_count → Add comment with mergedAt timestamp
+               No  → Skip (merged into the blocker's branch) → Increment skipped_open_count
    CLOSED  → Move to closed → Increment closed_count → Add comment noting PR closed without merge
    OPEN    → Skip (waiting for review) → Increment skipped_open_count
     ↓
