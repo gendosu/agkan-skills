@@ -128,6 +128,19 @@ Register blocking relationships when:
 - This task depends on another task that is not yet done (register as blocked)
 - Another task cannot start until this task is done (register as blocker)
 
+**Keep each task's blockers on one chain.** Dependent tasks are stacked on their blocker's open PR (see `agkan-subtask`), and a stack is a single chain. When this task has two or more blockers that do not already block one another in a line, add blocking relationships between the blockers so they form one chain. Put the blocker with the higher priority lower in the chain; on equal priority, put the smaller task ID lower.
+
+```bash
+# Example: this task (C) is blocked by A and B, and A is lower in the chain
+agkan task block add <A-id> <B-id>
+```
+
+**Do not create verification-only follow-up tasks.** A task whose only work is "confirm after another task's PR merges", with no code change of its own, must not be created or moved to Ready. Move its checklist items into the blocker task's task list, record the reason in this task's body, and close it:
+
+```bash
+agkan task update <id> status closed
+```
+
 ---
 
 ### 3. Task Decomposition Decision

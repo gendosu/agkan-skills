@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **agkan-subtask**: 先行タスクが `review`（PR OPEN）で 1 本の鎖に並んでいる場合、後続タスクのブランチを先行 PR のブランチから切り、PR をその上に積むように変更。一括 run で先行 PR のマージを待って後続タスクが止まる状態をなくすため。鎖にならない場合は理由を記録して `in_progress` のまま待機する
+- **agkan-planning-subtask**: 先行が複数あるタスクでは先行同士にも依存を登録して 1 本の鎖にするように変更。また「先行のマージ後に確認するだけ」のタスクは作らず、確認項目を先行タスクへ移して close するように変更。後続タスクを先行 PR の上に積めるようにするため
 
 ## [0.20.1] - 2026-10-08
 
