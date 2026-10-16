@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-10-16
+
 ### Added
 
 - **agkan-subtask**: 先行タスクが `review`（PR OPEN）で 1 本の鎖に並んでいる場合、後続タスクのブランチを先行 PR のブランチから切り、PR をその上に積むように変更。一括 run で先行 PR のマージを待って後続タスクが止まる状態をなくすため。鎖にならない場合と、リポジトリで「マージ後にブランチを自動削除」が無効な場合は、理由を記録して `in_progress` のまま待機する
