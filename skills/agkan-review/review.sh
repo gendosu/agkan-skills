@@ -6,6 +6,19 @@ closed_count=0
 skipped_open_count=0
 no_pr_count=0
 
+default_branch=$(gh repo view --json defaultBranchRef -q .defaultBranchRef.name)
+
+# A stacked PR merged before its blocker lands in the blocker's branch, not the default branch.
+in_default_branch() {
+  local base=$1 sha=$2
+  [ "$base" = "$default_branch" ] && return 0
+  [ -n "$sha" ] || return 1
+  case "$(gh api "repos/{owner}/{repo}/compare/${default_branch}...${sha}" -q .status 2>/dev/null || true)" in
+    behind|identical) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 tasks=$(agkan task list --status review --json)
 task_ids=$(echo "$tasks" | jq -r '.tasks[].id')
 
@@ -33,7 +46,7 @@ for id in $task_ids; do
     continue
   fi
 
-  pr_json=$(gh pr view "$pr_url" --json state,mergedAt 2>/dev/null || true)
+  pr_json=$(gh pr view "$pr_url" --json state,mergedAt,baseRefName,mergeCommit 2>/dev/null || true)
   if [ -z "$pr_json" ]; then
     echo "[$id] $title — Failed to fetch PR: $pr_url"
     no_pr_count=$((no_pr_count + 1))
@@ -42,8 +55,13 @@ for id in $task_ids; do
 
   state=$(echo "$pr_json" | jq -r '.state')
   merged_at=$(echo "$pr_json" | jq -r '.mergedAt // empty')
+  base_ref=$(echo "$pr_json" | jq -r '.baseRefName // empty')
+  merge_sha=$(echo "$pr_json" | jq -r '.mergeCommit.oid // empty')
 
-  if [ "$state" = "MERGED" ]; then
+  if [ "$state" = "MERGED" ] && ! in_default_branch "$base_ref" "$merge_sha"; then
+    echo "[$id] $title — skipped (merged into $base_ref, not yet in $default_branch)"
+    skipped_open_count=$((skipped_open_count + 1))
+  elif [ "$state" = "MERGED" ]; then
     agkan task update "$id" --status done
     agkan task comment add "$id" "Merged at ${merged_at}. PR was merged and task is complete."
     echo "[$id] $title — done (merged at $merged_at)"

@@ -27,8 +27,8 @@ bash "$BASE_DIR/review.sh"
 The script:
 1. Fetches all tasks with `--status review`
 2. Extracts the PR URL from each task body (`PR: <URL>`) or metadata (`pr` key)
-3. Calls `gh pr view <URL> --json state,mergedAt` for each PR
-4. Updates task status to `done` (MERGED) or `closed` (CLOSED without merge), skips OPEN
+3. Calls `gh pr view <URL> --json state,mergedAt,baseRefName,mergeCommit` for each PR
+4. Updates task status to `done` (MERGED into the default branch, or merged into a blocker's branch that has since reached the default branch) or `closed` (CLOSED without merge); skips OPEN PRs and PRs merged into a blocker's branch that is not yet in the default branch
 5. Adds a comment recording the reason and timestamp
 6. Prints a summary: `done: X, closed: X, skipped (OPEN): X, no PR: X`
 
