@@ -56,9 +56,10 @@ Review backlog tasks to assess decomposition, implementation readiness, and prio
 1. Fetch all backlog tasks
 2. For each task:
    - Confirm the content is clear (investigate code if needed)
+   - Ask the user about unresolved requirements, then resume the same task with their answer; the parent handles questions from sub-agents
    - Assess if decomposition is needed (1 task = 1 PR = 1 feature)
    - Move to "ready" status if implementation is clear and blockers are resolved
-   - Tag with "いつかやる" if deferrable
+   - Tag with "いつかやる" if deferrable; an unanswered question alone is not a reason to defer
 
 ### 3. agkan-run
 
@@ -175,10 +176,10 @@ Review a single backlog task to assess decomposition, implementation readiness, 
 - Expects a task to be pre-selected
 
 **Typical Flow:**
-1. Review task content and supplement with investigation results
+1. Review task content and supplement with investigation results; return unresolved user decisions to the parent to ask and resume with the answer
 2. Decide if task decomposition is needed (1 task = 1 PR = 1 feature)
 3. Move to "ready" status if implementation is clear and blockers are resolved
-4. Tag with "will-do-later" if deferrable
+4. Tag with "will-do-later" if deferrable; do not apply it merely while awaiting an answer, and remove it when moving to "ready"
 
 ### 9. release
 
