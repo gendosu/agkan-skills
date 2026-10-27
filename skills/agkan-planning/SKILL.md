@@ -70,6 +70,7 @@ Read <resolved-path-to-agkan-planning-subtask-SKILL.md> and follow its procedure
 ## Important Constraint
 Your role is ONLY to review the task and update its status in agkan (e.g., move to ready, decompose, or tag for deferral).
 Do NOT implement the task. Do NOT edit any source code or codebase files.
+If a required user decision cannot be resolved from existing answers or investigation, return a Needs user input handoff with the task ID, findings, question, options, recommendation, and the point to resume. Do not classify an unanswered question as Deferral or change status, priority, or deferral tags while clarification is pending. The parent will ask the user and return the answer so this task's planning can continue.
 
 ## Effort / Thoroughness
 Effort level: <PLANNING_EFFORT>
@@ -90,9 +91,16 @@ agkan task get <id> --json
 
 Then delegate only that single task to a sub-agent using the same delegation procedure above.
 
+**Handle clarification before considering the review complete:**
+
+- When the sub-agent reports **Needs user input**, ask the user immediately using the clarification procedure in `agkan-planning-subtask` Step 1. Also follow this path if a result reports Deferral solely because no answer has arrived; that is an incomplete review. An explicit user choice to postpone is a valid Deferral.
+- The parent owns the user conversation. Present the question and options, not just a report that the task is waiting for an answer. Follow the available question tool's response behavior; if no suitable tool is usable, ask directly in conversation.
+- After receiving the actual answer, resume the same sub-agent with it. If resuming is unavailable, delegate the same task again with the findings and answer, or continue it in the current agent. Reuse the investigation and record the answer in the task body.
+- Do not advance to the next backlog task or end with a completed-planning report while this clarification is unanswered. An explicit user request to defer or stop is handled as such; silence is neither.
+
 ### 3. Re-fetch Backlog Tasks and Continue or End Session
 
-After the sub-agent completes, re-fetch the backlog task list to pick up any changes (e.g., tasks added by decomposition):
+After the task's review is complete, including any clarification and resumed planning from Step 2, re-fetch the backlog task list to pick up any changes (e.g., tasks added by decomposition):
 
 ```bash
 agkan task list --status backlog --json
@@ -113,9 +121,10 @@ Delegate one task to sub-agent
     ↓
 Sub-agent reviews and makes decision
   - Content unclear? → Research code → Add to task
+  - User decision needed? → Hand question to parent → Ask user → Resume same task with answer
   - Can be decomposed? → Split into subtasks → Close original task
   - Ready to implement now? → Move to Ready
-  - Otherwise → Add "will-do-later" tag and keep in Backlog
+  - Deferral criteria met? → Record reason → Add "will-do-later" tag and keep in Backlog
     ↓
 Move to next task (repeat until all are done)
 ```
