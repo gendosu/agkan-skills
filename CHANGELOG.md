@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.21.1] - 2026-10-27
+
 ### Fixed
 
 - **agkan-planning / agkan-planning-subtask**: Ask the user about unresolved requirements during planning and resume the same task after receiving an answer, rather than classifying unanswered questions as Deferral. Clarify how sub-agents hand questions to the parent and how to ask directly in conversation when Codex's question tools are unavailable. Remove the `will-do-later` tag when moving a task to Ready
