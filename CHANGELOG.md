@@ -7,30 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **agkan-planning / agkan-planning-subtask**: Ask the user about unresolved requirements during planning and resume the same task after receiving an answer, rather than classifying unanswered questions as Deferral. Clarify how sub-agents hand questions to the parent and how to ask directly in conversation when Codex's question tools are unavailable. Remove the `will-do-later` tag when moving a task to Ready
+
 ## [0.21.0] - 2026-10-16
 
 ### Added
 
-- **agkan-subtask**: 先行タスクが `review`（PR OPEN）で 1 本の鎖に並んでいる場合、後続タスクのブランチを先行 PR のブランチから切り、PR をその上に積むように変更。一括 run で先行 PR のマージを待って後続タスクが止まる状態をなくすため。鎖にならない場合と、リポジトリで「マージ後にブランチを自動削除」が無効な場合は、理由を記録して `in_progress` のまま待機する
-- **agkan-planning-subtask**: 先行が複数あるタスクでは先行同士にも依存を登録して 1 本の鎖にするように変更。また「先行のマージ後に確認するだけ」のタスクは作らず、確認項目を先行タスクへ移して close するように変更。後続タスクを先行 PR の上に積めるようにするため
+- **agkan-subtask**: When predecessor tasks are in `review` with open PRs and form a single chain, create the dependent task's branch from its predecessor's PR branch and stack the new PR on top. This allows batch runs to proceed without waiting for predecessor PRs to merge. If the predecessors do not form a chain or automatic branch deletion after merge is disabled in the repository, record the reason and wait in `in_progress`
+- **agkan-planning-subtask**: Register dependencies between multiple predecessors so they form a single chain, allowing dependent tasks to stack their PRs on predecessor PRs. Do not create tasks whose only purpose is verification after a predecessor merges; move their checklist items into the predecessor task and close them
 
 ### Fixed
 
-- **agkan-review**: 先行より先にマージされた積み上げ PR（先行のブランチへマージされ、既定ブランチにはまだ入っていないもの）を `done` にせず、先行のマージを待つように修正
+- **agkan-review**: Wait for predecessor PRs to merge before marking a stacked PR's task as `done` when that PR has merged into its predecessor's branch but has not yet reached the default branch
 
 ## [0.20.1] - 2026-10-08
 
 ### Changed
 
-- **agkan-run / agkan-subtask**: 初回 PR を実装の残り状況に関わらず常に draft で作成するように変更。draft と通常 PR の判断基準が曖昧で draft 段階を飛ばせてしまっていたため、タスクが `review` に進む時点で ready for review に切り替える流れに統一 (#103)
+- **agkan-run / agkan-subtask**: Always create the initial PR as a draft, regardless of how much implementation remains, and mark it ready for review when the task moves to `review`. This removes the ambiguous criteria that allowed the draft stage to be skipped (#103)
 
 ## [0.20.0] - 2026-09-22
 
 ### Changed
 
-- タスク管理ワークフローをエージェント非依存に変更し、質問・委譲・計画・スキル参照に実行環境の機能を使用するように改善。委譲できない環境では同じ手順を現在のエージェントで実行
-- モデル未指定時は現在のモデルを継承し、明示されたモデルが利用できない場合の停止・スキップ手順を明確化。effort は環境が対応する設定、または作業の入念さを伝える指示として適用
-- レビュー手順を特定モデルに依存しない形に整理し、`agkan-run` は実行可能な ready タスクが残っていない場合にスキップしたタスクを報告して終了
+- Make task management workflows agent-independent by using the execution environment's capabilities for questions, delegation, planning, and skill references. Execute the same procedure in the current agent when delegation is unavailable
+- Inherit the current model when none is specified, and clarify when to stop or skip if an explicitly requested model is unavailable. Apply effort through a supported runtime setting or as instructions about task thoroughness
+- Make review procedures independent of specific models, and have `agkan-run` report skipped tasks and end when no executable ready tasks remain
 
 ## [0.19.3] - 2026-09-17
 
@@ -476,7 +480,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **execute-review**: Clarified handling when PR URL is not found in task body
   - Added recovery flow: search GitHub for related PRs using task title
   - If candidates found, ask user to confirm via AskUserQuestion
-  - If no candidates or user answers "なし", ask user to input URL directly
+  - If no candidates or user answers "none", ask user to input URL directly
   - Update task body with confirmed URL and continue processing
 
 ## [0.4.0] - 2026-03-06

@@ -42,10 +42,14 @@ PLANNING_EFFORT=$(echo "$CONFIG" | jq -r '.config.models.planning.effort // "hig
 ### 1. Content Review, Supplementation, and Task List Creation
 
 - If task content is unclear, investigate and confirm details by examining the code
-- **If questions arise that cannot be resolved through code investigation alone:**
-  - Use the environment's user-question tool, or ask directly in conversation, before proceeding
-  - Do NOT move to Ready until the question is resolved
-  - Record the question and the user's answer in the task body
+- **Resolve user decisions during planning:**
+  - Check the conversation, task body, and comments for an existing answer first. Ask only about unresolved choices that materially affect scope, behavior, or the implementation approach and cannot be resolved through investigation.
+  - Ask as soon as the choice is identified. Include the task ID, the question, the relevant findings, and a recommended option with alternatives and their consequences. Do not merely record "awaiting requirements" in the task body.
+  - Use a user-question tool that is available and permitted in the current environment and mode. In Codex, use `request_user_input` when permitted, or `request_user_input_async` when available. If no suitable tool is usable, ask directly in conversation and resume this task when the user replies.
+  - When running as a sub-agent, return a **Needs user input** handoff to the parent with the task ID, findings, question, options, recommendation, and the point to resume. This is a workflow handoff, not an agkan status or a completed review. The parent asks the user and passes the answer back to resume this task.
+  - Keep the clarification open until an actual answer arrives. An asynchronous tool returning, an empty response, a timeout, or a preselected recommendation is not an answer. Continue independent investigation if useful, but do not finalize the plan or change status, priority, or deferral tags because an answer has not arrived.
+  - After the answer, resume planning for the same task, record the question and actual answer in the task body, and update the approach and checklist. Mark earlier unanswered questions or conditional proposals as superseded; do not ask again about a resolved choice unless new evidence changes it.
+  - An unanswered question is not a Deferral decision. If the user explicitly chooses to postpone or says they cannot decide now, record that response and use the Deferral path in Step 4.
 - Append the investigated content to the task description:
 
 ```bash
@@ -169,6 +173,8 @@ agkan task update <id> --status closed
 
 **Decide** the outcome for this task. Do NOT run any `agkan task update` command yet.
 
+If a required user decision is still unanswered and the user has not explicitly chosen to postpone, return to Step 1 and ask or hand off the question. Do not record `Deferral (awaiting requirements)` or attach `will-do-later` merely because clarification is pending.
+
 **Ready** if all of the following conditions are met:
 - Scope that can be implemented as a single PR
 - Implementation approach is clear
@@ -178,8 +184,10 @@ Blockers do **not** prevent moving to Ready. If planning is complete and the tas
 
 **Deferral** if any of the following apply:
 - Low impact on current priorities
-- Resources or information are insufficient
-- The task itself is not yet well-defined enough to implement
+- Confirmed resource or external information limitations prevent completing the plan
+- The user explicitly chooses to postpone or cannot decide the requirements now
+
+Distinguish a confirmed limitation from a question the user has not yet answered. Record the reason and what would allow planning to resume.
 
 Record your decision (Ready or Deferral) and the reasoning. Proceed to Step 5.
 
@@ -193,7 +201,7 @@ Before executing any status change, verify all previous steps are complete:
 - [ ] Step 2: Blocking relationships are registered (or confirmed none exist)
 - [ ] Step 3: Decomposition decision is made (split or keep as-is)
 - [ ] Step 4: Decision is recorded (Ready or Deferral) with reasoning
-- [ ] No unresolved questions remain
+- [ ] Required user decisions are resolved, or the user explicitly chose to defer; any remaining external limitations are documented
 - [ ] Task scope matches 1 PR = 1 feature standard
 
 If any item is unchecked, return to that step and complete it before proceeding.
@@ -210,6 +218,12 @@ Determine priority and run:
 
 ```bash
 agkan task update <id> --status ready --priority <value>
+```
+
+If the task has a `will-do-later` tag, detach it now that planning is complete:
+
+```bash
+agkan tag detach <id> "will-do-later"
 ```
 
 Priority values: `critical` / `high` / `medium` / `low`
